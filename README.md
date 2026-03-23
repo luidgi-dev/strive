@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Strive
 
-## Getting Started
+Strive is a minimalist, AI-first product focused on turning discipline into sustainable momentum.
 
-First, run the development server:
+The goal is to avoid rigid "daily streak" anxiety and replace it with a flexible system based on weekly/monthly consistency.
+
+## Product Vision
+
+- Flexible consistency instead of binary success/failure.
+- Zero-friction logging, including conversational flows.
+- Quiet luxury UI: minimal, fast, and clear.
+
+## Repository Scope
+
+This repository is designed to host multiple streams of work:
+
+- `web/`: web product documentation and boundaries for the Next.js app.
+- `data/`: database schema, SQL migrations, RLS policies, and seed scripts.
+- `design/`: UX notes, wireframes, visual guidelines, and mockups.
+
+The current Next.js implementation still lives at repository root (`app/`, `components/`, `lib/`, etc.).
+A full physical move into `web/` can be done in a dedicated refactor once you are ready.
+
+## Quick Start (Current Web App at Root)
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Supabase Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Expected env keys in `.env.local`:
 
-## Learn More
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-To learn more about Next.js, take a look at the following resources:
+Supabase client helpers are available in `lib/supabase/`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Suggested Next Steps
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Put SQL assets (tables, RLS, functions) in `data/`.
+2. Store design references and UX decisions in `design/`.
+3. When stable, move the Next.js runtime files into `web/` and keep root as orchestrator/documentation.
