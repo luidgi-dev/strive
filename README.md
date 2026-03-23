@@ -1,93 +1,36 @@
-# Strive
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-**Strive** is a minimalist, AI-first Progressive Web App (PWA) designed to turn personal discipline into an automated lifestyle. Built with a "Cloud-Native" mindset, Strive moves away from the anxiety of rigid daily streaks toward a flexible, momentum-based approach to habit building.
+## Getting Started
 
-> *Your routines, your pace. Powered by AI.*
+First, run the development server:
 
----
-
-## The Philosophy
-
-Traditional habit trackers fail because life is unpredictable. Strive is built on three core pillars identified through user discovery:
-
-1. **Flexible Consistency**: Success isn't just "every day"; it's hitting your target. If your goal is 3x/week, Strive celebrates your progress whether you do it on Monday or Sunday.
-2. **Zero-Friction Logging**: The hardest part of a habit is tracking it. Strive uses a conversational AI Agent to let you log activities via natural language—just say it, and it's done.
-3. **Quiet Luxury UI**: Inspired by Linear and Apple's minimalist aesthetic, the interface stays out of your way, focusing on "Flow" and "Momentum".
-
-### Terminology
-
-- **Rituals**: We don't track "tasks". We build rituals—long-term intentions that define who you are.
-- **Momentum**: Our version of streaks. It measures the energy of your consistency over rolling periods (weekly/monthly).
-- **Logging**: The act of recording progress. Can be manual (tap) or conversational (AI).
-- **Flow**: Your personalized dashboard—a focused state of mind for your daily routine.
-
----
-
-## Tech Stack (Zero-Cost Architecture)
-
-Designed for high performance and scalability using a $0/month "Hobby Stack".
-
-| Layer | Technology |
-|---|---|
-| **Frontend** | [Next.js 15](https://nextjs.org/) (App Router, Server Actions) |
-| **Database & Auth** | [Supabase](https://supabase.com/) (PostgreSQL + RLS) |
-| **AI Engine** | [Vercel AI SDK](https://sdk.vercel.ai/) + Google Gemini 1.5 Flash (Free Tier) |
-| **Styling** | [Tailwind CSS](https://tailwindcss.com/), [Shadcn/UI](https://ui.shadcn.com/), Lucide Icons |
-| **Mobile** | PWA (Service Workers, Web Push API for iOS 16.4+) |
-| **Project Management** | [Linear](https://linear.app/) for sprint planning |
-
----
-
-## System Architecture
-
-Strive leverages a modern "Backend-as-a-Service" architecture to maintain a lean codebase while ensuring enterprise-grade security and AI integration.
-
-```mermaid
-graph TD
-    User((User)) -->|PWA Interface| NextJS[Next.js App Router]
-    NextJS -->|Server Actions| Supabase[(Supabase DB / Auth)]
-    NextJS -->|Vercel AI SDK| Gemini[Gemini 1.5 Flash]
-    Gemini -->|Function Calling| Supabase
-    Supabase -->|Realtime Update| NextJS
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
----
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## User-Centric Design (User Stories)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-Development is guided by the following core user needs:
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- As a **busy professional**, I want to log my habits via a quick voice note so that I don't have to open a complex app while on the move.
-- As a **fitness enthusiast**, I want to set a "3 times per week" goal so that I don't feel like a failure if I miss a specific day due to work.
-- As a **PWA user on iPhone**, I want to receive a push notification on Thursday if I'm behind on my weekly goals so that I can catch up before the weekend.
+## Learn More
 
----
+To learn more about Next.js, take a look at the following resources:
 
-## Roadmap
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-### Phase 1: Foundation 🟢
-- [x] Initial Product Purpose & Branding
-- [x] Technical Architecture Design
-- [x] Supabase Schema & RLS Policies
-- [ ] Next.js 15 Boilerplate with Tailwind & Shadcn
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### Phase 2: Core Experience 🔵
-- [ ] Ritual CRUD (Daily/Weekly/Monthly logic)
-- [ ] Interactive "Flow" Dashboard
-- [ ] Dynamic Momentum Algorithm (SQL-based streak calculation)
+## Deploy on Vercel
 
-### Phase 3: Intelligence & Mobile 🟣
-- [ ] AI Agent Integration (Natural Language Processing)
-- [ ] Tool Calling for automated habit logging
-- [ ] PWA Manifest & Web Push Notifications for iOS
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### Phase 4: Social (V2) 🟠
-- [ ] Private "Momentum Circles" with friends
-- [ ] Shared Rituals and progress feed
-
----
-
-## Developed by
-
-**Luidgi** — Junior Backend & Cloud Developer  
-Looking to bridge the gap between robust infrastructure and delightful user experiences.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
