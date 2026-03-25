@@ -39,6 +39,13 @@ Expected env keys in `.env.local`:
 
 Supabase client helpers are available in `lib/supabase/`.
 
+## AI Agent Guidelines
+To keep AI-generated changes consistent, follow:
+- Cursor: `.cursorrules`
+- Agent workflow: `docs/AGENTS.md`
+- Claude system prompt: `docs/system-prompt.md`
+- Terminology + UI tone: `docs/UX_WRITING.md`
+
 ## Suggested Next Steps
 
 1. Put SQL assets (tables, RLS, functions) in `data/`.
