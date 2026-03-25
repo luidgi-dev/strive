@@ -1,0 +1,27 @@
+# Cursor Rules - UX Writing & Terminology (LUI-15)
+
+When generating or editing any user-facing text (UI labels, buttons, empty states, onboarding copy, error/success messages), follow `docs/UX_WRITING.md`.
+
+Required canonical terms (use these by default):
+- Ritual
+- Momentum
+- Logged
+- Nailed it
+- The Flow
+- Log (preferred action verb)
+
+Forbidden / avoid (unless legacy or explicitly defined in `docs/UX_WRITING.md`):
+- "Task" / "Tasks" (use Ritual)
+- "Streak" / "streak" (use Momentum)
+- "Completed" / "completed" (use Logged)
+- "Dashboard" / "dashboard" (use The Flow)
+- "Done" as an action label (use Logged / Nailed it depending on intent)
+
+Tone & voice:
+- Minimalist (no verbose “please…”, no unnecessary explanations)
+- Encouraging (avoid blame / failure framing)
+- Conversational (natural phrasing, not robotic)
+
+Code integration:
+- Prefer code naming aligned with the guide (e.g., `ritual_id`, `momentum`, `logged_at`, `flow`).
+
