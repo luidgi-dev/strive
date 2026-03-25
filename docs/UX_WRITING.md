@@ -1,88 +1,88 @@
 # Strive UX Writing & Terminology Guide (LUI-15)
 
-Ce document impose la terminologie et la voix à utiliser dans toute la UI, les messages d’erreur/succès, l’onboarding et les générations d’agents (dev + IA).
+This document enforces the terminology and voice to be used across all UI, error/success messages, onboarding flows, and agent outputs (dev + AI).
 
-## Règle d’or
-Utilise les termes canoniques ci-dessous. Évite les synonymes “interdits” listés dans chaque entrée.
+## Golden Rule
+Use the canonical terms defined below. Avoid the "forbidden" synonyms listed in each entry.
 
 ## Terminology Reference
 
 | Product concept | Canonical term | Don't use (alternatives) | Notes |
 |---|---|---|---|
-| A single unit a user performs | Ritual | Task, Habit | “Ritual” est le terme principal côté produit. “Habit” n’est acceptable que dans des formulations explicatives, pas comme nom d’interface. |
-| List/board of rituals | Ritual board | To-do list | Terme UI pour l’espace où l’utilisateur gère ses rituels. |
-| The main dashboard experience | The Flow | Dashboard | “The Flow” est le nom de l’interface/section principale. |
-| Progress unit over time | Momentum | Streak | “Momentum” remplace l’anxiété de “streak”. |
-| Progress encouragement | Great momentum! | Great streak! | Exemple de ton (encourage, pas culpabilisant). |
-| Completed state / confirmation | Logged | Completed | Utilise “Logged” quand l’utilisateur a enregistré une action. |
-| Successful completion badge/CTA feedback | Nailed it | Done, Completed | “Nailed it” sert au feedback de réussite (et pas un bouton “Done”). |
-| Primary action after input | Log | Log/Track (sans préférence), Complete | “Log” est la forme préférée pour l’action et la confirmation. |
-| Tracking intent | Track | Track streak | “Track” doit mener à une action “Log” dans la UI (selon le contexte). |
-| User marks something complete | Log | Complete, Mark as done | Remplace “Complete” par “Log” (et rétroaction “Logged” / “Nailed it”). |
-| Completion feedback | Logged | Completed | Exemple: “Ritual logged.” |
-| Completion feedback (celebratory) | Nailed it | Done | Exemple: “Nailed it! One more ritual, one more step.” |
-| Item list entries | Ritual item | Task item | Nommer les composants et libellés en UI selon “Ritual”. |
-| Action button label | Log | Done, Complete | Cas “Done” interdit pour les boutons d’action. |
-| Empty state (board) | Your ritual board is empty | You have no tasks | Le vide doit être positif et orienté action. |
-| Empty state (flow) | Start building momentum | No dashboard items | Éviter les formulations “No X” sans guidance. |
-| Onboarding step | Add your first ritual | Add your first task | Encourage la discipline flexible (pas la contrainte). |
-| Error message (logging) | Couldn't log the ritual | Unable to complete task | Ton: direct, utile, pas culpabilisant. |
-| Validation message (form) | Add a ritual name | Task name is required | Éviter “task” dans les labels d’interface. |
-| Success message | Ritual logged | Task completed | Ton: concis, positif. |
-| Progress summary | Momentum over time | Streak over time | Mettre l’accent sur la continuité flexible. |
-| Weekly/monthly consistency | Consistency | Streak | Présenter la logique en “consistance” plutôt qu’en “quotas de jours”. |
-| System concept “run” | Log a ritual run | Mark a streak | “Run” est acceptable comme description technique, mais l’UI reste “Log”. |
-| CTA to begin | Start a ritual | Start a task | “Start” + “Ritual” (pas “Task”). |
-| CTA to review | Review the Flow | Open dashboard | “The Flow” en contexte UI. |
-| Section header | Your rituals | Your tasks | Éviter “tasks”. |
-| Success toast | Logged | Done | Toast doit être “Logged” ou “Nailed it” selon intensité. |
-| Status pill / label | Logged | Completed | Utilisé en petits UI éléments. |
-| Confirmation microcopy | Nice. Logged. | Nice. Done. | Court et conversationnel. |
-| API response semantic | status: "logged" | status: "completed" | API: préférer les valeurs “logged” côté semantics. |
-| DB column semantic | logged_at | completed_at | Préférer `logged_at` plutôt que `completed_at`. |
-| Object identifier | ritual_id | task_id | Préférer “ritual”. |
-| Component name | RitualCard | TaskCard | Préférer “Ritual”. |
-| Component name | RitualBoard | ToDoList/TaskList | Le terme UI est “Ritual board”. |
-| Page/route name | flow | dashboard | Si une route porte un terme, elle doit utiliser “flow”. |
-| Marketing-ish page title | The Flow | Dashboard | Pour le titre de section/écran. |
-| Voice: verbosity level | Minimalist | Verbose | Court, utile, sans explications inutiles. |
-| Voice: encouragement | Encouraging | Punishing | Pas de “You failed…” à la place de “You kept your momentum.” |
-| Voice: tone | Conversational | Robotic | Formulations naturelles (sans “successfully…”). |
-| Action verb (preferred) | Log | Complete | “Log” est la préférence globale. |
-| Action verb (allowed) | Track | Track | “Track” ok seulement si l’action UI reste “Log” au final. |
-| Feedback phrase | Nailed it! | Great job / Done | “Nailed it” canonique pour feedback de réussite. |
-| Motivation line | Keep going with momentum | Keep your streak | Éviter “streak”. |
-| Error recovery hint | Try again when you're ready | Try again to complete | Pas culpabilisant, orienté timing. |
-| Naming: list “to-do” | Ritual board | To-do list | Terminologie UI. |
-| Naming: “completed” state | Logged | Completed | Même en code: préférer “logged”. |
-| Naming: “done” state | Nailed it / Logged | Done | “Done” interdit pour boutons/texte utilisateur. |
-| Microcopy: “progress” | Momentum | Streak | Systématique. |
-| Microcopy: “result” | Logged / Nailed it | Completed / Done | Systématique. |
-| User motivation framing | Keep momentum | Keep your streak | Formulation encouragement pour éviter “streak”. |
+| A single unit a user performs | Ritual | Task, Habit | "Ritual" is the primary product term. "Habit" is only acceptable in explanatory phrasing, not as a UI label. |
+| List/board of rituals | Ritual board | To-do list | UI term for the space where the user manages their rituals. |
+| The main dashboard experience | The Flow | Dashboard | "The Flow" is the name of the main interface/section. |
+| Progress unit over time | Momentum | Streak | "Momentum" replaces the anxiety of "streak". |
+| Progress encouragement | Great momentum! | Great streak! | Tone example (encouraging, not guilt-inducing). |
+| Completed state / confirmation | Logged | Completed | Use "Logged" when the user has recorded an action. |
+| Successful completion badge/CTA feedback | Nailed it | Done, Completed | "Nailed it" is used for success feedback (not a "Done" button). |
+| Primary action after input | Log | Log/Track (no preference), Complete | "Log" is the preferred form for both the action and confirmation. |
+| Tracking intent | Track | Track streak | "Track" should lead to a "Log" action in the UI (context-dependent). |
+| User marks something complete | Log | Complete, Mark as done | Replace "Complete" with "Log" (feedback: "Logged" / "Nailed it"). |
+| Completion feedback | Logged | Completed | Example: "Ritual logged." |
+| Completion feedback (celebratory) | Nailed it | Done | Example: "Nailed it! One more ritual, one more step." |
+| Item list entries | Ritual item | Task item | Name UI components and labels using "Ritual". |
+| Action button label | Log | Done, Complete | "Done" is forbidden on action buttons. |
+| Empty state (board) | Your ritual board is empty | You have no tasks | Emptiness should feel positive and action-oriented. |
+| Empty state (flow) | Start building momentum | No dashboard items | Avoid "No X" phrasing without guidance. |
+| Onboarding step | Add your first ritual | Add your first task | Encourages flexible discipline (not constraint). |
+| Error message (logging) | Couldn't log the ritual | Unable to complete task | Tone: direct, helpful, not guilt-inducing. |
+| Validation message (form) | Add a ritual name | Task name is required | Avoid "task" in interface labels. |
+| Success message | Ritual logged | Task completed | Tone: concise, positive. |
+| Progress summary | Momentum over time | Streak over time | Emphasize flexible continuity. |
+| Weekly/monthly consistency | Consistency | Streak | Frame logic as "consistency" rather than "day quotas". |
+| System concept "run" | Log a ritual run | Mark a streak | "Run" is acceptable as a technical description, but UI stays "Log". |
+| CTA to begin | Start a ritual | Start a task | "Start" + "Ritual" (not "Task"). |
+| CTA to review | Review the Flow | Open dashboard | "The Flow" in UI context. |
+| Section header | Your rituals | Your tasks | Avoid "tasks". |
+| Success toast | Logged | Done | Toast should be "Logged" or "Nailed it" depending on intensity. |
+| Status pill / label | Logged | Completed | Used in small UI elements. |
+| Confirmation microcopy | Nice. Logged. | Nice. Done. | Short and conversational. |
+| API response semantic | status: "logged" | status: "completed" | API: prefer "logged" values for semantics. |
+| DB column semantic | logged_at | completed_at | Prefer `logged_at` over `completed_at`. |
+| Object identifier | ritual_id | task_id | Prefer "ritual". |
+| Component name | RitualCard | TaskCard | Prefer "Ritual". |
+| Component name | RitualBoard | ToDoList/TaskList | The UI term is "Ritual board". |
+| Page/route name | flow | dashboard | If a route carries a term, it must use "flow". |
+| Marketing-ish page title | The Flow | Dashboard | For section/screen titles. |
+| Voice: verbosity level | Minimalist | Verbose | Short, useful, no unnecessary explanations. |
+| Voice: encouragement | Encouraging | Punishing | No "You failed…" — use "You kept your momentum." |
+| Voice: tone | Conversational | Robotic | Natural phrasing (avoid "successfully…"). |
+| Action verb (preferred) | Log | Complete | "Log" is the global preference. |
+| Action verb (allowed) | Track | Track | "Track" only if the final UI action remains "Log". |
+| Feedback phrase | Nailed it! | Great job / Done | "Nailed it" is canonical for success feedback. |
+| Motivation line | Keep going with momentum | Keep your streak | Avoid "streak". |
+| Error recovery hint | Try again when you're ready | Try again to complete | Not guilt-inducing, timing-oriented. |
+| Naming: list "to-do" | Ritual board | To-do list | UI terminology. |
+| Naming: "completed" state | Logged | Completed | Even in code: prefer "logged". |
+| Naming: "done" state | Nailed it / Logged | Done | "Done" forbidden on buttons/user-facing text. |
+| Microcopy: "progress" | Momentum | Streak | Systematic. |
+| Microcopy: "result" | Logged / Nailed it | Completed / Done | Systematic. |
+| User motivation framing | Keep momentum | Keep your streak | Encouragement framing to avoid "streak". |
 
-> Note: le mapping canonique demandé par LUI-15 inclut `Task -> Ritual (ou Habit)` et `Streak -> Momentum`, ainsi que `Completed -> Logged` et `Dashboard -> The Flow`. Dans la pratique UI, utilisez “Ritual” / “Momentum” / “Logged” / “The Flow” comme termes par défaut.
+> Note: the canonical mapping required by LUI-15 includes `Task -> Ritual (or Habit)` and `Streak -> Momentum`, as well as `Completed -> Logged` and `Dashboard -> The Flow`. In practice, use "Ritual" / "Momentum" / "Logged" / "The Flow" as default UI terms.
 
 ## Tone & Voice Guidelines
 
-### Comment Strive “parle”
-- Minimaliste, pas verbeux: “Log run”, pas “Please log your running activity”.
-- Encourageant, pas culpabilisant: “Great momentum!”, pas “You failed to maintain your streak”.
-- Conversationnel, pas robotique: “Nailed it!”, pas “Successfully marked complete”.
-- Assume l’intelligence de l’utilisateur: évite les tutoriels dans la microcopy.
+### How Strive "speaks"
+- Minimalist, not verbose: "Log run", not "Please log your running activity".
+- Encouraging, not guilt-inducing: "Great momentum!", not "You failed to maintain your streak".
+- Conversational, not robotic: "Nailed it!", not "Successfully marked complete".
+- Assumes user intelligence: avoid tutorial-style microcopy.
 
-### Do / Don't (résumé)
-- Do: “Ritual logged.”
-- Don't: “Task completed.”
-- Do: “Your ritual board is empty.”
-- Don't: “You have no tasks.”
-- Do: “Great momentum!”
-- Don't: “Great streak!”
+### Do / Don't (summary)
+- Do: "Ritual logged."
+- Don't: "Task completed."
+- Do: "Your ritual board is empty."
+- Don't: "You have no tasks."
+- Do: "Great momentum!"
+- Don't: "Great streak!"
 
 ## Copy Examples (Before / After)
 
 1. Button (action)
    - Before: `Done`
-   - After: `Log` (ou `Nailed it` pour un feedback, pas un bouton)
+   - After: `Log` (or `Nailed it` for feedback, not a button)
 
 2. Button (completion)
    - Before: `Complete task`
@@ -117,51 +117,50 @@ Utilise les termes canoniques ci-dessous. Évite les synonymes “interdits” l
    - After: `Ritual name`
 
 10. Error message
-   - Before: `Unable to complete task`
-   - After: `Couldn't log the ritual`
+    - Before: `Unable to complete task`
+    - After: `Couldn't log the ritual`
 
 ## AI & Code Integration
 
-Cette section explique comment traduire les termes dans le code et dans les sorties d’IA.
+This section explains how to translate terms into code and AI outputs.
 
-### Nommage dans le code
-- IDs et variables:
-  - `ritual_id` (pas `task_id`)
-  - `momentum` (pas `streak`)
-  - `logged_at` (pas `completed_at`)
-  - `flow` (pas `dashboard`)
-- Composants:
+### Naming in code
+- IDs and variables:
+  - `ritual_id` (not `task_id`)
+  - `momentum` (not `streak`)
+  - `logged_at` (not `completed_at`)
+  - `flow` (not `dashboard`)
+- Components:
   - `RitualCard`, `RitualBoard`
-  - `Flow` (page/section), `FlowHeader` (si besoin)
-- Classes/IDs DOM:
+  - `Flow` (page/section), `FlowHeader` (if needed)
+- DOM classes/IDs:
   - `ritual-card`, `ritual-board`, `flow-header`
 
-### API et schémas
-- Expose des états sémantiques cohérents:
+### API and schemas
+- Expose consistent semantic states:
   - `status: "logged"`
-  - évite `completed` côté réponse sémantique (sauf migration legacy)
-- Colonne DB:
+  - avoid `completed` on the semantic response side (except for legacy migration)
+- DB column:
   - `logged_at`
-  - évite `completed_at` dans le schéma “nouveau”
+  - avoid `completed_at` in the "new" schema
 
-### Erreurs, feedback et événements
-- Texte d’erreur:
-  - “Couldn't log the ritual” plutôt que “Unable to complete task”
-- Texte de succès:
-  - “Ritual logged.”
-  - “Nailed it!” quand c’est une réussite encourageante
+### Errors, feedback and events
+- Error text:
+  - "Couldn't log the ritual" rather than "Unable to complete task"
+- Success text:
+  - "Ritual logged."
+  - "Nailed it!" when it's an encouraging success
 
 ## Terminology Checklist (Agents)
 
-Avant de générer/éditer une UI, un message ou une intégration API:
-- [ ] Utiliser `Ritual`, pas `Task`
-- [ ] Utiliser `Momentum`, pas `Streak`
-- [ ] Utiliser `Logged`, pas `Completed`
-- [ ] Utiliser `The Flow`, pas `Dashboard`
-- [ ] Boutons d’action: éviter le texte `Done`
-- [ ] Les labels “completion” doivent devenir `Log` / `Logged`
-- [ ] Ton: minimaliste, encourageant, conversationnel
-- [ ] Les erreurs: orientées “récupération”, pas culpabilisation
-- [ ] Noms de code alignés (`ritual_id`, `logged_at`, `momentum`, `flow`)
-- [ ] Exemple correct vs incorrect cohérent avec les sections ci-dessus
-
+Before generating/editing a UI, a message, or an API integration:
+- [ ] Use `Ritual`, not `Task`
+- [ ] Use `Momentum`, not `Streak`
+- [ ] Use `Logged`, not `Completed`
+- [ ] Use `The Flow`, not `Dashboard`
+- [ ] Action buttons: avoid the text `Done`
+- [ ] "Completion" labels must become `Log` / `Logged`
+- [ ] Tone: minimalist, encouraging, conversational
+- [ ] Errors: recovery-oriented, not guilt-inducing
+- [ ] Code names aligned (`ritual_id`, `logged_at`, `momentum`, `flow`)
+- [ ] Correct vs incorrect examples consistent with the sections above
