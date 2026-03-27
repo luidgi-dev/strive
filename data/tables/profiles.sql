@@ -1,4 +1,3 @@
--- Active: 1774638899369@@db.hjevipotibuxgsdktpeo.supabase.co@5432@postgres
 # Profiles table
 ## Extends auth.users table
 ## Adds additional fields for profile information
