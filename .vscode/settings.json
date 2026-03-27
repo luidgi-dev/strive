@@ -1,3 +1,12 @@
 {
-    "sqltools.connections": []
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "connectString": "postgresql://postgres:UevsIRtoO4jYmzMq@db.hjevipotibuxgsdktpeo.supabase.co:5432/postgres",
+            "name": "supabase"
+        }
+    ]
 }

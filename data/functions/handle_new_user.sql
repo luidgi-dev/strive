@@ -9,20 +9,45 @@
 
 create or replace function handle_new_user()
 returns trigger as $$
+declare
+  candidate_username text;
+  final_username text;
+  is_taken boolean;
 begin
+  
+  candidate_username := coalesce(
+    new.raw_user_meta_data->>'username', 
+    split_part(lower(new.email), '@', 1)
+  );
+  
+  final_username := candidate_username;
+
+  loop
+    select exists (
+      select 1 from public.profiles where username = final_username
+    ) into is_taken;
+
+    exit when not is_taken; 
+    
+    final_username := candidate_username || '-' || substring(md5(random()::text) from 1 for 4);
+  end loop;
+
+
   insert into public.profiles (id, username, timezone, avatar_url, created_at, updated_at)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1))
-    new.raw_user_meta_data->>'timezone',
+    final_username,
+    coalesce(new.raw_user_meta_data->>'timezone', 'UTC'),
     new.raw_user_meta_data->>'avatar_url',
     now(),
     now()
   );
+
   return new;
 end;
 $$ language plpgsql security definer;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure handle_new_user();

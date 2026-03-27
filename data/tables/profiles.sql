@@ -10,7 +10,7 @@ create table if not exists profiles (
     id uuid primary key references auth.users(id) on delete cascade,
     username text unique not null,
     avatar_url text,
-    timezone text not null,
+    timezone text not null default 'UTC',
     created_at timestamp not null default now(),
     updated_at timestamp not null default now()
 );
@@ -18,15 +18,22 @@ create table if not exists profiles (
 
 alter table profiles enable row level security;
 
-create policy "users can read their own profile"
-  on profiles for select using (auth.uid() = id);
+-- POLICY: SELECT (Read)
+-- Allows anyone to see a profile (useful for social features/displaying names)
+create policy "Public profiles are viewable by everyone"
+  on public.profiles for select
+  using ( true );
 
-create policy "users can update their own profile"
-  on profiles for update using (auth.uid() = id);
+-- POLICY: UPDATE
+-- Allows users to modify only their own data
+create policy "Users can update their own profile"
+  on public.profiles for update
+  using ( auth.uid() = id )
+  with check ( auth.uid() = id );
 
+-- POLICY: DELETE
+-- Allows users to delete only their own profile
+create policy "Users can delete their own profile"
+  on public.profiles for delete
+  using ( auth.uid() = id );
 
-create policy "users can delete their own profile"
-  on profiles for delete using (auth.uid() = id);
-
-create policy "users can insert their own profile"
-  on profiles for insert with check (auth.uid() = id);
