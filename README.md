@@ -14,12 +14,11 @@ The goal is to avoid rigid "daily streak" anxiety and replace it with a flexible
 
 This repository is designed to host multiple streams of work:
 
-- `web/`: web product documentation and boundaries for the Next.js app.
+- `app/`: Next.js app development.
 - `data/`: database schema, SQL migrations, RLS policies, and seed scripts.
 - `design/`: UX notes, wireframes, visual guidelines, and mockups.
 
 The current Next.js implementation still lives at repository root (`app/`, `components/`, `lib/`, etc.).
-A full physical move into `web/` can be done in a dedicated refactor once you are ready.
 
 ## Quick Start (Current Web App at Root)
 
