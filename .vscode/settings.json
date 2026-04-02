@@ -5,7 +5,7 @@
             "previewLimit": 50,
             "server": "localhost",
             "driver": "PostgreSQL",
-            "connectString": "postgresql://postgres:UevsIRtoO4jYmzMq@db.hjevipotibuxgsdktpeo.supabase.co:5432/postgres",
+            "connectString": "postgresql://postgres:YOUR_PASSWORD@db.XXX.supabase.co:5432/postgres",
             "name": "supabase"
         }
     ]
