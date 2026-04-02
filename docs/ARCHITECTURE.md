@@ -73,3 +73,17 @@ Static assets served by Next.js.
 - Pages/routes: kebab-case (`/app/ritual-detail/page.tsx`)
 - Database: snake_case (`ritual_logs`, `logged_at`)
 - Functions: camelCase (`getRituals`, `logRitual`)
+
+
+## AI Agent Skills
+
+The `.agents/` directory contains reusable instruction sets for AI tools (Cursor, Claude, etc.).
+
+### Skills Directory
+
+- `supabase-postgres-best-practices/` — PostgreSQL optimization and Supabase patterns
+
+These are **committed to the repo** so all agents share the same knowledge base. They are separate from:
+- `.cursorrules` — Cursor-specific rules (in root)
+- `docs/AGENTS.md` — Human-readable agent guidelines
+- `docs/system-prompt.md` — Claude system prompt
