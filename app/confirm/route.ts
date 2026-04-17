@@ -8,8 +8,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
+  
+  // 1. Change the default redirect to your new branded page
   const _next = searchParams.get('next')
-  const next = _next?.startsWith('/') ? _next : '/'
+  const next = _next?.startsWith('/') ? _next : '/auth/confirmed'
 
   if (token_hash && type) {
     const supabase = await createClient()
@@ -18,15 +20,16 @@ export async function GET(request: NextRequest) {
       type,
       token_hash,
     })
+    
     if (!error) {
-      // redirect user to specified redirect URL or root of app
+      // 2. On success, the user goes to /auth/confirmed
       redirect(next)
     } else {
-      // redirect the user to an error page with some instructions
-      redirect(`/auth/error?error=${error?.message}`)
+      // Log the error for debugging in development
+      console.error('Auth verification error:', error.message)
+      redirect(`/auth/error?error=${encodeURIComponent(error.message)}`)
     }
   }
 
-  // redirect the user to an error page with some instructions
-  redirect(`/auth/error?error=No token hash or type`)
+  redirect(`/auth/error?error=Invalid token or missing type`)
 }

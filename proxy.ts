@@ -41,11 +41,23 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 3. Optional: Protected Routes Logic
-  // If user is not logged in and trying to access /protected, redirect to /auth/login
-  if (!user && request.nextUrl.pathname.startsWith("/protected")) {
+  const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
+  const isProtectedRoute = request.nextUrl.pathname.startsWith("/protected");
+  const isLandingPage = request.nextUrl.pathname === "/";
+  const isConfirmedPage = request.nextUrl.pathname === "/auth/confirmed";
+
+  // 1. If NOT logged in and trying to access /protected -> redirect to login
+  if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    return NextResponse.redirect(url);
+  }
+
+  // 2. If LOGGED IN and trying to access landing or auth pages 
+  // Exception: Allow /auth/confirmed so they see your success message
+  if (user && !isConfirmedPage && (isLandingPage || isAuthPage)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/protected";
     return NextResponse.redirect(url);
   }
 
