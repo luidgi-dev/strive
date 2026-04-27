@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image' // Ajout import
 
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -14,7 +16,6 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import Link from 'next/link'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -29,7 +30,6 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
     setError(null)
 
     try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/update-password`,
       })
@@ -43,52 +43,94 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
   }
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn('flex flex-col gap-8 w-full max-w-md mx-auto', className)} {...props}>
+      {/* Brand Identity */}
+      <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm border border-black/5 dark:border-white/10">
+        <Image
+          src="/icon.svg"
+          alt="Strive logo"
+          width={64}
+          height={64}
+          className="dark:invert"
+        />
+      </div>
+
       {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
+        <Card className="border-border bg-card shadow-lg">
+          <CardHeader className="space-y-4 p-6 pt-8 text-center">
+            <CardTitle className="font-sora text-3xl font-bold tracking-tight">
+              Check your email
+            </CardTitle>
+            <CardDescription className="font-dm-sans text-base leading-relaxed text-muted-foreground">
+              Instructions have been sent to your inbox.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive a password reset
-              email.
+          <CardContent className="p-6 pt-0 text-center">
+            <p className="font-dm-sans text-sm text-muted-foreground mb-6">
+              If an account exists for this email, you will receive a link to reset your password shortly.
             </p>
+            <Button variant="outline" className="w-full h-11 font-dm-sans">
+              <Link href="/auth/login">
+                Back to sign in
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your password
+        <Card className="border-border bg-card shadow-lg">
+          <CardHeader className="space-y-4 p-6 pt-8 text-center">
+            <CardTitle className="font-sora text-3xl font-bold tracking-tight">
+              Reset your password
+            </CardTitle>
+            <CardDescription className="font-dm-sans text-base leading-relaxed text-muted-foreground">
+              Enter your email and we&apos;ll send you a link to get back into your account.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Sending...' : 'Send reset email'}
-                </Button>
+          
+          <CardContent className="p-6 pt-0">
+            <form onSubmit={handleForgotPassword} className="space-y-8">
+              <div className="grid gap-2">
+                <Label 
+                  htmlFor="email" 
+                  className="font-dm-sans text-sm font-medium text-foreground"
+                >
+                  Your email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="font-dm-sans h-11 bg-background border-input focus:ring-primary focus:border-primary transition-all"
+                />
               </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{' '}
-                <Link href="/auth/login" className="underline underline-offset-4">
-                  Login
-                </Link>
+
+              {error && (
+                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm font-dm-sans">
+                  {error}
+                </div>
+              )}
+
+              <Button 
+                type="submit" 
+                className="w-full h-11 font-dm-sans text-base font-semibold transition-all hover:opacity-90 active:scale-[0.98]" 
+                disabled={isLoading}
+              >
+                {isLoading ? 'Sending...' : 'Send reset link'}
+              </Button>
+
+              <div className="text-center">
+                <p className="font-dm-sans text-sm text-muted-foreground">
+                  Already steady?{' '}
+                  <Link 
+                    href="/auth/login" 
+                    className="font-medium text-foreground underline underline-offset-4 hover:text-primary transition-colors"
+                  >
+                    Resume your arc
+                  </Link>
+                </p>
               </div>
             </form>
           </CardContent>
