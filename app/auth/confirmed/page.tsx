@@ -15,7 +15,7 @@ export default function ConfirmedPage() {
             alt="Strive logo"
             width={80}
             height={80}
-            className="block dark:invert"
+            className="block"
           />
         </div>
 
