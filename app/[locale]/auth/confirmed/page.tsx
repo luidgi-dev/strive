@@ -24,7 +24,7 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
             alt={`${tCommon("appName")} logo`}
             width={80}
             height={80}
-            className="block dark:invert"
+            className="block"
           />
         </div>
 
