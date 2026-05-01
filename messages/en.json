@@ -1,0 +1,52 @@
+{
+  "common": {
+    "appName": "Strive",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "terminology": {
+    "ritual": "Ritual",
+    "rituals": "Rituals",
+    "momentum": "Momentum",
+    "theFlow": "The Flow",
+    "logged": "Logged",
+    "nailedIt": "Nailed it",
+    "onTrack": "On Track",
+    "caution": "Needs Attention",
+    "missed": "Missed"
+  },
+  "dashboard": {
+    "title": "The Flow",
+    "subtitle": "Your rituals, your momentum.",
+    "greeting": "Hello {email}",
+    "noRituals": "No rituals yet. Start building your momentum.",
+    "openApp": "Enter the Strive app"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Appearance",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "home": {
+    "tagline": "An app designed for those who prefer",
+    "taglineEmphasis": "consistency over intensity.",
+    "cta": "Find your rhythm"
+  },
+  "auth": {
+    "confirmedTitle": "Your rhythm is set",
+    "confirmedDescription": "Your email has been confirmed. You are ready to start your journey with Strive.",
+    "signupSuccessTitle": "Check your inbox",
+    "signupSuccessDescription": "Confirm your email to set your rhythm.",
+    "signupSuccessBody": "We've sent a confirmation link to your email address. Please click it to activate your account and begin your arc.",
+    "signupSuccessHint": "Can't find it? Check your spam folder or wait a few minutes.",
+    "backToLogin": "Back to sign in",
+    "openApp": "Enter the Strive app",
+    "errorTitle": "Sorry, something went wrong.",
+    "errorCode": "Code error: {error}",
+    "errorFallback": "An unspecified error occurred."
+  }
+}
