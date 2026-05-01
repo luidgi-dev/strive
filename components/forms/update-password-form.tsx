@@ -45,13 +45,13 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
   return (
     <div className={cn('flex flex-col gap-8 w-full max-w-md mx-auto', className)} {...props}>
       {/* Brand Identity */}
-      <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm border border-black/5 dark:border-white/10">
+      <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm border border-border/70">
         <Image
           src="/icon.svg"
           alt="Strive logo"
           width={64}
           height={64}
-          className="dark:invert"
+          className="block"
         />
       </div>
 

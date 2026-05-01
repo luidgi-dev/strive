@@ -10,7 +10,7 @@ export default function Home() {
         
         {/*Logo */}
         <div className="flex flex-col items-center mb-8">
-         <div className="overflow-hidden rounded-[22%] shadow-lg ring-1 ring-black/5">
+         <div className="overflow-hidden rounded-[22%] shadow-lg ring-1 ring-border/50">
            <Image
              src="/icon.svg"
              alt="Strive logo"
