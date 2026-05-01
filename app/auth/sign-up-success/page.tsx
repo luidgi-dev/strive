@@ -13,13 +13,13 @@ export default function SignUpSuccessPage() {
       <div className="w-full max-w-md space-y-8">
         
         {/* Centered Strive Logo */}
-        <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm border border-black/5 dark:border-white/10">
+        <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm border border-border/70">
           <Image
             src="/icon.svg"
             alt="Strive logo"
             width={64}
             height={64}
-            className="dark:invert"
+            className="block"
           />
         </div>
 
