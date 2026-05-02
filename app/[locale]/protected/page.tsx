@@ -1,34 +1,80 @@
-import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
 
-import { LogoutButton } from "@/components/logout-button";
-import { LocaleSwitcher } from "@/components/ui/locale-switcher";
-import { createClient } from "@/lib/supabase/server";
+import {
+  AiConversationSection,
+  HeroSection,
+  LandingDivider,
+  PhilosophySection,
+  RitualVisualizationSection,
+  VocabularySection,
+  LandingFooter,
+} from "@/components/landing";
+import type { LandingContent } from "@/components/landing/types";
+import { defaultLocale } from "@/i18n";
 
-type ProtectedPageProps = {
+type HomePageProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function ProtectedPage({ params }: ProtectedPageProps) {
+export default async function Home({ params }: HomePageProps) {
   const { locale } = await params;
-  const supabase = await createClient();
+  const messages = await getMessages();
+  const landing = messages.landing as LandingContent | undefined;
 
-  const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims) {
-    redirect(locale === "en" ? "/auth/login" : `/${locale}/auth/login`);
+  if (!landing) {
+    notFound();
   }
 
-  const t = await getTranslations("dashboard");
+  const authPath =
+    locale === defaultLocale ? "/auth/login" : `/${locale}/auth/login`;
 
   return (
-    <div className="flex h-svh w-full flex-col items-center justify-center gap-4 p-6 text-center">
-      <LocaleSwitcher />
-      <h1 className="text-2xl font-heading">{t("title")}</h1>
-      <p className="text-muted-foreground">{t("subtitle")}</p>
-      <p>
-        {t("greeting", { email: data.claims.email ?? "unknown" })}
-      </p>
-      <LogoutButton />
-    </div>
+    <main className="min-h-screen bg-background text-foreground">
+      <HeroSection
+        logoAlt={landing.meta.logoAlt}
+        title={landing.hero.title}
+        description={landing.hero.description}
+        ctaLabel={landing.hero.cta}
+        authHref={authPath}
+        isAvailable={false} 
+    />
+
+      <LandingDivider />
+      <PhilosophySection
+        eyebrow={landing.philosophy.eyebrow}
+        title={landing.philosophy.title}
+        paragraphs={landing.philosophy.paragraphs}
+      />
+
+      <LandingDivider />
+      <AiConversationSection
+        eyebrow={landing.intelligence.eyebrow}
+        title={landing.intelligence.title}
+        paragraphs={landing.intelligence.paragraphs}
+        messages={landing.intelligence.messages}
+      />
+
+      <LandingDivider />
+      <VocabularySection
+        eyebrow={landing.vocabulary.eyebrow}
+        title={landing.vocabulary.title}
+        items={landing.vocabulary.items}
+      />
+
+      <LandingDivider />
+      <RitualVisualizationSection
+        eyebrow={landing.visualization.eyebrow}
+        title={landing.visualization.title}
+        card={landing.visualization.card}
+      />
+
+      <LandingDivider />
+      <LandingFooter 
+        thanks={landing.footer.thanks}
+        cta={landing.footer.cta}
+      />
+
+    </main>
   );
 }
