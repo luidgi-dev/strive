@@ -1,0 +1,157 @@
+{
+  "common": {
+    "appName": "Strive",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
+  },
+  "terminology": {
+    "ritual": "Rituel",
+    "rituals": "Rituels",
+    "momentum": "Momentum",
+    "theFlow": "Le Flow",
+    "logged": "Enregistre",
+    "nailedIt": "Accompli",
+    "onTrack": "Dans les temps",
+    "caution": "Attention requise",
+    "missed": "Manque"
+  },
+  "dashboard": {
+    "title": "Le Flow",
+    "subtitle": "Tes rituels, ton momentum.",
+    "greeting": "Salut {email}",
+    "noRituals": "Aucun rituel pour l'instant. Commence a construire ton momentum.",
+    "openApp": "Entrer dans l'app Strive"
+  },
+  "settings": {
+    "title": "Parametres",
+    "theme": "Apparence",
+    "language": "Langue",
+    "darkMode": "Mode sombre",
+    "lightMode": "Mode clair"
+  },
+  "home": {
+    "tagline": "Une app pensee pour celles et ceux qui preferent",
+    "taglineEmphasis": "la regularite a l'intensite.",
+    "cta": "Trouver ton rythme"
+  },
+  "landing": {
+    "meta": {
+      "logoAlt": "Logo Strive"
+    },
+    "hero": {
+      "title": "Strive.",
+      "description": "Une application pour celles et ceux qui préfèrent la constance à l'intensité.",
+      "cta": "Bientôt disponible"
+    },
+    "philosophy": {
+      "eyebrow": "Philosophie",
+      "title": "Un coach calme, pas un sergent.",
+      "paragraphs": [
+        "Nous ne croyons pas au hustle. Nous ne célébrons pas le grind. Strive est née d'une conviction simple : la progression durable naît du calme, pas de la pression.",
+        "Nous célébrons le momentum, cette force tranquille qui s'installe quand on respecte son propre rythme. Chaque rituel enregistré trace un arc, visible sur la durée.",
+        "Pas de culpabilité. Pas de notifications agressives. Juste un espace pour construire, jour après jour, avec intention."
+      ]
+    },
+    "intelligence": {
+      "eyebrow": "Intelligence naturelle",
+      "title": "Une conversation avec votre rythme.",
+      "paragraphs": [
+        "Strive utilise une intelligence discrète pour supprimer la friction. Pas de cases à cocher, pas de menus complexes.",
+        "Vous racontez votre journée, en texte ou à la voix, et elle comprend, ajuste vos rituels, et garde votre momentum stable."
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "text": "J'ai fait tout ce qui était prévu, sauf le sport aujourd'hui."
+        },
+        {
+          "role": "assistant",
+          "text": "Compris. Lecture, méditation et journal marqués comme enregistrés. Sport noté comme repos pour aujourd'hui."
+        },
+        {
+          "role": "user",
+          "text": "Je veux commencer le yoga deux fois par semaine."
+        },
+        {
+          "role": "assistant",
+          "text": "Nouveau rituel créé : Yoga — mardi et jeudi. Votre arc commence maintenant."
+        }
+      ]
+    },
+    "vocabulary": {
+      "eyebrow": "Vocabulaire",
+      "title": "Les mots comptent.",
+      "items": [
+        {
+          "from": "Habitude",
+          "to": "Rituel",
+          "description": "Chaque action récurrente mérite du respect."
+        },
+        {
+          "from": "Série, streak",
+          "to": "Rythme",
+          "description": "Votre cadence personnelle, pas une course."
+        },
+        {
+          "from": "Score",
+          "to": "Momentum",
+          "description": "Un indicateur de progression, pas un jugement."
+        },
+        {
+          "from": "Échec",
+          "to": "Manqué",
+          "description": "Un jour plus calme. Demain est neuf."
+        },
+        {
+          "from": "Sauter",
+          "to": "Repos",
+          "description": "Une pause intentionnelle, pas un abandon."
+        }
+      ]
+    },
+    "visualization": {
+      "eyebrow": "Visualisation",
+      "title": "Une carte de rituel.",
+      "card": {
+        "name": "Journal du soir",
+        "schedule": "Chaque jour · 21h00",
+        "statusLabel": "En rythme",
+        "momentumLabel": "Momentum",
+        "momentumPrimary": "5",
+        "momentumSecondary": "/ 7 cette semaine",
+        "arcLabel": "Arc",
+        "arcPrimary": "12",
+        "arcSecondary": "semaines",
+        "restMarker": "—",
+        "weekdays": [
+          { "shortLabel": "L", "state": "logged" },
+          { "shortLabel": "M", "state": "logged" },
+          { "shortLabel": "M", "state": "logged" },
+          { "shortLabel": "J", "state": "logged" },
+          { "shortLabel": "V", "state": "logged" },
+          { "shortLabel": "S", "state": "rest" },
+          { "shortLabel": "D", "state": "empty" }
+        ]
+      }
+    },
+    "footer": {
+      "thanks": "Merci d'avoir pris le temps de lire notre vision. L'application arrive très bientôt.",
+      "cta": "Se déconnecter"
+    }
+  },
+  "auth": {
+    "confirmedTitle": "Ton rythme est lance",
+    "confirmedDescription": "Ton e-mail est confirme. Tu peux commencer ton parcours avec Strive.",
+    "signupSuccessTitle": "Verifie ta boite mail",
+    "signupSuccessDescription": "Confirme ton e-mail pour lancer ton rythme.",
+    "signupSuccessBody": "On a envoye un lien de confirmation a ton adresse e-mail. Clique dessus pour activer ton compte et commencer ton arc.",
+    "signupSuccessHint": "Tu ne le vois pas ? Verifie tes spams ou attends quelques minutes.",
+    "backToLogin": "Retour a la connexion",
+    "openApp": "Entrer dans l'app Strive",
+    "errorTitle": "Desole, une erreur est survenue.",
+    "errorCode": "Code erreur : {error}",
+    "errorFallback": "Une erreur non specifiee est survenue."
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "common": {
+    "appName": "Strive",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "terminology": {
+    "ritual": "Ritual",
+    "rituals": "Rituals",
+    "momentum": "Momentum",
+    "theFlow": "The Flow",
+    "logged": "Logged",
+    "nailedIt": "Nailed it",
+    "onTrack": "On Track",
+    "caution": "Needs Attention",
+    "missed": "Missed"
+  },
+  "dashboard": {
+    "title": "The Flow",
+    "subtitle": "Your rituals, your momentum.",
+    "greeting": "Hello {email}",
+    "noRituals": "No rituals yet. Start building your momentum.",
+    "openApp": "Enter the Strive app"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Appearance",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "home": {
+    "tagline": "An app designed for those who prefer",
+    "taglineEmphasis": "consistency over intensity.",
+    "cta": "Find your rhythm"
+  },
+  "landing": {
+    "meta": {
+      "logoAlt": "Strive logo"
+    },
+    "hero": {
+      "title": "Strive",
+      "description": "An app designed for those who prefer consistency over intensity.",
+      "cta": "Available soon"
+    },
+    "philosophy": {
+      "eyebrow": "Philosophy",
+      "title": "A calm coach, not a drill sergeant.",
+      "paragraphs": [
+        "We do not worship hustle. We do not celebrate grind. Strive comes from one simple belief: lasting progress grows from calm, not pressure.",
+        "We celebrate momentum, the quiet strength that settles in when you honor your own rhythm. Every ritual you log traces an arc you can see over time.",
+        "No guilt. No aggressive reminders. Just space to build, day by day, with intention."
+      ]
+    },
+    "intelligence": {
+      "eyebrow": "Natural intelligence",
+      "title": "A conversation with your rhythm.",
+      "paragraphs": [
+        "Strive uses discreet intelligence to remove friction. No busywork checklists, no dense menus.",
+        "You tell your day, in text or voice, and it understands, adjusts your rituals, and keeps your momentum steady."
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "text": "I did everything planned except the gym today."
+        },
+        {
+          "role": "assistant",
+          "text": "Got it. Reading, meditation, and journal marked as logged. Sport noted as rest for today."
+        },
+        {
+          "role": "user",
+          "text": "I want to start yoga twice a week."
+        },
+        {
+          "role": "assistant",
+          "text": "New ritual created: Yoga — Tuesday and Thursday. Your arc starts now."
+        }
+      ]
+    },
+    "vocabulary": {
+      "eyebrow": "Vocabulary",
+      "title": "Words matter.",
+      "items": [
+        {
+          "from": "Habit",
+          "to": "Ritual",
+          "description": "Every recurring action deserves respect."
+        },
+        {
+          "from": "Series, streak",
+          "to": "Rhythm",
+          "description": "Your personal cadence, not a race."
+        },
+        {
+          "from": "Score",
+          "to": "Momentum",
+          "description": "A signal of progress, not a verdict."
+        },
+        {
+          "from": "Failure",
+          "to": "Missed",
+          "description": "A softer day. Tomorrow is new."
+        },
+        {
+          "from": "Skip",
+          "to": "Rest",
+          "description": "An intentional pause, not walking away."
+        }
+      ]
+    },
+    "visualization": {
+      "eyebrow": "Visualization",
+      "title": "A ritual card.",
+      "card": {
+        "name": "Evening journal",
+        "schedule": "Every day · 9:00 p.m.",
+        "statusLabel": "In rhythm",
+        "momentumLabel": "Momentum",
+        "momentumPrimary": "5",
+        "momentumSecondary": "/ 7 this week",
+        "arcLabel": "Arc",
+        "arcPrimary": "12",
+        "arcSecondary": "weeks",
+        "restMarker": "—",
+        "weekdays": [
+          { "shortLabel": "Mo", "state": "logged" },
+          { "shortLabel": "Tu", "state": "logged" },
+          { "shortLabel": "We", "state": "logged" },
+          { "shortLabel": "Th", "state": "logged" },
+          { "shortLabel": "Fr", "state": "logged" },
+          { "shortLabel": "Sa", "state": "rest" },
+          { "shortLabel": "Su", "state": "empty" }
+        ]
+      }
+    },
+    "footer": {
+      "thanks": "Thank you for your time, the application is coming soon.",
+      "cta": "Sign Out"
+    }
+  },
+  "auth": {
+    "confirmedTitle": "Your rhythm is set",
+    "confirmedDescription": "Your email has been confirmed. You are ready to start your journey with Strive.",
+    "signupSuccessTitle": "Check your inbox",
+    "signupSuccessDescription": "Confirm your email to set your rhythm.",
+    "signupSuccessBody": "We've sent a confirmation link to your email address. Please click it to activate your account and begin your arc.",
+    "signupSuccessHint": "Can't find it? Check your spam folder or wait a few minutes.",
+    "backToLogin": "Back to sign in",
+    "openApp": "Enter the Strive app",
+    "errorTitle": "Sorry, something went wrong.",
+    "errorCode": "Code error: {error}",
+    "errorFallback": "An unspecified error occurred."
+  }
+}
