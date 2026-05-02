@@ -3,6 +3,7 @@ import { DM_Sans, Geist, Geist_Mono, Sora } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 import { locales, type Locale } from "@/i18n";
 import "../globals.css";
@@ -50,10 +51,18 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
     <html
       lang={locale}
       className={`${sora.variable} ${dmSans.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-white dark:bg-black text-slate-900 dark:text-slate-50">
+      <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
