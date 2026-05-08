@@ -7,5 +7,6 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
  // TODO : vérifier que le use client soit à utiliser et jeter un oil sur 
- const badVariable: any = "test"; // (Usage de any -> ERROR)
 
+// ESLint ne dira rien, mais l'IA doit le voir (Règle Design Tokens)
+<div className="bg-[#FF5733] p-4">Test IA</div>
