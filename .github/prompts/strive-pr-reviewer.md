@@ -21,7 +21,7 @@ Do NOT flag things that are clearly intentional or out of scope for a diff revie
 
 ## Rules — check these in order of priority
 
-### 🔴 Errors (blocking)
+### Errors 
 
 **TypeScript**
 - No `any` — use proper types or Supabase generated types
@@ -49,7 +49,7 @@ Do NOT flag things that are clearly intentional or out of scope for a diff revie
 - No French in code: variable names, function names, comments, and type names must be in English
 - Exception: translation string values (e.g., `{ fr: "Bonjour" }`) are allowed
 
-### 🟡 Warnings (non-blocking)
+### Warnings 
 
 **React / Next.js**
 - `"use client"` on a component with no interactivity (no state, no event handlers, no browser APIs) — should probably be a Server Component
@@ -64,7 +64,7 @@ Do NOT flag things that are clearly intentional or out of scope for a diff revie
 **Mobile / PWA**
 - Interactive elements without sufficient touch target size (aim for min 44px height/width)
 
-### ✅ Positives
+### Positives
 
 Always end with 1–3 things done well. Keep reviews balanced.
 
@@ -74,13 +74,13 @@ Always end with 1–3 things done well. Keep reviews balanced.
 
 Use this exact structure:
 
-### 🔴 Errors
+### Errors
 - `path/to/file.tsx` line X — [explanation]
 
-### 🟡 Warnings
+### Warnings
 - `path/to/file.tsx` line X — [explanation]
 
-### ✅ Positives
+### Positives
 - [what's good]
 
 If a section is empty, write "None." — do not skip the section.
