@@ -85,7 +85,7 @@ jobs:
         id: review
         uses: actions/ai-inference@v1
         with:
-          model: openai/gpt-4o-mini
+          model: openai/claude-3-5-haiku
           system-prompt: ${{ steps.prompt.outputs.content }}
           prompt: |
             PR: ${{ github.event.pull_request.title }}
