@@ -61,7 +61,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
     try {
       // 1. Supabase Auth Sign Up
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const {error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
