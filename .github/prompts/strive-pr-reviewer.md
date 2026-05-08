@@ -21,13 +21,13 @@ Do NOT flag things that are clearly intentional or out of scope for a diff revie
 
 ## Rules — check these in order of priority
 
-### Errors 
+### Required changes
 
 **TypeScript**
 - No `any` — use proper types or Supabase generated types
 - No type assertions (`as X`) to silence errors — fix the type instead
 
-**Security**
+**Data handling**
 - `userId` must always come from `supabase.auth.getUser()` server-side — never from request body, params, or client state
 
 **Data fetching**

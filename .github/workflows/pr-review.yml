@@ -86,7 +86,7 @@ jobs:
         id: review
         uses: actions/ai-inference@v1
         with:
-          model: mistral/mistral-small-latest
+          model: mistral/codestral-latest
           system-prompt: ${{ steps.prompt.outputs.content }}
           prompt: |
             PR: ${{ github.event.pull_request.title }}
