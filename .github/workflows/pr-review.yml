@@ -99,11 +99,15 @@ jobs:
 
       - name: Post review comment
         uses: actions/github-script@v7
+        env:
+          REVIEW_DATA: ${{ steps.review.outputs.response }}
         with:
           script: |
+            const body = process.env.REVIEW_DATA;
+            
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## Strive AI Review\n\n${{ steps.review.outputs.response }}`
+              body: `## Strive PR Agent Review\n\n${body}`
             })
