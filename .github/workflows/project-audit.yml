@@ -59,7 +59,7 @@ jobs:
         id: audit
         uses: actions/ai-inference@v1
         with:
-          model: mistral-ai/Codestral-2501
+          model: openai/gpt-4o
           system-prompt: ${{ steps.prompt.outputs.content }}
           prompt: |
             Focus for this run: ${{ github.event.inputs.focus_area }}
