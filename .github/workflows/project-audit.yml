@@ -1,100 +1,96 @@
-name: Strive Project Audit
-
-on:
-  workflow_dispatch:
-    inputs:
-      focus_area:
-        description: "Audit focus (leave blank for full audit)"
-        required: false
-        default: "full"
-        type: choice
-        options:
-          - full
-          - documentation
-          - architecture
-          - code-quality
-          - pwa-design-system
-          - ai-agent
-
-jobs:
-  audit:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      models: read
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build codebase snapshot
-        id: snapshot
-        run: |
-          SNAPSHOT=$(find app components lib docs -type f \( \
-            -name "*.ts" \
-            -o -name "*.tsx" \
-            -o -name "*.md" \
-            -o -name "*.sql" \
-            -o -name "*.css" \
-          \) \
-            | grep -v "node_modules" \
-            | grep -v "__tests__" \
-            | grep -v ".next" \
-            | sort \
-            | xargs awk 'FNR==1{print "\n\n--- FILE: " FILENAME " ---"}1' \
+- name: Build snapshot for focus area
+  id: snapshot
+  run: |
+    FOCUS="${{ github.event.inputs.focus_area }}"
+    case "$FOCUS" in
+      documentation)
+        SNAPSHOT=$(
+          for f in README.md AGENTS.md CLAUDE.md docs/*.md app/README.md components/README.md lib/README.md; do
+            [ -f "$f" ] && { echo; echo "--- $f ---"; cat "$f"; }
+          done
+        )
+        ;;
+      architecture)
+        SNAPSHOT=$(
+          echo "=== FILE TREE ==="
+          find app components lib -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.css" \) | sort
+          echo
+          echo "=== KEY FILES ==="
+          for f in proxy.ts next.config.ts i18n.ts "app/[locale]/layout.tsx" "app/[locale]/page.tsx"; do
+            [ -f "$f" ] && { echo; echo "--- $f ---"; cat "$f"; }
+          done
+        )
+        ;;
+      code-quality)
+        SNAPSHOT=$(
+          echo "=== \"use client\" usage (overuse check) ==="
+          grep -rn '"use client"' app components 2>/dev/null || echo "(none)"
+          echo
+          echo "=== forbidden terminology (task|streak|completed) ==="
+          grep -rEn '\b(task|streak|completed)\b' app components lib 2>/dev/null | head -40 || echo "(none)"
+          echo
+          echo "=== console.log occurrences ==="
+          grep -rn 'console\.log' app components lib 2>/dev/null || echo "(none)"
+          echo
+          echo "=== raw HTML elements (should use Shadcn) ==="
+          grep -rEn '<(button|input|select)\b' app components 2>/dev/null | head -30 || echo "(none)"
+        )
+        ;;
+      pwa-design-system)
+        SNAPSHOT=$(
+          echo "=== app/globals.css ==="
+          cat app/globals.css
+          echo
+          echo "=== loading.tsx files present ==="
+          find app -name "loading.tsx" 2>/dev/null || echo "(none)"
+          echo
+          echo "=== components/ui/*.tsx ==="
+          for f in components/ui/*.tsx; do
+            [ -f "$f" ] && { echo; echo "--- $f ---"; cat "$f"; }
+          done
+        )
+        ;;
+      ai-agent)
+        if [ -d lib/agent ]; then
+          SNAPSHOT=$(
+            echo "=== lib/agent/ ==="
+            find lib/agent -type f | sort | while read f; do
+              echo; echo "--- $f ---"; cat "$f"
+            done
           )
-          echo "content<<EOF" >> $GITHUB_OUTPUT
-          echo "$SNAPSHOT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Load system prompt
-        id: prompt
-        run: |
-          PROMPT=$(cat .github/prompts/strive-project-reviewer.md)
-          echo "content<<EOF" >> $GITHUB_OUTPUT
-          echo "$PROMPT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Run audit
-        id: audit
-        uses: actions/ai-inference@v1
-        with:
-          model: openai/gpt-4o
-          system-prompt: ${{ steps.prompt.outputs.content }}
-          prompt: |
-            Focus for this run: ${{ github.event.inputs.focus_area }}
-
-            When focus is not "full", prioritize the relevant audit pillar but still flag
-            any critical issues found in other areas.
-
-            Full codebase snapshot:
-
-            ${{ steps.snapshot.outputs.content }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          max-tokens: 4000
-
-      - name: Create audit issue
-        uses: actions/github-script@v7
-        env:
-          AUDIT_OUTPUT: ${{ steps.audit.outputs.response }}
-        with:
-          script: |
-            const focus = '${{ github.event.inputs.focus_area }}';
-            const date = new Date().toISOString().split('T')[0];
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `Audit [${focus}] — ${date}`,
-              body: [
-                `**Focus:** ${focus}`,
-                `**Triggered by:** @${context.actor}`,
-                `**Run:** ${runUrl}`,
-                '',
-                '---',
-                '',
-                process.env.AUDIT_OUTPUT
-              ].join('\n'),
-              labels: ['documentation']
-            });
+        else
+          SNAPSHOT=$(
+            echo "AI agent layer NOT YET IMPLEMENTED (no lib/agent/ directory)."
+            echo "Expected from Phase 3 onwards. Audit the readiness:"
+            echo
+            echo "=== package.json (check Vercel AI SDK + Gemini deps) ==="
+            cat package.json
+            echo
+            echo "=== lib/supabase/server.ts (auth.getUser availability) ==="
+            cat lib/supabase/server.ts
+          )
+        fi
+        ;;
+      full|*)
+        SNAPSHOT=$(
+          echo "=== FILE TREE ==="
+          find app components lib docs -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.md" -o -name "*.css" \) | sort
+          echo
+          echo "=== README.md ==="
+          cat README.md 2>/dev/null
+          echo
+          echo "=== AGENTS.md ==="
+          cat AGENTS.md 2>/dev/null
+          echo
+          echo "=== SIGNALS ==="
+          echo "\"use client\" count: $(grep -rln '\"use client\"' app components 2>/dev/null | wc -l)"
+          echo "console.log count:  $(grep -rn 'console\.log' app components lib 2>/dev/null | wc -l)"
+          echo
+          echo "Forbidden terminology hits (task|streak|completed), max 20:"
+          grep -rEn '\b(task|streak|completed)\b' app components lib 2>/dev/null | head -20 || echo "(none)"
+        )
+        ;;
+    esac
+    echo "content<<EOF" >> $GITHUB_OUTPUT
+    echo "$SNAPSHOT" >> $GITHUB_OUTPUT
+    echo "EOF" >> $GITHUB_OUTPUT
