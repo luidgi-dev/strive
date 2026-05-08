@@ -57,6 +57,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      models: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -93,7 +94,7 @@ jobs:
             Review this diff and apply the rules from your system prompt:
 
             ${{ steps.diff.outputs.diff }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           max-tokens: 1500
 
       - name: Post review comment
