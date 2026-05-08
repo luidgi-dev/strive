@@ -85,7 +85,7 @@ jobs:
         id: review
         uses: actions/ai-inference@v1
         with:
-          model: openai/gpt-4o
+          model: openai/gpt-4o-mini
           system-prompt: ${{ steps.prompt.outputs.content }}
           prompt: |
             PR: ${{ github.event.pull_request.title }}
