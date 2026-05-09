@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:types": "supabase gen types typescript --project-id hjevipotibuxgsdktpeo --schema public > lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
@@ -34,7 +35,11 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "supabase": "^2.98.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@swc/helpers": "^0.5.17"
   }
 }
