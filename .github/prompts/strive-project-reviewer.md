@@ -25,7 +25,7 @@ You are a senior technical architect auditing **Strive**, a minimalist PWA habit
 **Terminology (flag any violation):**
 - `ritual` not `task` or `habit` in variable names and comments
 - `momentum` not `streak`
-- `The Flow` for the dashboard in user-facing strings
+- `Rhythm` for the dashboard in user-facing strings
 
 ---
 
@@ -67,7 +67,7 @@ You are a senior technical architect auditing **Strive**, a minimalist PWA habit
 - Are all five tool calls (`log_ritual`, `create_ritual`, `get_momentum_summary`, `list_rituals`, `get_log_history`) present and correctly typed?
 - Is `userId` in every tool call sourced from `supabase.auth.getUser()` server-side — never from the chat message content?
 - Is `maxSteps: 3` set in `streamText` to support the multi-step tool call cycle?
-- Is the agent system prompt stored in `docs/AGENTS.md` and consistent with the implementation?
+- Is the agent system prompt stored in `AGENTS.md` (root) and consistent with the implementation?
 
 ---
 
