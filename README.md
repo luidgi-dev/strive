@@ -33,7 +33,7 @@ The full product specification lives in [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SP
 | `docs/` | Architecture, design system, UX writing, product spec | [`docs/README.md`](docs/README.md) |
 | `design/` | Design workspace (wireframes, mockups, research) | [`design/README.md`](design/README.md) |
 | `.agents/` | Reusable AI skill packs | [`.agents/README.md`](.agents/README.md) |
-| `.github/` | CI workflows and AI review prompts | [`.github/README.md`](.github/README.md) |
+| `.github/` | CI workflows and AI review prompts | [`.github/WORKFLOWS.md`](.github/WORKFLOWS.md) |
 
 Root files like `proxy.ts`, `i18n.ts`, `next.config.ts`, `tsconfig.json` are build/runtime critical and are documented in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -70,7 +70,7 @@ Two GitHub Actions workflows guard the repo:
 - `pr-review.yml` — AI-assisted review on every pull request, checking code semantics, terminology, and architectural fit.
 - `project-audit.yml` — periodic project-wide audit for documentation drift and architectural health.
 
-Both workflows consume prompts from `.github/prompts/`. See [`.github/README.md`](.github/README.md) for the full setup.
+Both workflows consume prompts from `.github/prompts/`. See [`.github/WORKFLOWS.md`](.github/WORKFLOWS.md) for the full setup.
 
 ## AI agent guidelines
 

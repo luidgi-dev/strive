@@ -67,7 +67,7 @@ See [`.agents/README.md`](../.agents/README.md). Vendored skill packs (e.g. `sup
 
 ### `.github/` — CI and AI review workflows
 
-See [`.github/README.md`](../.github/README.md).
+See [`.github/WORKFLOWS.md`](../.github/WORKFLOWS.md).
 
 ---
 
