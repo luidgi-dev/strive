@@ -1,0 +1,29 @@
+
+---
+description: Strive agent rules — defers to AGENTS.md for terminology, code semantics, and Next.js conventions. Adds Cursor-specific workflow.
+alwaysApply: true
+---
+
+# Strive — Cursor Rules
+
+Cursor inherits **all** agent rules from [AGENTS.md](mdc:AGENTS.md) at the repository root. That file is the single source of truth for terminology, code semantics, tone, Next.js conventions, and pitfalls to avoid.
+
+This file only adds Cursor-specific workflow on top of `AGENTS.md`.
+
+## Cursor interaction protocol
+
+When the user asks for a change, do this in order:
+
+1. Restate the goal briefly (1–2 sentences).
+2. Identify assumptions and ask up to 3 clarifying questions if repo patterns are unclear.
+3. Propose a minimal plan before large or breaking edits.
+4. Implement with the smallest diff that achieves the goal.
+5. Verify consistency with `AGENTS.md` (terminology, semantic naming, App Router conventions).
+6. Summarize what changed and what the user should sanity-check.
+
+## Quick verification checklist (run mentally before finishing)
+
+- [ ] All user-facing copy is in English (unless the user asked otherwise).
+- [ ] Copy matches [docs/UX_WRITING.md](mdc:docs/UX_WRITING.md) — no forbidden terms (`Task`, `Streak`, `Completed`, `Dashboard`, `Done` as action label).
+- [ ] Code uses Strive semantic names (`ritual_id`, `momentum`, `logged_at`, `flow`).
+- [ ] Diff is minimal and consistent with existing Next.js patterns.
