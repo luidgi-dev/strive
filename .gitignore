@@ -44,3 +44,7 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Supabase CLI local cache (auto-generated, never commit)
+supabase/.temp/
+supabase/.branches/
