@@ -32,9 +32,10 @@ Strive speaks like a **calm, knowledgeable coach** — never pushy, never guilt-
 | Product Concept | Canonical Term | Forbidden Synonyms | Notes |
 |---|---|---|---|
 | Single unit of action | **Ritual** | Task, Habit, Routine | Primary term. "Habit" only for long-form prose. |
-| Main interface/section | **The Flow** | Dashboard, Home | Use for routes and section headers. |
+| Main interface / dashboard | **Rhythm** | Dashboard, Home, The Flow | The home tab. Replaces the earlier "The Flow" name. |
 | Progress unit | **Momentum** | Streak, Series | Replaces the anxiety of "streaks." |
 | Progress logic | **Consistency** | Productivity, Hustle | Focus on rhythm over output. |
+| Long-term consistency view | **The Arc** | Heatmap, Calendar | 12-week visualization on a ritual detail page. |
 | Management space | **Ritual board** | To-do list, Task list | UI term for the ritual list/board. |
 | Action (Verb) | **Log** | Complete, Finish, Done | Global preference for buttons and feedback. |
 | Action (Secondary) | **Track** | Track streak | Leads to a "Log" action in UI. |
@@ -42,23 +43,24 @@ Strive speaks like a **calm, knowledgeable coach** — never pushy, never guilt-
 | Success (Standard) | **Logged** | Completed, Done | For status pills and standard feedback. |
 | Objective/Goal | **Target / Intention** | Goal, Objective | Softer, more mindful framing. |
 | System Concept | **Run** | Streak | Technical description only (e.g., "Log a ritual run"). |
-| System Prompt | **Reminder** | Notification | More helpful and less intrusive. |
+| Notification | **Reminder** | Alert, Push | More helpful and less intrusive. |
 | Failed/Missing | **Missed** | Failure, Failed, Lost | Neutral, non-judgmental language. |
+| Day without logging | **Rest** | Off-day, Failure | Neutral framing for inactivity. |
 
 ---
 
 ## 3. Banned Patterns & Guardrails
 
 ### Words to Avoid
-* **Done:** Forbidden on action buttons or user-facing text. Use **Log** or **Logged**.
-* **Failure / Punishment:** Never reference these. Use a dash (`—`) or neutral language.
-* **Perfect:** Use **Steady** or **Strong** instead.
+- **Done:** Forbidden on action buttons or user-facing text. Use **Log** or **Logged**.
+- **Failure / Punishment:** Never reference these. Use a dash (`—`) or neutral language.
+- **Perfect:** Use **Steady** or **Strong** instead.
 
 ### Patterns to Avoid
-* **Excessive Punctuation:** No multiple exclamation marks ("Great job!!!").
-* **Emoji Abuse:** Use sparingly. Never let an emoji carry the primary meaning.
-* **Gamification:** Avoid "Level up!", "Unlocked!", or "Points."
-* **Guilt-Nudges:** Avoid "You haven't done X in 3 days." Use "Start building momentum."
+- **Excessive Punctuation:** No multiple exclamation marks ("Great job!!!").
+- **Emoji Abuse:** Use sparingly. Never let an emoji carry the primary meaning.
+- **Gamification:** Avoid "Level up!", "Unlocked!", or "Points."
+- **Guilt-Nudges:** Avoid "You haven't done X in 3 days." Use "Start building momentum."
 
 ---
 
@@ -69,7 +71,8 @@ Strive speaks like a **calm, knowledgeable coach** — never pushy, never guilt-
 | **Action Button** | `Done` / `Complete task` | `Log` / `Log ritual` |
 | **Success Toast** | `Task completed` | `Logged` / `Nailed it!` |
 | **Empty Board** | `You have no tasks` | `Your ritual board is empty` |
-| **Empty Flow** | `No dashboard items` | `Start building momentum` |
+| **Empty Dashboard** | `No dashboard items` | `Start building momentum` |
+| **Tab label** | `Dashboard` / `Home` | `Rhythm` |
 | **Onboarding** | `Add your first task` | `Add your first ritual` |
 | **Error Message** | `Unable to complete task` | `Couldn't log the ritual` |
 | **Form Label** | `Task name` | `Ritual name` |
@@ -83,13 +86,22 @@ Strive speaks like a **calm, knowledgeable coach** — never pushy, never guilt-
 Consistent semantics must exist from the database to the DOM.
 
 ### Naming in Code
-* **Variables & IDs:** Use `ritual_id`, `momentum`, `logged_at`, `flow_state`. (Avoid `task_id`, `streak`, `completed_at`).
-* **UI Components:** `RitualCard`, `RitualBoard`, `Flow`, `FlowHeader`.
-* **DOM Classes:** `.ritual-card`, `.ritual-board`, `.flow-header`.
+- **Variables & IDs:** Use `ritual_id`, `momentum`, `logged_at`. (Avoid `task_id`, `streak`, `completed_at`.)
+- **UI Components:** `RitualCard`, `RitualBoard`.
+- **DOM Classes:** `.ritual-card`, `.ritual-board`.
 
 ### API & Database
-* **Schema:** Prefer `logged_at` over `completed_at`.
-* **API Response:** Use `status: "logged"` instead of `status: "completed"`.
+- **Schema:** Prefer `logged_at` over `completed_at`.
+- **API Response:** Use `status: "logged"` instead of `status: "completed"`.
+
+### Code drift note (legacy → canonical)
+
+The canonical UI term for the main dashboard is **Rhythm**. The codebase still uses `flow_*` semantic names from the previous "The Flow" naming:
+
+- Code (legacy, in use today): `flow_state`, `Flow`, `FlowHeader`, `.flow-header`
+- Code (target after rename): `rhythm_state`, `Rhythm`, `RhythmHeader`, `.rhythm-header`
+
+The code rename is scheduled for **Phase 2**. Until then, agents may keep `flow_*` identifiers when modifying existing code, but new code must use `rhythm_*` and any user-facing copy must say **Rhythm** (never "The Flow").
 
 ---
 
@@ -99,11 +111,13 @@ Before generating/editing a UI or message, verify:
 - [ ] Use **Ritual**, not **Task**.
 - [ ] Use **Momentum**, not **Streak**.
 - [ ] Use **Logged**, not **Completed**.
-- [ ] Use **The Flow**, not **Dashboard**.
+- [ ] Use **Rhythm**, not **Dashboard** (and never legacy "The Flow").
+- [ ] Use **The Arc** for the 12-week consistency visualization.
 - [ ] Action buttons: avoid the text **Done**.
 - [ ] Tone: minimalist, encouraging, conversational.
 - [ ] Errors: recovery-oriented, not guilt-inducing.
-- [ ] Code names aligned (`ritual_id`, `logged_at`, `momentum`).
+- [ ] Code names aligned (`ritual_id`, `logged_at`, `momentum`); see §5 for the `flow_*` → `rhythm_*` migration note.
 
 ---
+
 > *Note: Progress is non-linear. Respect the pause, encourage the return.*

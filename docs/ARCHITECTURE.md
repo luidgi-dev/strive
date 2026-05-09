@@ -1,89 +1,131 @@
 # Architecture Overview
 
+Strive is a Next.js 16 app with a Supabase (PostgreSQL) backend. It is internationalized via `next-intl` and runs at the repository root — there is no separate `web/` package.
+
+---
+
 ## Folder Map
 
-### `app/`
-Next.js 16 App Router. Houses pages and route handlers.
+### `app/` — Next.js App Router
 
-- `auth/` — Auth pages (login, signup, reset password)
-- `(protected)/` — Authenticated user pages (route group)
-- `layout.tsx` — Root layout
-- `page.tsx` — Landing page
+Locale-aware routing. All user-facing routes live under `[locale]/`.
 
-### `components/`
-Reusable React components.
+- `[locale]/page.tsx` — Landing page
+- `[locale]/layout.tsx` — Root layout
+- `[locale]/auth/` — Auth flow: `login/`, `sign-up/`, `sign-up-success/`, `confirm/`, `confirmed/`, `forgot-password/`, `update-password/`, `error/`
+- `[locale]/protected/` — Authenticated routes (Rhythm, Rituals, Circles, Settings)
+- `globals.css` — Global styles, color tokens, typography
+- `favicon.ico`, `icon.svg` — App icons
+- `README.md` — Product specification (screens, navigation, interaction rules)
 
-- `forms/` — Auth and data-entry forms
-- `ui/` — Primitive components (from shadcn/Base UI)
+### `components/` — Reusable React components
 
-### `lib/`
-Shared utilities and client libraries.
+- `forms/` — Auth forms (`login-form`, `sign-up-form`, `forgot-password-form`, `update-password-form`, `logout-button`)
+- `landing/` — Landing page sections (`hero-section`, `philosophy-section`, `vocabulary-section`, `ai-conversation-section`, `ritual-visualization-section`, `landing-shell`, `landing-footer`, plus `index.ts`, `types.ts`)
+- `providers/` — React context providers (`theme-provider`)
+- `ui/` — Primitives (`button`, `card`, `input`, `label`, `locale-switcher`, `theme-toggle`)
 
-- `supabase/` — Supabase client instances + auth helpers
-- `utils.ts` — General utilities
-- `constants.ts` — App-wide constants
+Files use **kebab-case** (`login-form.tsx`); component identifiers stay **PascalCase** (`LoginForm`).
 
-### `data/`
-Database schema, migrations, seeds, and views (PostgreSQL + Supabase).
+### `lib/` — Shared utilities and clients
 
-- `tables/` — Table definitions (DDL)
-- `triggers/` — Database triggers
-- `seeds/` — Reference data and test fixtures
-- `views/` — SQL views for reports and queries
-- `migrate.py` — Migration runner
+- `supabase/`
+  - `client.ts` — Browser-safe Supabase client (publishable key)
+  - `server.ts` — Server-side client with cookie-based session (`@supabase/ssr`)
+  - `middleware.ts` — Used by `proxy.ts` to refresh sessions on each request
+- `utils.ts` — Generic helpers (Tailwind class merging, etc.)
 
-### `design/`
-UX/design assets, wireframes, and visual guidelines.
+### `messages/` — i18n translations
 
-### `docs/`
-Documentation hub for developers and AI agents.
+- `en.json`, `fr.json` — All user-facing strings, consumed by `next-intl` based on the URL locale segment.
 
-- `AGENTS.md` — AI agent guidelines
-- `system-prompt.md` — Claude system prompt
-- `UX_WRITING.md` — Terminology and UI tone
-- `ARCHITECTURE.md` — This file
+### `data/` — Database (PostgreSQL on Supabase)
 
-### `public/`
-Static assets served by Next.js.
+See [`data/README.md`](../data/README.md) for the full migration guide and schema overview.
+
+- `tables/` — DDL files in dependency order
+- `triggers/` — DB triggers (e.g. `handle_new_user.sql`)
+- `seeds/` — Reference data and a local-dev test fixture
+- `views/` — SQL views (`ritual_progress`, `daily_summary`, `ritual_log_history`)
+- `migrate.py` — Python migration runner
+
+### `public/` — Static assets
+
+Favicons, PWA manifest, brand SVGs and JPEGs.
+
+### `docs/` — Documentation hub
+
+See [`docs/README.md`](README.md) for the index.
+
+### `design/` — Design workspace
+
+See [`design/README.md`](../design/README.md). Wireframes, mockups, flows, research notes.
+
+### `.agents/` — Reusable AI skills
+
+See [`.agents/README.md`](../.agents/README.md). Vendored skill packs (e.g. `supabase-postgres-best-practices`).
+
+### `.github/` — CI and AI review workflows
+
+See [`.github/README.md`](../.github/README.md).
+
+---
+
+## Root files (build/runtime critical — do not move)
+
+| File | Role |
+|---|---|
+| `package.json`, `package-lock.json` | Dependencies and scripts |
+| `next.config.ts` | Next.js config (wraps the `next-intl` plugin) |
+| `tsconfig.json` | TypeScript config |
+| `eslint.config.mjs` | ESLint flat config |
+| `postcss.config.mjs` | Tailwind / PostCSS |
+| `components.json` | shadcn CLI config |
+| `proxy.ts` | Next.js Proxy — session refresh + auth gating |
+| `i18n.ts` | `next-intl` runtime config |
+| `next-env.d.ts` | Auto-generated Next.js types |
 
 ---
 
 ## Data Flow
 
-1. **User action** → Next.js app
-2. **Client-side** → `lib/supabase/client.ts` (anon key queries)
-3. **Server-side** → `lib/supabase/server.ts` (admin queries, RLS bypass)
-4. **Database** → `data/` (tables + RLS policies)
-5. **Response** → Component render
+1. **Request** hits a route under `app/[locale]/`.
+2. **Proxy** (`proxy.ts`) calls the Supabase middleware to refresh the session cookie and gate protected routes.
+3. **Server Components** read data via `lib/supabase/server.ts` using the user's session.
+4. **Client Components** (only when interactivity is needed) read via `lib/supabase/client.ts`.
+5. **Database** enforces per-user isolation through RLS policies defined in `data/tables/*.sql`.
+6. **Translations** are resolved by `next-intl` from `messages/{locale}.json` based on the URL segment.
 
 ---
 
-## When to Add New Folders
+## When to add new folders or files
 
-- **New page type?** Create a new route group in `app/(group-name)/`
-- **New domain (rituals, logs)?** Create a new folder in `components/` (e.g., `components/rituals/`)
-- **New utility library?** Add a new file in `lib/` (or subfolder if complex)
-- **New SQL schema?** Add files to `data/tables/`
+| Need | Where |
+|---|---|
+| New page | `app/[locale]/<route>/page.tsx` |
+| New domain (rituals, logs, circles) | `components/<domain>/` |
+| New utility | `lib/<topic>.ts` (or `lib/<topic>/` if it grows) |
+| New table or view | `data/tables/` or `data/views/` |
+| New translation key | `messages/en.json` **and** `messages/fr.json` |
+| New AI skill | `.agents/skills/<skill-name>/` |
 
 ---
 
 ## Naming Conventions
 
-- Components: PascalCase (`RitualCard.tsx`)
-- Pages/routes: kebab-case (`/app/ritual-detail/page.tsx`)
-- Database: snake_case (`ritual_logs`, `logged_at`)
-- Functions: camelCase (`getRituals`, `logRitual`)
+- **Components**: kebab-case filenames, PascalCase identifiers (`login-form.tsx` exporting `LoginForm`).
+- **Routes**: kebab-case (`/forgot-password`).
+- **Database**: snake_case, lowercase SQL (`ritual_logs`, `logged_at`). See `data/README.md`.
+- **Functions/variables**: camelCase (`getRituals`, `logRitual`).
+- **Semantic naming for product concepts**: see [`UX_WRITING.md`](UX_WRITING.md) §5 (`ritual_id`, `momentum`, `logged_at`, `flow`).
 
+---
 
-## AI Agent Skills
+## AI agent setup
 
-The `.agents/` directory contains reusable instruction sets for AI tools (Cursor, Claude, etc.).
+Reusable agent knowledge is split across four places:
 
-### Skills Directory
-
-- `supabase-postgres-best-practices/` — PostgreSQL optimization and Supabase patterns
-
-These are **committed to the repo** so all agents share the same knowledge base. They are separate from:
-- `.cursorrules` — Cursor-specific rules (in root)
-- `docs/AGENTS.md` — Human-readable agent guidelines
-- `docs/system-prompt.md` — Claude system prompt
+- [`AGENTS.md`](../AGENTS.md) — single source of truth for agent rules (terminology, code semantics, protocol).
+- [`CLAUDE.md`](../CLAUDE.md) — Claude Code entry index pointing to docs to read first.
+- [`.cursor/rules/strive.mdc`](../.cursor/rules/strive.mdc) — Cursor-specific workflow on top of `AGENTS.md`.
+- [`.agents/`](../.agents/) — Vendored skill packs.
