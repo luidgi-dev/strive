@@ -1,14 +1,64 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+<!-- Portfolio Quality: AI agent behavior guidelines for Strive -->
+# Strive AI Agent Guidelines (LUI-14)
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+This document is the single source of truth for how AI agents should behave in the Strive repository.
 
-## Strive AI Agent Guidelines (LUI-14)
+## Non-negotiables (always follow)
+- Write outputs in English unless the user explicitly asks otherwise.
+- For any user-facing text (UI labels, buttons, empty states, onboarding copy, error/success messages, confirmations, tooltips), follow [`docs/UX_WRITING.md`](docs/UX_WRITING.md) **exactly**. That document is the canonical source for terminology, tone, code naming, and forbidden patterns — do not duplicate or paraphrase its rules here, read it.
+- Keep tone minimalist, encouraging, and conversational (no blame, no guilt framing, no robotic phrasing).
 
-This repository defines agent behavior and terminology in `docs/`.
+## Why this exists
+AI-first development only works if every agent writes consistently. These rules make sure Cursor, Claude, and other agents:
+- use the same product language (defined in `docs/UX_WRITING.md`)
+- produce compatible code naming (defined in `docs/UX_WRITING.md` §5)
+- ship UI/UX copy that feels like Strive
 
-Authoritative docs:
-- `docs/AGENTS.md` (agent workflow + code naming conventions)
-- `docs/system-prompt.md` (Claude system prompt)
-- `docs/UX_WRITING.md` (terminology and UI tone)
+## Source references (the coherence chain)
+- Terminology, voice, code naming, forbidden patterns: [`docs/UX_WRITING.md`](docs/UX_WRITING.md)
+- File structure and conventions: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- Visual contract (colors, typography, spacing): [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
+- Cursor-specific workflow: [`.cursor/rules/strive.mdc`](.cursor/rules/strive.mdc)
+- Claude Code entry index: [`CLAUDE.md`](CLAUDE.md)
+- Reusable skill packs: [`.agents/`](.agents/)
+
+## Default interaction protocol
+When the user asks for a change, follow this sequence:
+1. Interpret the request and restate the goal in 1–2 sentences.
+2. Ask 1–3 clarifying questions if requirements are ambiguous or repo patterns are unclear.
+3. Propose a minimal plan before making breaking changes.
+4. Implement with the smallest diff that achieves the goal.
+5. Verify consistency:
+   - terminology and tone → check `docs/UX_WRITING.md`
+   - code naming → check `docs/UX_WRITING.md` §5
+   - file structure → check `docs/ARCHITECTURE.md`
+6. Summarize what changed and what the user should verify manually.
+
+If you cannot confidently complete step 5, ask before proceeding.
+
+## Next.js alignment (repo reality)
+This repository hosts the Next.js 16 app at the root (`app/`, `components/`, `lib/`, etc.).
+
+- Use App Router patterns.
+- Prefer Server Components by default.
+- Only add `"use client"` when you genuinely need client-only behavior (hooks, browser APIs, interactivity).
+- The app uses `next-intl` with locale routing (`[locale]/`); never hardcode user-facing strings — add them to `messages/en.json` and `messages/fr.json`.
+- Auth and protected-route logic lives in `proxy.ts` (Next.js 16 Proxy API) — do not bypass it from pages.
+
+## Portfolio-quality output standards
+When writing code or docs:
+- Keep diffs focused (no unrelated formatting churn).
+- Use clear structure and consistent headings.
+- Validate any user-facing copy against `docs/UX_WRITING.md` before finishing.
+- Be direct and helpful; avoid over-explaining.
+
+## Common pitfalls
+- Inventing new product terms or code identifiers without checking `docs/UX_WRITING.md`.
+- Assuming a different Next.js version than the repo actually uses (it's Next.js 16).
+- Adding documentation that duplicates `docs/UX_WRITING.md` — link to it instead.
+- Bypassing `proxy.ts` for auth checks inside individual routes.
+
+## Quick self-check (one minute, before finishing)
+- [ ] Did I cross-check user-facing copy against `docs/UX_WRITING.md`?
+- [ ] Did I keep the diff minimal and consistent with existing Next.js patterns?
+- [ ] Did I update the relevant doc when I changed structure, terminology, or visual rules?

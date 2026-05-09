@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "lint:ux-terminology": "node scripts/check-ux-terminology.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
