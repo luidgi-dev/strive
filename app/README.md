@@ -52,6 +52,8 @@ The header app-name link points to `/[locale]/protected/flow` — Flow is the de
 
 - **Server Components by default**; only add `"use client"` when you genuinely need browser-only behavior. The protected layout and feature pages are server components.
 - All user-facing strings go through `next-intl`. Add the key in both [`messages/en.json`](../messages/en.json) and [`messages/fr.json`](../messages/fr.json) — never hardcode in the component. Navigation labels live under `navigation.*`, per-feature copy under `app.<feature>.*`.
+- In Server Components, prefer the async API: `await getTranslations(ns)` from `next-intl/server`. The sync `useTranslations` hook is reserved for Client Components (`"use client"`).
+- For internal links, import `Link` from [`@/lib/i18n/navigation`](../lib/i18n/navigation.ts) — it prefixes the current locale automatically. Plain `next/link` will lose the locale and silently fall back to English via the proxy rewrite.
 - Auth + profile helper: [`lib/profile.ts`](../lib/profile.ts) (`getAuthenticatedProfile()`). Raw Supabase clients come from [`lib/supabase/server.ts`](../lib/supabase/server.ts) and [`lib/supabase/client.ts`](../lib/supabase/client.ts).
 - Page filenames are lowercase (`page.tsx`, `layout.tsx`, `loading.tsx`); route segments are kebab-case (`forgot-password/`, `sign-up-success/`).
 

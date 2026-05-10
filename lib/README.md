@@ -10,6 +10,9 @@ Shared utilities and client libraries for the Strive web app.
   - `middleware.ts` — Refreshes the session cookie; called from `proxy.ts`; also typed with `<Database>`
   - `database.types.ts` — Auto-generated TypeScript types reflecting the public schema (tables, views, enums). Do not edit by hand. Regenerate with `npm run db:types`.
 - `profile.ts` — `getAuthenticatedProfile()`: server-side helper that returns `{ user, profile }` from the Supabase session + `profiles` table. Used by `app/[locale]/protected/layout.tsx` to gate access and render the header avatar.
+- `i18n/` — Locale-aware navigation helpers built on `next-intl`
+  - `routing.ts` — `defineRouting` config (re-uses `locales`/`defaultLocale` from root `i18n.ts`, `localePrefix: "as-needed"` to match the proxy's clean-URL behavior for English)
+  - `navigation.ts` — `createNavigation(routing)` re-exports: `Link`, `redirect`, `usePathname`, `useRouter`, `getPathname`. Use these instead of `next/link` / `next/navigation` for any internal route that needs to preserve the current locale.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
 
 ## Usage
@@ -36,6 +39,18 @@ if (!user) redirect(`/${locale}/auth/login`)
 ```
 
 Returns `{ user: null, profile: null }` when there is no session — callers decide how to react (the protected layout redirects to login).
+
+### Locale-aware navigation
+
+Always use the wrappers from `@/lib/i18n/navigation` for internal links — they automatically prefix the current locale (`/protected/flow` → `/fr/protected/flow` for French users) so navigation never silently flips back to the default locale.
+
+```tsx
+import { Link } from "@/lib/i18n/navigation";
+
+<Link href="/protected/rituals">{t("rituals")}</Link>
+```
+
+Bare `next/link` is fine for external URLs and locale-agnostic anchors, but never for routes under `[locale]/`.
 
 ### Client Component (only when needed)
 
