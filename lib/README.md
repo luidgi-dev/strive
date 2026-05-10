@@ -9,6 +9,7 @@ Shared utilities and client libraries for the Strive web app.
   - `server.ts` — Server-side client, typed with `<Database>`, cookie-based session handling
   - `middleware.ts` — Refreshes the session cookie; called from `proxy.ts`; also typed with `<Database>`
   - `database.types.ts` — Auto-generated TypeScript types reflecting the public schema (tables, views, enums). Do not edit by hand. Regenerate with `npm run db:types`.
+- `profile.ts` — `getAuthenticatedProfile()`: server-side helper that returns `{ user, profile }` from the Supabase session + `profiles` table. Used by `app/[locale]/protected/layout.tsx` to gate access and render the header avatar.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
 
 ## Usage
@@ -21,6 +22,20 @@ import { createClient } from '@/lib/supabase/server'
 const supabase = await createClient()
 const { data: { user } } = await supabase.auth.getUser()
 ```
+
+### Authenticated profile helper
+
+For server components in the protected segment that need both the verified user and their profile row, use the helper instead of repeating the query:
+
+```ts
+import { getAuthenticatedProfile } from '@/lib/profile'
+
+const { user, profile } = await getAuthenticatedProfile()
+if (!user) redirect(`/${locale}/auth/login`)
+// profile?.username, profile?.avatar_url
+```
+
+Returns `{ user: null, profile: null }` when there is no session — callers decide how to react (the protected layout redirects to login).
 
 ### Client Component (only when needed)
 
@@ -62,5 +77,5 @@ Run `npm run db:types` after any schema change (new table, new column, new view,
 ## Conventions
 
 - Files are lowercase, kebab-case where they have multiple words.
-- Add new utilities directly in `lib/utils.ts` while it stays small. If a utility set grows beyond a single concern, give it its own subfolder (`lib/<topic>/`).
+- Add new utilities directly in `lib/utils.ts` while it stays small. If a utility set grows beyond a single concern, give it its own file (e.g. `lib/profile.ts`) or subfolder (`lib/<topic>/`).
 - Never hardcode secrets here — read from `process.env` only.
