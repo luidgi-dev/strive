@@ -1,11 +1,11 @@
 // components/ui/bottom-nav.tsx
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HeartHandshake, Users, AudioWaveform } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 
 export function BottomNav() {
   const pathname = usePathname();
