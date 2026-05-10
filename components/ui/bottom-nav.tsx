@@ -1,11 +1,10 @@
 // components/ui/bottom-nav.tsx
 "use client";
 
-import { usePathname } from "next/navigation";
 import { HeartHandshake, Users, AudioWaveform } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
-import { Link } from "@/lib/i18n/navigation";
+import { Link, usePathname } from "@/lib/i18n/navigation";
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -22,7 +21,7 @@ export function BottomNav() {
       <div className="flex h-16 items-center justify-around">
         {navItems.map((item) => {
           
-          const isActive = pathname.includes(item.href);
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           
           return (
             <Link
