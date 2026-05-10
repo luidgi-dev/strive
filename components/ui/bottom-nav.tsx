@@ -29,7 +29,7 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "relative flex flex-col items-center justify-center gap-1 transition-colors min-w-[44px] min-h-[44px]",
+                "relative flex flex-col items-center justify-center gap-1 transition-colors min-w-[64px] min-h-[48px]",
                 isActive ? "text-foreground" : "text-muted-foreground"
               )}
             >
