@@ -20,7 +20,7 @@ export default function CirclesPage() {
       </p>
       
       {/* Available soon CTA */}
-      <Button disabled size="lg" variant="outline" className="mt-4 h-14 border-dashed opacity-50">
+      <Button disabled size="lg" variant="outline" className="mt-4 min-h-[44px] px-6 border-dashed opacity-50">
         {tLanding("cta")}
       </Button>
     </div>
