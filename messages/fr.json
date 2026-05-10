@@ -153,5 +153,21 @@
     "errorTitle": "Desole, une erreur est survenue.",
     "errorCode": "Code erreur : {error}",
     "errorFallback": "Une erreur non specifiee est survenue."
+  },
+  "navigation": {
+    "flow": "Rythme",
+    "rituals": "Rituels",
+    "circles": "Cercles"
+  },
+  "app": {
+    "rituals": {
+      "description": "Développez votre constance grâce à des rituels quotidiens porteurs de sens."
+    },
+    "circles": {
+      "description": "Partagez votre élan avec un cercle privé."
+    },
+    "flow": {
+      "description": "Votre dynamique quotidienne, visualisée."
+    }
   }
 }
