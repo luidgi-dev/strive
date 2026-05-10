@@ -1,3 +1,4 @@
+//app/[locale]/layout.tsx
 import type { Metadata } from "next";
 import { DM_Sans, Geist, Geist_Mono, Sora } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
