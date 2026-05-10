@@ -153,5 +153,22 @@
     "errorTitle": "Sorry, something went wrong.",
     "errorCode": "Code error: {error}",
     "errorFallback": "An unspecified error occurred."
+  },
+  "navigation": {
+    "flow": "Rhythm",
+    "rituals": "Rituals",
+    "circles": "Circles"
+  },
+  "app": {
+    "rituals": {
+      "description": "Build consistency through meaningful daily practices."
+    },
+    "circles": {
+      "description": "Share your momentum with a private collective."
+    },
+    "flow": {
+      "description": "Your daily momentum, visualized."
+    }
   }
 }
+
