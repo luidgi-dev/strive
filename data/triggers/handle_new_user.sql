@@ -44,6 +44,8 @@ begin
         now()
     );
 
+    insert into user_credits (user_id) values (new.id);
+    
     return new;
 end;
 $$;
