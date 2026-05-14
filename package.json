@@ -41,6 +41,6 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@swc/helpers": "^0.5.17"
+    "@swc/helpers": "$@swc/helpers"
   }
 }
