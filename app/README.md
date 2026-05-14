@@ -6,24 +6,33 @@ Locale-aware routing for the Strive web app. All user-facing routes live under `
 
 ```
 app/
+├── layout.tsx                  # Root layout: <html>/<body>, fonts, ThemeProvider
 ├── [locale]/
+│   ├── layout.tsx              # Locale validation + NextIntlClientProvider
 │   ├── page.tsx                # Landing
-│   ├── layout.tsx              # Root layout (theme, providers, intl)
 │   ├── auth/                   # Auth flow (see below)
 │   └── protected/              # Authenticated routes
-│       ├── layout.tsx          # Auth gate + sticky header (app name, UserAvatar → settings)
+│       ├── layout.tsx          # Auth gate + <ProtectedHeader />
 │       ├── loading.tsx         # Suspense fallback (spinner) for the protected segment
 │       ├── page.tsx            # Legacy protected landing
 │       └── (app)/              # Route group: in-app shell with BottomNav
 │           ├── layout.tsx      # Wraps children with padding + <BottomNav />
-│           ├── flow/page.tsx     # "Rhythm" — daily momentum
-│           ├── rituals/page.tsx  # Rituals list
-│           └── circles/page.tsx  # Circles
+│           ├── flow/page.tsx       # "Rhythm" — daily momentum
+│           ├── rituals/page.tsx    # Rituals list
+│           ├── circles/page.tsx    # Circles
+│           └── settings/           # User settings (see "Settings" below)
+│               ├── page.tsx
+│               ├── action.ts       # updateUsername, updateAvatar
+│               └── components/     # Profile, Preferences, Membership, DangerZone
 ├── globals.css                 # Color tokens, typography, base styles
 ├── favicon.ico
 ├── icon.svg
 └── README.md                   # This file
 ```
+
+### Layout split (root vs locale)
+
+`<html>`, `<body>`, fonts and the `ThemeProvider` live in the **root** layout (`app/layout.tsx`). The `[locale]/layout.tsx` only validates the locale and wraps children in `NextIntlClientProvider`. Switching locale therefore re-mounts only the intl provider, not the theme — this avoids the React 19 "scripts inside React components are never executed when rendering on the client" warning that next-themes' anti-FOUC inline script otherwise triggers on every locale change. `<html lang>` is resolved server-side via `getLocale()` from `next-intl/server`.
 
 ### Auth flow (`[locale]/auth/`)
 
@@ -40,9 +49,22 @@ Individual pages don't repeat the auth check.
 
 ### The `(app)` route group
 
-`(app)/` is a route group (parentheses → no URL segment), so its children live at `/[locale]/protected/flow`, `/rituals`, `/circles`. The group exists to scope the in-app shell — `(app)/layout.tsx` injects the [`BottomNav`](../components/ui/bottom-nav.tsx) and content padding for tabbed pages. Routes that should not have the bottom nav (e.g. `settings/`) go directly under `protected/`, outside the group.
+`(app)/` is a route group (parentheses → no URL segment), so its children live at `/[locale]/protected/flow`, `/rituals`, `/circles`, `/settings`. The group exists to scope the in-app shell — `(app)/layout.tsx` injects the [`BottomNav`](../components/ui/bottom-nav.tsx) and content padding for tabbed pages.
+
+Some routes inside the group intentionally render full-bleed without the shared chrome (no header, no bottom nav). `settings/` is the first of those — it provides its own in-page back header. Hiding works as follows: [`ProtectedHeader`](../components/layout/protected-header.tsx) and [`BottomNav`](../components/ui/bottom-nav.tsx) are client components that read `usePathname()` from [`@/lib/i18n/navigation`](../lib/i18n/navigation.ts) and return `null` for `/protected/settings`. Add other "destination" routes to those guards instead of moving them out of the group.
 
 The header app-name link points to `/[locale]/protected/flow` — Flow is the default in-app destination after sign-in.
+
+### Settings (`(app)/settings/`)
+
+Server-rendered page that fetches the user's profile and membership in parallel via [`getAuthenticatedProfile()`](../lib/profile.ts) and [`getMembership()`](../lib/profile.ts). Four client sections handle interactivity:
+
+- `ProfileSection` — avatar upload (Server Action → `user-assets` bucket) and inline username edit.
+- `PreferencesSection` — language (next-intl), theme (next-themes), Smart reminders placeholder.
+- `MembershipSection` — tier badge, monthly credits, reset date, "Voir les formules" sheet listing the three tiers.
+- `DangerZoneSection` — logout (reuses [`LogoutButton`](../components/forms/logout-button.tsx)) and two-step delete-account confirmation.
+
+Mutations live in [`settings/action.ts`](./[locale]/protected/(app)/settings/action.ts): `updateUsername` (regex + length validation, maps Postgres `23505` to a `usernameTaken` i18n key) and `updateAvatar` (MIME + size whitelist, uploads to `avatars/{user.id}/{uuid}.{ext}` for cache-busted URLs).
 
 ### Loading UI
 

@@ -26,10 +26,73 @@
   },
   "settings": {
     "title": "Settings",
+    "back": "Back",
     "theme": "Appearance",
     "language": "Language",
     "darkMode": "Dark Mode",
-    "lightMode": "Light Mode"
+    "lightMode": "Light Mode",
+    "profile": {
+      "editAvatar": "Change avatar",
+      "editUsername": "Edit username",
+      "save": "Save",
+      "cancel": "Cancel",
+      "usernameTaken": "This username is already taken",
+      "usernameInvalid": "Use 3 to 30 letters, numbers, _ or -",
+      "avatarTooLarge": "Image must be under 2 MB",
+      "avatarWrongType": "Use a JPG, PNG or WebP image",
+      "uploadFailed": "Upload failed. Try again."
+    },
+    "preferences": {
+      "label": "Preferences",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System",
+      "smartReminders": "Smart reminders",
+      "comingSoon": "Coming soon"
+    },
+    "membership": {
+      "label": "Membership",
+      "plan": "Plan",
+      "credits": "Credits",
+      "creditsValue": "{used} / {total}",
+      "resetsOn": "Resets on",
+      "tierLite": "Lite",
+      "tierPremium": "Premium",
+      "tierLifetime": "Lifetime",
+      "viewPlans": "View plans",
+      "currentPlan": "Current plan"
+    },
+    "unlockSheet": {
+      "title": "Strive plans",
+      "subtitle": "AI conversational logging stays behind Premium. The rest of Strive stays yours.",
+      "liteLabel": "Lite",
+      "litePrice": "Free",
+      "liteTagline": "To find your rhythm.",
+      "liteBullet1": "Unlimited rituals",
+      "liteBullet2": "Classic Momentum",
+      "liteBullet3": "5 AI logs / month",
+      "premiumLabel": "Premium",
+      "premiumPrice": "€2.99 / mo  ·  €24.99 / yr",
+      "premiumTagline": "Intelligence, unfolded.",
+      "premiumBullet1": "AI conversational logging",
+      "premiumBullet2": "The Arc — 12 weeks",
+      "premiumBullet3": "Smart reminders",
+      "lifetimeLabel": "Lifetime",
+      "lifetimePrice": "€39.99 once",
+      "lifetimeTagline": "Once, forever.",
+      "lifetimeBullet1": "Everything in Premium",
+      "lifetimeBullet2": "Early access to new features",
+      "lifetimeBullet3": "No subscription",
+      "continue": "Continue"
+    },
+    "danger": {
+      "logOut": "Log out",
+      "deleteAccount": "Delete account",
+      "deleteConfirmTitle": "Delete your account?",
+      "deleteConfirmBody": "This permanently erases your profile, rituals and history. This cannot be undone.",
+      "deleteCancel": "Keep my account",
+      "deleteConfirm": "Yes, delete"
+    }
   },
   "home": {
     "tagline": "An app designed for those who prefer",

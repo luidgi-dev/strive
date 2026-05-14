@@ -10,6 +10,10 @@ export function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations("navigation");
 
+  if (pathname === "/protected/settings" || pathname.startsWith("/protected/settings/")) {
+    return null;
+  }
+
   const navItems = [
     { name: t("flow"), href: "/protected/flow", icon: AudioWaveform },
     { name: t("rituals"), href: "/protected/rituals", icon: HeartHandshake },

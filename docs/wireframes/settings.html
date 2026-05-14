@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Settings — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.28 0.005 200);
+    --primary: oklch(0.20 0.005 200);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 200);
+    --muted: oklch(0.96 0.002 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.92 0.002 200);
+    --input: oklch(0.92 0.002 200);
+    --ring: oklch(0.80 0.01 200);
+    --radius: 0.75rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --font-heading: "Sora", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --card: oklch(0.22 0.006 200);
+    --card-foreground: oklch(0.86 0.006 200);
+    --primary: oklch(0.88 0.008 200);
+    --primary-foreground: oklch(0.18 0.006 200);
+    --secondary: oklch(0.26 0.006 200);
+    --muted: oklch(0.26 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 0.07);
+    --input: oklch(1 0 0 / 0.09);
+    --ring: oklch(0.40 0.01 200);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+  }
+  /* Theme switcher (wireframe only, not part of the page) */
+  .wf-controls {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    font-size: 11px;
+  }
+  .wf-controls button {
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font: inherit;
+  }
+  .wf-controls button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  /* Mobile-style frame */
+  .frame {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  /* In-page header */
+  .page-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    background: color-mix(in oklch, var(--background) 80%, transparent);
+    backdrop-filter: blur(12px);
+  }
+  .page-header h1 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+  .back-btn {
+    width: 44px;
+    height: 44px;
+    margin-left: -10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--foreground);
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .back-btn:hover { background: var(--muted); }
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 16px 24px 48px;
+  }
+  /* Section */
+  .section { display: flex; flex-direction: column; gap: 12px; }
+  .section-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    padding: 0 4px;
+  }
+  /* Profile */
+  .profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 0 8px;
+  }
+  .avatar-wrap {
+    position: relative;
+    width: 96px;
+    height: 96px;
+  }
+  .avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+  }
+  .pencil {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-foreground);
+    cursor: pointer;
+  }
+  .pencil svg { width: 14px; height: 14px; }
+  .username-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+  }
+  .username {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: -0.015em;
+  }
+  .pencil-inline {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    color: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
+    background: transparent;
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .pencil-inline:hover { background: var(--muted); color: var(--muted-foreground); }
+  .pencil-inline svg { width: 14px; height: 14px; }
+  .email {
+    color: var(--muted-foreground);
+    font-size: 13px;
+  }
+  /* Row */
+  .row {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 4px;
+  }
+  .row + .row {
+    border-top: 1px solid var(--border);
+  }
+  .row-label { font-size: 14px; }
+  .row-hint { color: var(--muted-foreground); font-size: 12px; }
+  /* Segmented control */
+  .segmented {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    background: var(--muted);
+    border-radius: var(--radius-md);
+  }
+  .segmented button {
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    padding: 6px 10px;
+    border-radius: calc(var(--radius-md) - 3px);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 28px;
+  }
+  .segmented button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .segmented svg { width: 13px; height: 13px; }
+  /* Switch */
+  .switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+    border-radius: 999px;
+    transition: background 0.2s;
+  }
+  .switch.disabled { opacity: 0.5; pointer-events: none; }
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--background);
+    border-radius: 999px;
+    transition: transform 0.2s;
+  }
+  .switch.on { background: var(--foreground); }
+  .switch.on::after { transform: translateX(16px); }
+  /* Reminders row override */
+  .reminders-row { align-items: center; }
+  .reminders-row .row-label-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  /* Membership */
+  .tier-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: var(--radius-md);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0 16px;
+    min-height: 44px;
+    width: 100%;
+    font-size: 14px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .btn-secondary {
+    background: var(--secondary);
+    color: var(--foreground);
+  }
+  .btn-ghost-destructive {
+    background: transparent;
+    color: color-mix(in oklch, var(--destructive) 70%, transparent);
+    padding: 12px;
+  }
+  /* Danger */
+  .danger { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+  .danger-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid color-mix(in oklch, var(--destructive) 30%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in oklch, var(--destructive) 6%, transparent);
+  }
+  .danger-confirm p { font-size: 13px; color: var(--foreground); }
+  .btn-destructive {
+    background: color-mix(in oklch, var(--destructive) 15%, transparent);
+    color: var(--destructive);
+  }
+  /* Sheet preview */
+  .sheet-preview {
+    margin-top: 32px;
+    padding: 16px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+  }
+  .sheet-preview h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--muted-foreground);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .sheet {
+    border-radius: var(--radius-lg);
+    background: var(--background);
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .sheet-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.015em;
+  }
+  .sheet-sub {
+    color: var(--muted-foreground);
+    font-size: 13px;
+    margin-top: -8px;
+  }
+  .tier-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .tier-option.selected {
+    border-color: var(--foreground);
+    background: var(--muted);
+  }
+  .radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1.5px solid var(--muted-foreground);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .tier-option.selected .radio {
+    border-color: var(--foreground);
+  }
+  .tier-option.selected .radio::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    background: var(--foreground);
+    border-radius: 999px;
+  }
+  .tier-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .tier-name { font-weight: 500; font-size: 14px; display: flex; justify-content: space-between; }
+  .tier-hint { font-size: 12px; color: var(--muted-foreground); }
+</style>
+</head>
+<body>
+  <div class="wf-controls" role="group" aria-label="Wireframe theme">
+    <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
+    <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+  </div>
+
+  <div class="frame">
+    <header class="page-header">
+      <button type="button" class="back-btn" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <h1>Settings</h1>
+    </header>
+
+    <main class="content">
+
+      <!-- PROFILE -->
+      <section class="section">
+        <div class="profile">
+          <div class="avatar-wrap">
+            <div class="avatar">L</div>
+            <button class="pencil" type="button" aria-label="Change avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+          <div class="username-row">
+            <span class="username">Luidgi Dev</span>
+            <button type="button" class="pencil-inline" aria-label="Edit username">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+          <div class="email">user@email.com</div>
+        </div>
+      </section>
+
+      <!-- PREFERENCES -->
+      <section class="section">
+        <div class="section-label">Preferences</div>
+
+        <div class="row">
+          <span class="row-label">Language</span>
+          <div class="segmented" role="group" aria-label="Language">
+            <button type="button" aria-pressed="true">EN</button>
+            <button type="button" aria-pressed="false">FR</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="row-label">Theme</span>
+          <div class="segmented" role="group" aria-label="Theme">
+            <button type="button" aria-pressed="true" aria-label="Light">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              Light
+            </button>
+            <button type="button" aria-pressed="false" aria-label="Dark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              Dark
+            </button>
+            <button type="button" aria-pressed="false" aria-label="System">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              System
+            </button>
+          </div>
+        </div>
+
+        <div class="row reminders-row">
+          <div class="row-label-stack">
+            <span class="row-label">Smart reminders</span>
+            <span class="row-hint">Coming soon</span>
+          </div>
+          <div class="switch disabled" aria-disabled="true" role="switch" aria-checked="false"></div>
+        </div>
+      </section>
+
+      <!-- MEMBERSHIP -->
+      <section class="section">
+        <div class="section-label">Membership</div>
+
+        <div class="row">
+          <span class="row-label">Plan</span>
+          <span class="tier-badge">Lite</span>
+        </div>
+        <div class="row">
+          <span class="row-label">Credits</span>
+          <span class="row-hint">0 / 5</span>
+        </div>
+        <div class="row">
+          <span class="row-label">Resets on</span>
+          <span class="row-hint">June 1</span>
+        </div>
+
+        <button class="btn btn-primary" type="button" style="margin-top:8px">Unlock Strive</button>
+      </section>
+
+      <!-- DANGER ZONE -->
+      <section class="section">
+        <div class="danger">
+          <button class="btn btn-secondary" type="button">Log out</button>
+          <button class="btn btn-ghost-destructive" type="button">Delete account</button>
+        </div>
+      </section>
+
+      <!-- BOTTOM SHEET PREVIEW -->
+      <div class="sheet-preview">
+        <h3>Unlock Strive — bottom sheet (preview)</h3>
+        <div class="sheet">
+          <div>
+            <div class="sheet-title">Unlock Strive</div>
+            <div class="sheet-sub">Remove limits. Keep going.</div>
+          </div>
+
+          <div class="tier-option selected">
+            <div class="radio"></div>
+            <div class="tier-info">
+              <div class="tier-name"><span>Premium</span><span>€3.99 / mo</span></div>
+              <div class="tier-hint">Cancel anytime</div>
+            </div>
+          </div>
+          <div class="tier-option">
+            <div class="radio"></div>
+            <div class="tier-info">
+              <div class="tier-name"><span>Lifetime</span><span>€39 once</span></div>
+              <div class="tier-hint">Pay once, yours forever</div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" type="button" disabled style="opacity:0.5">Continue</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  const root = document.documentElement;
+  const initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  root.dataset.theme = initial;
+  document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.setTheme;
+      root.dataset.theme = t;
+      document.querySelectorAll(".wf-controls [data-set-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>
