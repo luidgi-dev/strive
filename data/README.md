@@ -13,6 +13,7 @@ data/
 ├── tables/                     # one file per table, in dependency order
 │   ├── ritual_categories.sql
 │   ├── profiles.sql
+│   ├── user_credits.sql
 │   ├── rituals.sql
 │   ├── log_statuses.sql
 │   ├── ritual_logs.sql
@@ -21,7 +22,10 @@ data/
 │   └── circle_members.sql
 │
 ├── triggers/
-│   └── handle_new_user.sql     # auto-creates a profile row on auth sign-up
+│   └── handle_new_user.sql     # auto-creates profile + user_credits rows on auth sign-up
+│
+├── storage/                    # Supabase Storage buckets + RLS policies
+│   └── user_assets_bucket.sql  # user-assets bucket (avatars, etc.)
 │
 ├── seeds/
 │   ├── seed_log_statuses.sql   # reference data: completed, rest, missed, partial
@@ -46,7 +50,8 @@ Strive uses **Supabase (PostgreSQL)** as its database. Row Level Security (RLS) 
 
 | Table                | Description                                                                             |
 | -------------------- | --------------------------------------------------------------------------------------- |
-| `profiles`           | Extends `auth.users` (1:1). Created automatically on sign-up via trigger.               |
+| `profiles`           | Extends `auth.users` (1:1). Created automatically on sign-up via trigger. Holds `tier` (`lite` / `premium` / `lifetime`). |
+| `user_credits`       | One row per user. Monthly AI-log balance + reset window. Auto-created on sign-up via trigger. |
 | `ritual_categories`  | System-wide and user-defined categories. Rows with `user_id = null` are visible to all. |
 | `rituals`            | Core entity. Three types: `recurring`, `one_time`, `open`.                              |
 | `log_statuses`       | Reference table: `completed`, `rest`, `missed`, `partial`. Read-only for clients.       |
@@ -71,6 +76,14 @@ Strive uses **Supabase (PostgreSQL)** as its database. Row Level Security (RLS) 
 - **Momentum** — computed on the fly via views and SQL functions. Never stored.
 - **Momentum badges** — computed in application logic (Phase 2/3). No table needed.
 - **Notification history** — out of scope for Phase 1.
+
+### Storage buckets
+
+Supabase Storage buckets and their RLS policies live in [`storage/`](./storage/). They are not table definitions and are kept separate from the `migrate.py` pipeline — apply them once via the Supabase SQL Editor or by extending `migrate.py` with a `STORAGE` block.
+
+| Bucket        | File                                | Path convention                | Notes                                                                                                 |
+| ------------- | ----------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `user-assets` | [`storage/user_assets_bucket.sql`](./storage/user_assets_bucket.sql) | `avatars/{user.id}/{filename}` | Public read. Writes (`INSERT`/`UPDATE`/`DELETE`) restricted to the authenticated user's own folder. |
 
 ---
 
