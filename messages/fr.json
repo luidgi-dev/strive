@@ -25,11 +25,74 @@
     "openApp": "Entrer dans l'app Strive"
   },
   "settings": {
-    "title": "Parametres",
+    "title": "Paramètres",
+    "back": "Retour",
     "theme": "Apparence",
     "language": "Langue",
     "darkMode": "Mode sombre",
-    "lightMode": "Mode clair"
+    "lightMode": "Mode clair",
+    "profile": {
+      "editAvatar": "Changer l'avatar",
+      "editUsername": "Modifier le nom",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "usernameTaken": "Ce nom est déjà pris",
+      "usernameInvalid": "3 à 30 caractères : lettres, chiffres, _ ou -",
+      "avatarTooLarge": "L'image doit faire moins de 2 Mo",
+      "avatarWrongType": "Utilise une image JPG, PNG ou WebP",
+      "uploadFailed": "Échec de l'envoi. Réessaie."
+    },
+    "preferences": {
+      "label": "Préférences",
+      "themeLight": "Clair",
+      "themeDark": "Sombre",
+      "themeSystem": "Système",
+      "smartReminders": "Rappels intelligents",
+      "comingSoon": "Bientôt"
+    },
+    "membership": {
+      "label": "Abonnement",
+      "plan": "Formule",
+      "credits": "Crédits",
+      "creditsValue": "{used} / {total}",
+      "resetsOn": "Renouvellement",
+      "tierLite": "Lite",
+      "tierPremium": "Premium",
+      "tierLifetime": "À vie",
+      "viewPlans": "Voir les formules",
+      "currentPlan": "Plan actuel"
+    },
+    "unlockSheet": {
+      "title": "Les formules Strive",
+      "subtitle": "Les logs IA conversationnels restent derrière Premium. Le reste de Strive reste à vous.",
+      "liteLabel": "Lite",
+      "litePrice": "Gratuit",
+      "liteTagline": "Pour trouver son rythme.",
+      "liteBullet1": "Rituels illimités",
+      "liteBullet2": "Momentum classique",
+      "liteBullet3": "5 logs IA / mois",
+      "premiumLabel": "Premium",
+      "premiumPrice": "2,99 € / mois  ·  24,99 € / an",
+      "premiumTagline": "L'intelligence, dépliée.",
+      "premiumBullet1": "Logs IA conversationnels",
+      "premiumBullet2": "The Arc — 12 semaines",
+      "premiumBullet3": "Rappels intelligents",
+      "lifetimeLabel": "À vie",
+      "lifetimePrice": "39,99 € une fois",
+      "lifetimeTagline": "Une fois, pour toujours.",
+      "lifetimeBullet1": "Tout Premium",
+      "lifetimeBullet2": "Accès anticipé aux nouveautés",
+      "lifetimeBullet3": "Pas d'abonnement",
+      "continue": "Continuer"
+    },
+    "danger": {
+      "logOut": "Se déconnecter",
+      "deleteAccount": "Supprimer le compte",
+      "deleteConfirmTitle": "Supprimer votre compte ?",
+      "deleteConfirmBody": "Cette action efface définitivement votre profil, vos rituels et votre historique. Elle ne peut pas être annulée.",
+      "deleteCancel": "Garder mon compte",
+      "deleteConfirm": "Oui, supprimer"
+    }
   },
   "home": {
     "tagline": "Une app pensée pour celles et ceux qui préfèrent",
