@@ -3,7 +3,9 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Geist, Geist_Mono, Sora } from "next/font/google";
 import { getLocale } from "next-intl/server";
 
+import { DynamicThemeColor } from "@/components/providers/dynamic-theme-color";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { THEME_COLOR_DARK, THEME_COLOR_LIGHT } from "@/lib/theme-colors";
 
 import "./globals.css";
 
@@ -34,8 +36,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f8f9f9" },
-    { media: "(prefers-color-scheme: dark)", color: "#1d2122" },
+    { media: "(prefers-color-scheme: light)", color: THEME_COLOR_LIGHT },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR_DARK },
   ],
 };
 
@@ -59,6 +61,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <DynamicThemeColor />
           {children}
         </ThemeProvider>
       </body>
