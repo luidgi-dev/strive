@@ -1,5 +1,5 @@
 // app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Geist, Geist_Mono, Sora } from "next/font/google";
 import { getLocale } from "next-intl/server";
 
@@ -30,6 +30,13 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Strive",
   description: "Consistency over intensity.",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8f9f9" },
+    { media: "(prefers-color-scheme: dark)", color: "#1d2122" },
+  ],
 };
 
 export default async function RootLayout({
