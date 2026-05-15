@@ -1,9 +1,24 @@
-export default function SettingsLoading() {
+import { ChevronLeft } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+
+import { Link } from "@/lib/i18n/navigation";
+
+export default async function SettingsLoading() {
+  const t = await getTranslations("settings");
+
   return (
-    <div className="-mx-6 -mb-24 -mt-4 flex flex-1 flex-col bg-background">
+    <div className="-mx-6 -mb-32 -mt-4 flex flex-1 flex-col bg-background">
       <header className="sticky top-0 z-30 flex h-14 items-center gap-1 bg-background/80 px-2 backdrop-blur-md">
-        <div className="size-11" aria-hidden />
-        <div className="h-4 w-20 animate-pulse rounded-md bg-muted" aria-hidden />
+        <Link
+          href="/protected/flow"
+          aria-label={t("back")}
+          className="inline-flex size-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
+        >
+          <ChevronLeft className="size-5" />
+        </Link>
+        <h1 className="font-heading text-base font-semibold tracking-tight">
+          {t("title")}
+        </h1>
       </header>
 
       <div className="mx-auto flex w-full max-w-md flex-col gap-8 px-6 pb-16 pt-2">

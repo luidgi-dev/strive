@@ -14,7 +14,7 @@ export default async function InternalAppLayout({ children, params }: Props) {
 
   return (
     <>
-      <div className="flex-1 px-6 pb-24 pt-4">
+      <div className="flex-1 px-6 pb-32 pt-4">
         {children}
       </div>
       <BottomNav />
