@@ -21,8 +21,11 @@ app/
 │           ├── rituals/page.tsx    # Rituals list
 │           ├── circles/page.tsx    # Circles
 │           └── settings/           # User settings (see "Settings" below)
+│               ├── layout.tsx      # Wraps {children} with SettingsTransition
 │               ├── page.tsx
+│               ├── loading.tsx     # Shimmer skeleton matching page.tsx structure
 │               ├── action.ts       # updateUsername, updateAvatar
+│               ├── settings-transition.tsx  # Client wrapper: slide-in-from-right + fade-in
 │               └── components/     # Profile, Preferences, Membership, DangerZone
 ├── globals.css                 # Color tokens, typography, base styles
 ├── favicon.ico
@@ -33,6 +36,8 @@ app/
 ### Layout split (root vs locale)
 
 `<html>`, `<body>`, fonts and the `ThemeProvider` live in the **root** layout (`app/layout.tsx`). The `[locale]/layout.tsx` only validates the locale and wraps children in `NextIntlClientProvider`. Switching locale therefore re-mounts only the intl provider, not the theme — this avoids the React 19 "scripts inside React components are never executed when rendering on the client" warning that next-themes' anti-FOUC inline script otherwise triggers on every locale change. `<html lang>` is resolved server-side via `getLocale()` from `next-intl/server`.
+
+The root layout also exports `viewport` with a media-queried `themeColor` (light `#f8f9f9`, dark `#1d2122`, matching the `--background` tokens). The browser/OS status bar — visible on the PWA installed to a home screen — follows the OS color-scheme preference. Hex values are required because the `<meta name="theme-color">` tag and `public/site.webmanifest` cannot reference CSS tokens; the manifest also pins `theme_color` and `background_color` to the dark value since Strive is dark-by-default. Note that `themeColor` is static at the OS level and does **not** follow the in-app theme toggle.
 
 ### Auth flow (`[locale]/auth/`)
 
@@ -66,9 +71,11 @@ Server-rendered page that fetches the user's profile and membership in parallel 
 
 Mutations live in [`settings/action.ts`](./[locale]/protected/(app)/settings/action.ts): `updateUsername` (regex + length validation, maps Postgres `23505` to a `usernameTaken` i18n key) and `updateAvatar` (MIME + size whitelist, uploads to `avatars/{user.id}/{uuid}.{ext}` for cache-busted URLs).
 
+Because Settings is a full-bleed destination route (no shared header, no bottom nav), it opens with a brief slide-in to read as a panel rather than a hard page swap. `settings-transition.tsx` is a small `"use client"` wrapper that applies `animate-in slide-in-from-right-4 fade-in duration-300 ease-out` from `tw-animate-css`. It is mounted by `settings/layout.tsx` (not `page.tsx`) so the animation runs **once on route entry** and spans both the Suspense fallback (`loading.tsx`) and the resolved page content — the layout does not re-mount when `loading.tsx` is replaced by `page.tsx`. Wrapping `page.tsx` directly would have animated the content only after data resolved, leaving the skeleton to appear without animation. The wrapper itself lives next to the route rather than in `settings/components/` because that folder is reserved for content sections; it's also not in the root `components/` because it's settings-specific, not a reusable primitive.
+
 ### Loading UI
 
-`protected/loading.tsx` is the Suspense boundary for the whole protected segment. Per-route loading files can be added alongside any `page.tsx` when a tighter boundary is useful.
+`protected/loading.tsx` is the Suspense boundary for the whole protected segment. Per-route loading files can be added alongside any `page.tsx` when a tighter boundary is useful — `settings/loading.tsx` does this, rendering a shimmer skeleton that mirrors the page's header + avatar + sections layout so the swap-in feels seamless. The skeleton inherits the slide-in animation from `settings/layout.tsx` because the layout wraps `{children}`, which is what Next.js fills with the loading fallback before swapping in the page.
 
 ## Conventions
 
