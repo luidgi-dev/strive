@@ -21,7 +21,7 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/80 backdrop-blur-md pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/80 backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
       <div className="flex h-16 items-center justify-around">
         {navItems.map((item) => {
           
