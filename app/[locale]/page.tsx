@@ -8,7 +8,7 @@ import {
   VocabularySection,
 } from "@/components/landing";
 import { PwaInstallNotice } from "@/components/pwa-install-notice";
-import { defaultLocale } from "@/i18n";
+import { defaultLocale } from "@/lib/locales";
 
 type HomePageProps = {
   params: Promise<{ locale: string }>;

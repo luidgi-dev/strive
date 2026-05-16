@@ -20,9 +20,16 @@ export async function proxy(request: NextRequest) {
   const withLocale = (targetPath: string) =>
     locale === defaultLocale ? targetPath : `/${locale}${targetPath}`;
 
+  // Stamp the resolved locale on the request so server-side next-intl APIs
+  // (getRequestConfig, getMessages, getTranslations) can read it without
+  // relying on next-intl's auto-detection, which does not work reliably with
+  // our custom rewrite below.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-strive-locale", locale);
+
   let response = NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: requestHeaders,
     },
   });
 
@@ -33,7 +40,7 @@ export async function proxy(request: NextRequest) {
       pathname === "/" ? `/${defaultLocale}` : `/${defaultLocale}${pathname}`;
     response = NextResponse.rewrite(rewriteUrl, {
       request: {
-        headers: request.headers,
+        headers: requestHeaders,
       },
     });
   }
@@ -53,7 +60,9 @@ export async function proxy(request: NextRequest) {
           );
 
           const rewritePath = response.headers.get("x-middleware-rewrite");
-          response = NextResponse.next({ request });
+          response = NextResponse.next({
+            request: { headers: requestHeaders },
+          });
           if (rewritePath) {
             response.headers.set("x-middleware-rewrite", rewritePath);
           }

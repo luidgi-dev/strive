@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { defaultLocale } from "@/i18n";
+import { defaultLocale } from "@/lib/locales";
 
 type ProtectedHomeProps = {
   params: Promise<{ locale: string }>;

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
-import { defaultLocale } from "@/i18n";
+import { defaultLocale } from "@/lib/locales";
 
 type ConfirmedPageProps = {
   params: Promise<{ locale: string }>;

@@ -4,7 +4,8 @@ import { Moon, MonitorSmartphone, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
-import { usePathname, useRouter } from "@/lib/i18n/navigation";
+import { defaultLocale, locales } from "@/lib/locales";
+import { usePathname } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 type Locale = "en" | "fr";
@@ -16,7 +17,6 @@ export function PreferencesSection() {
   const t = useTranslations("settings");
   const tPref = useTranslations("settings.preferences");
   const locale = useLocale() as Locale;
-  const router = useRouter();
   const pathname = usePathname();
 
   const { theme, setTheme } = useTheme();
@@ -26,7 +26,16 @@ export function PreferencesSection() {
 
   function switchLocale(next: Locale) {
     if (next === locale) return;
-    router.replace(pathname, { locale: next });
+    // Hard navigation. A soft navigation via the next-intl router updates the
+    // URL but Next.js can serve the cached [locale]/layout.tsx (with the
+    // previous locale's NextIntlClientProvider messages), leaving the page in
+    // the old language. A full reload re-renders the layout server-side with
+    // the new locale.
+    const cleanPath =
+      pathname.replace(new RegExp(`^/(?:${locales.join("|")})(?=/|$)`), "") ||
+      "/";
+    const target = next === defaultLocale ? cleanPath : `/${next}${cleanPath}`;
+    window.location.assign(target);
   }
 
   const themeOptions: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
@@ -116,6 +125,11 @@ function SegmentedButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
+      // The theme variant of this control reads from localStorage via
+      // next-themes, so the active state can differ between SSR and the
+      // first client render. React patches the correct value after
+      // hydration; suppressing here keeps the console clean.
+      suppressHydrationWarning
       {...rest}
       className={cn(
         "inline-flex items-center gap-1 rounded-[6px] px-2.5 py-1 text-xs font-medium transition-colors",
