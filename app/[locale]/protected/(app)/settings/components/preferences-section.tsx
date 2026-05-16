@@ -31,11 +31,15 @@ export function PreferencesSection() {
     // previous locale's NextIntlClientProvider messages), leaving the page in
     // the old language. A full reload re-renders the layout server-side with
     // the new locale.
+    //
+    // Use `replace` (not `assign`) so the previous-locale page is not left in
+    // the browser history. Otherwise a swipe-back gesture lands on the same
+    // page in the old language, which feels broken.
     const cleanPath =
       pathname.replace(new RegExp(`^/(?:${locales.join("|")})(?=/|$)`), "") ||
       "/";
     const target = next === defaultLocale ? cleanPath : `/${next}${cleanPath}`;
-    window.location.assign(target);
+    window.location.replace(target);
   }
 
   const themeOptions: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
