@@ -611,7 +611,9 @@
 
 <script>
   const root = document.documentElement;
-  if (window.parent !== window) root.classList.add("embedded");
+  const isEmbedded = window.parent !== window;
+  const isClean = new URLSearchParams(window.location.search).has("clean");
+  if (isEmbedded || isClean) root.classList.add("embedded");
   const initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   root.dataset.theme = initial;
   document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { type LucideIcon, List, LayoutGrid, MessageCircle } from "lucide-react";
 import {
   LandingEyebrow,
@@ -8,7 +9,7 @@ type Screenshot = {
   icon: LucideIcon;
   title: string;
   caption: string;
-  src?: string;
+  preview?: { light: string; dark: string };
 };
 
 const screenshots: Screenshot[] = [
@@ -16,7 +17,10 @@ const screenshots: Screenshot[] = [
     icon: List,
     title: "Rhythm",
     caption: "Today's rituals at a glance.",
-    src: "/wireframes/rhythm.html",
+    preview: {
+      light: "/wireframes/rhythm-light.png",
+      dark: "/wireframes/rhythm-dark.png",
+    },
   },
   {
     icon: LayoutGrid,
@@ -47,19 +51,29 @@ export function ScreenshotsSection({
       </div>
 
       <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0">
-        {screenshots.map(({ icon: Icon, title: itemTitle, caption, src }) => (
+        {screenshots.map(({ icon: Icon, title: itemTitle, caption, preview }) => (
           <figure
             key={itemTitle}
             className="flex w-64 shrink-0 snap-center flex-col gap-4 md:w-auto"
           >
             <div className="relative flex aspect-[9/19] items-center justify-center overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-muted to-card">
-              {src ? (
-                <iframe
-                  src={src}
-                  title={itemTitle}
-                  loading="lazy"
-                  className="pointer-events-none size-full border-0 bg-background"
-                />
+              {preview ? (
+                <>
+                  <Image
+                    src={preview.light}
+                    alt={`${itemTitle} preview`}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 256px"
+                    className="object-cover dark:hidden"
+                  />
+                  <Image
+                    src={preview.dark}
+                    alt={`${itemTitle} preview`}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 256px"
+                    className="hidden object-cover dark:block"
+                  />
+                </>
               ) : (
                 <>
                   <Icon className="size-14 text-muted-foreground/40" />
