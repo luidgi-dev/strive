@@ -5,19 +5,17 @@ import { Button } from "@/components/ui/button";
 type HeroSectionProps = {
   logoAlt: string;
   title: string;
-  description: string;
+  tagline: React.ReactNode;
   ctaLabel: string;
   authHref: string;
-  isAvailable?: boolean;
 };
 
 export function HeroSection({
   logoAlt,
   title,
-  description,
+  tagline,
   ctaLabel,
   authHref,
-  isAvailable = false,
 }: HeroSectionProps) {
   return (
     <section className="flex min-h-[85vh] flex-col items-center justify-center px-6 text-center">
@@ -42,19 +40,13 @@ export function HeroSection({
       <h1 className="mb-6 font-heading text-5xl font-bold tracking-tight md:text-7xl">
         {title}
       </h1>
-      <p className="max-w-md font-sans text-lg text-muted-foreground md:text-xl">
-        {description}
+      <p className="max-w-md font-sans text-lg leading-relaxed text-muted-foreground md:text-xl">
+        {tagline}
       </p>
       <div className="mt-12">
-        {isAvailable ? (
-          <Button size="lg" className="h-14 px-10 rounded-full text-lg">
-            <Link href={authHref}>{ctaLabel}</Link>
-          </Button>
-        ) : (
-          <Button disabled size="lg" className="h-14 px-10 rounded-full text-lg">
-            {ctaLabel}
-          </Button>
-        )}
+        <Button className="h-14 rounded-full px-10 text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]">
+          <Link href={authHref}>{ctaLabel}</Link>
+        </Button>
       </div>
     </section>
   );
