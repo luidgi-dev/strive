@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Download, MoreVertical, Share2 } from "lucide-react";
+import { Download, MoreVertical, SquarePlus, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -80,7 +80,7 @@ export function PwaInstallNotice() {
         render={
           <button
             type="button"
-            aria-label="Install Strive on your home screen"
+            aria-label="Install Strive on your phone"
             className="fixed right-4 top-4 z-50 flex size-10 items-center justify-center rounded-full border border-border bg-background/85 text-foreground shadow-sm backdrop-blur-md transition-colors hover:bg-card md:right-6 md:top-6"
           >
             <Download className="size-4" />
@@ -89,7 +89,7 @@ export function PwaInstallNotice() {
       />
       <SheetContent>
         <div className="mx-auto w-full max-w-md space-y-4">
-          <SheetTitle>Install Strive on your home screen</SheetTitle>
+          <SheetTitle>Install Strive on your phone</SheetTitle>
           <SheetDescription>
             Get the full app experience. No browser chrome.
           </SheetDescription>
@@ -128,11 +128,13 @@ export function PwaInstallNotice() {
               <Step number={1}>Open this page in Safari.</Step>
               <Step number={2}>
                 Tap the Share button{" "}
-                <Share2 className="inline-block size-3.5 align-text-bottom text-muted-foreground" />{" "}
+                <Upload className="inline-block size-3.5 align-text-bottom text-muted-foreground" />{" "}
                 at the bottom of the screen.
               </Step>
               <Step number={3}>
-                Scroll down and tap &quot;Add to Home Screen&quot;.
+                Scroll down and tap &quot;Add to Home Screen&quot;{" "}
+                <SquarePlus className="inline-block size-3.5 align-text-bottom text-muted-foreground" />
+                .
               </Step>
               <Step number={4}>Tap &quot;Add&quot;.</Step>
             </ol>
