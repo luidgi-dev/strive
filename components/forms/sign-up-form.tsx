@@ -94,7 +94,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       <div className="flex flex-col items-center gap-4">
         <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm border border-border/70">
           <Image
-            src="/icon.svg"
+            src="/strive-app-dark.svg"
             alt="Strive logo"
             width={64}
             height={64}

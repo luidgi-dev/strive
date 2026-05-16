@@ -20,7 +20,7 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
       <div className="max-w-md space-y-8">
         <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm mb-4">
           <Image
-            src="/icon.svg"
+            src="/strive-app-dark.svg"
             alt={`${tCommon("appName")} logo`}
             width={80}
             height={80}

@@ -23,7 +23,7 @@ export function HeroSection({
     <section className="flex min-h-[85vh] flex-col items-center justify-center px-6 text-center">
       <div className="mb-12 overflow-hidden rounded-2xl shadow-sm ring-1 ring-border/8">
         <Image
-          src="/strive-logo.jpeg"
+          src="/strive-app-dark.svg"
           alt={logoAlt}
           width={80}
           height={80}

@@ -21,7 +21,7 @@ export default async function Home({ params }: HomePageProps) {
         <div className="flex flex-col items-center mb-8">
           <div className="overflow-hidden rounded-[22%] shadow-lg ring-1 ring-black/5">
             <Image
-              src="/icon.svg"
+              src="/strive-app-dark.svg"
               alt={`${tCommon("appName")} logo`}
               width={100}
               height={100}

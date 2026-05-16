@@ -50,7 +50,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       {/* Brand Identity */}
       <div className="overflow-hidden rounded-2xl shadow-sm mx-auto">
         <Image
-          src="/icon.svg"
+          src="/strive-app-dark.svg"
           alt="Strive logo"
           width={64}
           height={64}
