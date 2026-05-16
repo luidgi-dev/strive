@@ -56,31 +56,39 @@ export function ScreenshotsSection({
             key={itemTitle}
             className="flex w-64 shrink-0 snap-center flex-col gap-4 md:w-auto"
           >
-            <div className="relative flex aspect-[9/19] items-center justify-center overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-muted to-card">
+            <div className="relative aspect-[9/19] overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-muted to-card">
               {preview ? (
                 <>
-                  <Image
-                    src={preview.light}
-                    alt={`${itemTitle} preview`}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 256px"
-                    className="object-cover dark:hidden"
+                  {/* Dynamic island hint — sits in the top bezel area */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute left-1/2 top-1.5 z-10 h-1 w-12 -translate-x-1/2 rounded-full bg-foreground/30"
                   />
-                  <Image
-                    src={preview.dark}
-                    alt={`${itemTitle} preview`}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 256px"
-                    className="hidden object-cover dark:block"
-                  />
+                  {/* Screen area — inset so the gradient acts as a thin bezel */}
+                  <div className="absolute inset-x-2 bottom-3 top-4 overflow-hidden rounded-2xl">
+                    <Image
+                      src={preview.light}
+                      alt={`${itemTitle} preview`}
+                      fill
+                      sizes="(min-width: 768px) 33vw, 256px"
+                      className="object-cover dark:hidden"
+                    />
+                    <Image
+                      src={preview.dark}
+                      alt={`${itemTitle} preview`}
+                      fill
+                      sizes="(min-width: 768px) 33vw, 256px"
+                      className="hidden object-cover dark:block"
+                    />
+                  </div>
                 </>
               ) : (
-                <>
+                <div className="flex h-full items-center justify-center">
                   <Icon className="size-14 text-muted-foreground/40" />
                   <span className="absolute bottom-4 font-sans text-[10px] uppercase tracking-widest text-muted-foreground/50">
                     placeholder
                   </span>
-                </>
+                </div>
               )}
             </div>
             <figcaption>
