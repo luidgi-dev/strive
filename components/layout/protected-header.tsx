@@ -18,7 +18,7 @@ export function ProtectedHeader({ avatarUrl, displayName }: Props) {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between bg-background/80 px-6 backdrop-blur-md">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between bg-background px-6">
       <Link href="/protected/flow" className="text-2xl font-bold tracking-tighter">
         {t("appName")}
       </Link>

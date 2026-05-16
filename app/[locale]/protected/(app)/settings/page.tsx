@@ -29,7 +29,7 @@ export default async function SettingsPage({ params }: Props) {
 
   return (
     <div className="-mx-6 -mb-32 -mt-4 flex flex-1 flex-col bg-background">
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-1 bg-background/80 px-2 backdrop-blur-md">
+      <header className="sticky top-0 z-30 flex h-14 items-center gap-1 bg-background px-2">
         <Link
           href="/protected/flow"
           aria-label={t("back")}
