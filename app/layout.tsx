@@ -32,6 +32,21 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Strive",
   description: "Consistency over intensity.",
+  icons: {
+    icon: [
+      {
+        url: "/strive-app-dark.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: dark)",
+      },
+      {
+        url: "/strive-app-light.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: light)",
+      },
+      { url: "/strive-app-dark.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
