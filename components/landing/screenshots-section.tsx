@@ -56,7 +56,7 @@ export function ScreenshotsSection({
             key={itemTitle}
             className="flex w-64 shrink-0 snap-center flex-col gap-4 md:w-auto"
           >
-            <div className="relative aspect-[9/19] overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-muted to-card">
+            <div className="relative aspect-[7/12] overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-muted to-card">
               {preview ? (
                 <>
                   {/* Screen area — inset so the gradient acts as a thin bezel.
