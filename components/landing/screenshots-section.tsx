@@ -59,26 +59,23 @@ export function ScreenshotsSection({
             <div className="relative aspect-[9/19] overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-muted to-card">
               {preview ? (
                 <>
-                  {/* Dynamic island hint — sits in the top bezel area */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute left-1/2 top-1.5 z-10 h-1 w-12 -translate-x-1/2 rounded-full bg-foreground/30"
-                  />
-                  {/* Screen area — inset so the gradient acts as a thin bezel */}
-                  <div className="absolute inset-x-2 bottom-3 top-4 overflow-hidden rounded-2xl">
+                  {/* Screen area — inset so the gradient acts as a thin bezel.
+                      bg-background matches the wireframe's own background so the
+                      tiny letterbox from object-contain stays invisible. */}
+                  <div className="absolute inset-2 overflow-hidden rounded-2xl bg-background">
                     <Image
                       src={preview.light}
                       alt={`${itemTitle} preview`}
                       fill
                       sizes="(min-width: 768px) 33vw, 256px"
-                      className="object-cover dark:hidden"
+                      className="object-contain dark:hidden"
                     />
                     <Image
                       src={preview.dark}
                       alt={`${itemTitle} preview`}
                       fill
                       sizes="(min-width: 768px) 33vw, 256px"
-                      className="hidden object-cover dark:block"
+                      className="hidden object-contain dark:block"
                     />
                   </div>
                 </>
