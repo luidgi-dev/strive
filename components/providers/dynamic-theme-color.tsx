@@ -5,6 +5,8 @@ import { useTheme } from "next-themes";
 
 import { THEME_COLOR_DARK, THEME_COLOR_LIGHT } from "@/lib/theme-colors";
 
+const DYNAMIC_ATTR = "data-dynamic-theme-color";
+
 export function DynamicThemeColor() {
   const { resolvedTheme } = useTheme();
 
@@ -12,17 +14,19 @@ export function DynamicThemeColor() {
     if (!resolvedTheme) return;
     const color = resolvedTheme === "dark" ? THEME_COLOR_DARK : THEME_COLOR_LIGHT;
 
-    // iOS PWA WebView only re-evaluates the status bar when a theme-color meta
-    // node is added — mutating an existing node's content waits for the next
-    // navigation gesture. Strip every existing tag (including the SSR
-    // media-queried ones) and append a fresh single source of truth.
+    // Only ever remove tags we injected ourselves. Removing nodes that React
+    // tracks (e.g. from a viewport export) breaks reconciliation and throws
+    // "Cannot read properties of null (reading 'removeChild')" on unmount.
+    // iOS PWA WebView also only re-evaluates the status bar when a fresh node
+    // is appended, so we strip-and-add rather than mutate.
     document
-      .querySelectorAll('meta[name="theme-color"]')
+      .querySelectorAll(`meta[${DYNAMIC_ATTR}]`)
       .forEach((meta) => meta.remove());
 
     const meta = document.createElement("meta");
     meta.name = "theme-color";
     meta.content = color;
+    meta.setAttribute(DYNAMIC_ATTR, "");
     document.head.appendChild(meta);
   }, [resolvedTheme]);
 
