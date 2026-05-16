@@ -14,11 +14,6 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
-
 type Platform = "ios" | "android";
 
 const subscribeStandalone = (callback: () => void) => {
@@ -29,7 +24,7 @@ const subscribeStandalone = (callback: () => void) => {
 
 const getStandaloneSnapshot = () =>
   window.matchMedia("(display-mode: standalone)").matches ||
-  (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+  window.navigator.standalone === true;
 
 const getStandaloneServerSnapshot = () => true;
 
@@ -62,9 +57,9 @@ export function PwaInstallNotice() {
     useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    const handler = (event: Event) => {
+    const handler = (event: BeforeInstallPromptEvent) => {
       event.preventDefault();
-      setDeferredPrompt(event as BeforeInstallPromptEvent);
+      setDeferredPrompt(event);
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
