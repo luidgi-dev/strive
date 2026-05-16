@@ -8,11 +8,17 @@ const USERNAME_MIN = 3;
 const USERNAME_MAX = 30;
 
 const AVATAR_BUCKET = "user-assets";
-const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+// iPhone photos are routinely 3-5 MB. Keep in sync with CLIENT_AVATAR_MAX_BYTES
+// in components/profile-section.tsx.
+const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 const AVATAR_MIME_TO_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
+  // HEIC/HEIF: iOS default since iOS 11. Safari usually converts on upload,
+  // but accept the raw types as a fallback in case it does not.
+  "image/heic": "heic",
+  "image/heif": "heif",
 };
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -76,31 +82,42 @@ export async function updateAvatar(formData: FormData): Promise<ActionResult> {
   const filename = `${crypto.randomUUID()}.${ext}`;
   const path = `avatars/${user.id}/${filename}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from(AVATAR_BUCKET)
-    .upload(path, file, {
-      cacheControl: "31536000",
-      contentType: file.type,
-      upsert: false,
-    });
+  try {
+    const { error: uploadError } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .upload(path, file, {
+        cacheControl: "31536000",
+        contentType: file.type,
+        upsert: false,
+      });
 
-  if (uploadError) return { ok: false, error: "uploadFailed" };
+    if (uploadError) {
+      console.error("[updateAvatar] storage upload failed", uploadError);
+      return { ok: false, error: "uploadFailed" };
+    }
 
-  const { data: publicUrlData } = supabase.storage
-    .from(AVATAR_BUCKET)
-    .getPublicUrl(path);
+    const { data: publicUrlData } = supabase.storage
+      .from(AVATAR_BUCKET)
+      .getPublicUrl(path);
 
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({
-      avatar_url: publicUrlData.publicUrl,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        avatar_url: publicUrlData.publicUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
 
-  if (updateError) return { ok: false, error: "uploadFailed" };
+    if (updateError) {
+      console.error("[updateAvatar] profile update failed", updateError);
+      return { ok: false, error: "uploadFailed" };
+    }
 
-  revalidatePath("/protected/settings");
-  revalidatePath("/protected", "layout");
-  return { ok: true };
+    revalidatePath("/protected/settings");
+    revalidatePath("/protected", "layout");
+    return { ok: true };
+  } catch (err) {
+    console.error("[updateAvatar] unexpected error", err);
+    return { ok: false, error: "uploadFailed" };
+  }
 }

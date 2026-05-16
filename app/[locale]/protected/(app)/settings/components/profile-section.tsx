@@ -25,6 +25,10 @@ const KNOWN_PROFILE_ERRORS = new Set([
   "uploadFailed",
 ]);
 
+// Keep in sync with AVATAR_MAX_BYTES in ../action.ts. The client check fails fast
+// (no wasted upload of a too-large iPhone photo) before the server action runs.
+const CLIENT_AVATAR_MAX_BYTES = 5 * 1024 * 1024;
+
 export function ProfileSection({ username, email, avatarUrl }: Props) {
   const t = useTranslations("settings.profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,6 +50,12 @@ export function ProfileSection({ username, email, avatarUrl }: Props) {
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > CLIENT_AVATAR_MAX_BYTES) {
+      setAvatarError("avatarTooLarge");
+      e.target.value = "";
+      return;
+    }
 
     const formData = new FormData();
     formData.set("avatar", file);
@@ -124,7 +134,7 @@ export function ProfileSection({ username, email, avatarUrl }: Props) {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
           className="hidden"
           onChange={handleAvatarChange}
         />
