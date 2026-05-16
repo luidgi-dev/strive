@@ -1,11 +1,10 @@
 // app/layout.tsx
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { DM_Sans, Geist, Geist_Mono, Sora } from "next/font/google";
 import { getLocale } from "next-intl/server";
 
 import { DynamicThemeColor } from "@/components/providers/dynamic-theme-color";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { THEME_COLOR_DARK, THEME_COLOR_LIGHT } from "@/lib/theme-colors";
 
 import "./globals.css";
 
@@ -49,12 +48,9 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: THEME_COLOR_LIGHT },
-    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR_DARK },
-  ],
-};
+// theme-color is intentionally not declared via the viewport export.
+// It's owned by DynamicThemeColor so the status bar follows the resolved
+// app theme (system or user override), not just the OS media query.
 
 export default async function RootLayout({
   children,
