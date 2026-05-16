@@ -27,7 +27,15 @@ export function HeroSection({
           alt={logoAlt}
           width={80}
           height={80}
-          className="size-20 object-cover"
+          className="hidden size-20 object-cover dark:block"
+          priority
+        />
+        <Image
+          src="/strive-app-light.svg"
+          alt={logoAlt}
+          width={80}
+          height={80}
+          className="block size-20 object-cover dark:hidden"
           priority
         />
       </div>

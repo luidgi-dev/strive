@@ -25,7 +25,14 @@ export default async function Home({ params }: HomePageProps) {
               alt={`${tCommon("appName")} logo`}
               width={100}
               height={100}
-              className="aspect-square object-cover"
+              className="hidden aspect-square object-cover dark:block"
+            />
+            <Image
+              src="/strive-app-light.svg"
+              alt={`${tCommon("appName")} logo`}
+              width={100}
+              height={100}
+              className="block aspect-square object-cover dark:hidden"
             />
           </div>
         </div>

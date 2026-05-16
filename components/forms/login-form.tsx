@@ -54,7 +54,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           alt="Strive logo"
           width={64}
           height={64}
-          className="block" 
+          className="hidden dark:block"
+        />
+        <Image
+          src="/strive-app-light.svg"
+          alt="Strive logo"
+          width={64}
+          height={64}
+          className="block dark:hidden"
         />
       </div>
 
