@@ -7,6 +7,7 @@ import {
   ScreenshotsSection,
   VocabularySection,
 } from "@/components/landing";
+import { PwaInstallNotice } from "@/components/pwa-install-notice";
 import { defaultLocale } from "@/i18n";
 
 type HomePageProps = {
@@ -54,6 +55,8 @@ export default async function Home({ params }: HomePageProps) {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      <PwaInstallNotice />
+
       <HeroSection
         logoAlt="Strive logo"
         title="Strive"
