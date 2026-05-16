@@ -8,6 +8,7 @@ type Screenshot = {
   icon: LucideIcon;
   title: string;
   caption: string;
+  src?: string;
 };
 
 const screenshots: Screenshot[] = [
@@ -15,6 +16,7 @@ const screenshots: Screenshot[] = [
     icon: List,
     title: "Rhythm",
     caption: "Today's rituals at a glance.",
+    src: "/wireframes/rhythm.html",
   },
   {
     icon: LayoutGrid,
@@ -45,16 +47,27 @@ export function ScreenshotsSection({
       </div>
 
       <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0">
-        {screenshots.map(({ icon: Icon, title: itemTitle, caption }) => (
+        {screenshots.map(({ icon: Icon, title: itemTitle, caption, src }) => (
           <figure
             key={itemTitle}
             className="flex w-64 shrink-0 snap-center flex-col gap-4 md:w-auto"
           >
             <div className="relative flex aspect-[9/19] items-center justify-center overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-muted to-card">
-              <Icon className="size-14 text-muted-foreground/40" />
-              <span className="absolute bottom-4 font-sans text-[10px] uppercase tracking-widest text-muted-foreground/50">
-                placeholder
-              </span>
+              {src ? (
+                <iframe
+                  src={src}
+                  title={itemTitle}
+                  loading="lazy"
+                  className="pointer-events-none size-full border-0 bg-background"
+                />
+              ) : (
+                <>
+                  <Icon className="size-14 text-muted-foreground/40" />
+                  <span className="absolute bottom-4 font-sans text-[10px] uppercase tracking-widest text-muted-foreground/50">
+                    placeholder
+                  </span>
+                </>
+              )}
             </div>
             <figcaption>
               <p className="font-heading text-base font-bold">{itemTitle}</p>
