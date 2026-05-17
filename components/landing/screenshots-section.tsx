@@ -5,18 +5,14 @@ import {
   LandingSectionTitle,
 } from "@/components/landing/landing-shell";
 
-type Screenshot = {
+type ScreenshotConfig = {
   icon: LucideIcon;
-  title: string;
-  caption: string;
   preview?: { light: string; dark: string };
 };
 
-const screenshots: Screenshot[] = [
+const screenshotConfigs: ScreenshotConfig[] = [
   {
     icon: List,
-    title: "Rhythm",
-    caption: "Today's rituals at a glance.",
     preview: {
       light: "/wireframes/rhythm-light.png",
       dark: "/wireframes/rhythm-dark.png",
@@ -24,24 +20,35 @@ const screenshots: Screenshot[] = [
   },
   {
     icon: LayoutGrid,
-    title: "The Arc",
-    caption: "Twelve weeks of consistency, visualized.",
+    preview: {
+      light: "/wireframes/the-arc-light.png",
+      dark: "/wireframes/the-arc-dark.png",
+    },
   },
   {
     icon: MessageCircle,
-    title: "AI chat",
-    caption: "Log a ritual in your own words.",
+    preview: {
+      light: "/wireframes/ai-chat-light.png",
+      dark: "/wireframes/ai-chat-dark.png",
+    },
   },
 ];
+
+type ScreenshotItem = {
+  title: string;
+  caption: string;
+};
 
 type ScreenshotsSectionProps = {
   eyebrow: string;
   title: string;
+  items: [ScreenshotItem, ScreenshotItem, ScreenshotItem];
 };
 
 export function ScreenshotsSection({
   eyebrow,
   title,
+  items,
 }: ScreenshotsSectionProps) {
   return (
     <section className="mx-auto max-w-5xl px-6 py-16 md:py-24">
@@ -51,7 +58,9 @@ export function ScreenshotsSection({
       </div>
 
       <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0">
-        {screenshots.map(({ icon: Icon, title: itemTitle, caption, preview }) => (
+        {screenshotConfigs.map(({ icon: Icon, preview }, index) => {
+          const { title: itemTitle, caption } = items[index];
+          return (
           <figure
             key={itemTitle}
             className="flex w-64 shrink-0 snap-center flex-col gap-4 md:w-auto"
@@ -95,7 +104,8 @@ export function ScreenshotsSection({
               </p>
             </figcaption>
           </figure>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

@@ -77,6 +77,14 @@ export default async function Home({ params }: HomePageProps) {
       <ScreenshotsSection
         eyebrow="See it in action"
         title="A calm dashboard for your week."
+        items={[
+          { title: "Rhythm", caption: "Today's rituals at a glance." },
+          {
+            title: "The Arc",
+            caption: "Twelve weeks of consistency, visualized.",
+          },
+          { title: "AI chat", caption: "Log a ritual in your own words." },
+        ]}
       />
 
       <LandingDivider />
