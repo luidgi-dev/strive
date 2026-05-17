@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Define a Ritual · One-time variant — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<!--
+  VARIANT NOTE:
+  This file is a conditional variant of rituals-define.html where the user
+  selected Type = "One-time" instead of "Recurring". The Cadence + Target +
+  scheduling refinement blocks are replaced by a single Date picker (maps to
+  schema column `due_date`).
+
+  Shared components (sheet shell, backdrop, header, name input, type segmented,
+  category chips, sticky CTA) are duplicated here for self-contained preview,
+  but in React they'll be one component with conditional rendering driven by
+  the selected ritual_type. Edits to shared styles should be applied to both
+  files until they're factored into the React component.
+-->
+<style>
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.28 0.005 200);
+    --primary: oklch(0.20 0.005 200);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 200);
+    --muted: oklch(0.96 0.002 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --accent: oklch(0.96 0.002 200);
+    --border: oklch(0.92 0.002 200);
+    --input: oklch(0.92 0.002 200);
+    --ring: oklch(0.80 0.01 200);
+    --momentum: oklch(0.62 0.12 154);
+    --caution: oklch(0.68 0.14 72);
+    --missed: oklch(0.62 0.17 27);
+    --radius: 0.75rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --font-heading: "Sora", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --card: oklch(0.22 0.006 200);
+    --card-foreground: oklch(0.86 0.006 200);
+    --primary: oklch(0.88 0.008 200);
+    --primary-foreground: oklch(0.18 0.006 200);
+    --secondary: oklch(0.26 0.006 200);
+    --muted: oklch(0.26 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --accent: oklch(0.26 0.006 200);
+    --border: oklch(1 0 0 / 0.07);
+    --input: oklch(1 0 0 / 0.09);
+    --ring: oklch(0.40 0.01 200);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  body { display: flex; justify-content: center; padding: 0; }
+
+  /* Wireframe theme switcher */
+  .wf-controls {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    font-size: 11px;
+  }
+  .wf-controls button {
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font: inherit;
+  }
+  .wf-controls button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Mobile-style frame */
+  .frame {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  /* Faded Rituals backdrop */
+  .rituals-backdrop {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    filter: blur(3px);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .bg-header {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+  }
+  .bg-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .bg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .bg-main {
+    flex: 1;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .bg-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+  }
+  .bg-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .bg-pill {
+    width: 130px;
+    height: 30px;
+    border-radius: 999px;
+    background: var(--foreground);
+    opacity: 0.85;
+  }
+  .bg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    height: 62px;
+    flex-shrink: 0;
+  }
+  .backdrop-overlay {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--background) 25%, transparent);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Bottom sheet (rigid form modal) */
+  .sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 78%;
+    background: var(--card);
+    border-top-left-radius: var(--radius-2xl);
+    border-top-right-radius: var(--radius-2xl);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    box-shadow: 0 -16px 40px oklch(0 0 0 / 0.25), 0 -4px 12px oklch(0 0 0 / 0.14);
+    overflow: hidden;
+  }
+  .sheet-handle {
+    align-self: center;
+    width: 36px;
+    height: 4px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+    margin: 9px 0 0;
+    flex-shrink: 0;
+  }
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 12px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sheet-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover { background: var(--accent); color: var(--foreground); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* Form */
+  .form {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .field-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    padding: 0 4px;
+  }
+
+  /* Text input (Name) */
+  .text-input {
+    background: var(--accent);
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+    padding: 12px 14px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: -0.005em;
+    color: var(--foreground);
+    outline: none;
+    width: 100%;
+  }
+  .text-input::placeholder { color: var(--muted-foreground); }
+  .text-input.focused {
+    border-color: color-mix(in oklch, var(--foreground) 35%, transparent);
+    background: var(--card);
+  }
+
+  /* Segmented control */
+  .segmented {
+    display: flex;
+    background: var(--accent);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .seg {
+    flex: 1;
+    padding: 8px 10px;
+    background: transparent;
+    color: var(--muted-foreground);
+    border: 0;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    text-align: center;
+  }
+  .seg.active {
+    background: color-mix(in oklch, var(--foreground) 18%, transparent);
+    color: var(--foreground);
+  }
+
+  /* Date picker (One-time variant, maps to schema due_date) */
+  .date-picker {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-radius: var(--radius-lg);
+    background: var(--accent);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    cursor: pointer;
+    font: inherit;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.005em;
+  }
+  .date-picker:hover {
+    border-color: color-mix(in oklch, var(--foreground) 30%, transparent);
+  }
+  .date-picker .date-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--muted-foreground);
+  }
+  .date-picker .date-meta {
+    color: var(--muted-foreground);
+    font-weight: 500;
+    font-size: 12.5px;
+    margin-left: 2px;
+  }
+
+  /* Category chips */
+  .chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font: inherit;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
+    color: var(--foreground);
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .chip:hover { background: color-mix(in oklch, var(--foreground) 5%, transparent); }
+  .chip.selected {
+    background: color-mix(in oklch, var(--foreground) 15%, transparent);
+    border-color: color-mix(in oklch, var(--foreground) 35%, transparent);
+    color: var(--foreground);
+  }
+  .chip.new {
+    border-style: dashed;
+    color: var(--muted-foreground);
+  }
+  .chip.new:hover { color: var(--foreground); }
+
+  /* Optional refinement link aligned under the date picker */
+  .date-refine {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding-left: 4px;
+  }
+  /* Optional form-level link (Add a note) */
+  .opt-link {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 0;
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    font: inherit;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0.005em;
+  }
+  .opt-link:hover { color: var(--foreground); }
+  .opt-link svg { width: 12px; height: 12px; }
+  .opt-standalone {
+    padding-left: 4px;
+  }
+
+  /* Sticky CTA bar */
+  .cta-bar {
+    padding: 12px 20px calc(14px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: var(--card);
+    flex-shrink: 0;
+  }
+  .cta-primary {
+    width: 100%;
+    padding: 13px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+  }
+  .cta-primary:disabled {
+    background: color-mix(in oklch, var(--foreground) 35%, transparent);
+    cursor: not-allowed;
+  }
+
+  /* Hide wireframe chrome when embedded */
+  .embedded .wf-controls { display: none; }
+</style>
+</head>
+<body>
+  <div class="wf-controls" role="group" aria-label="Wireframe theme">
+    <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
+    <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+  </div>
+
+  <div class="frame">
+    <!-- Faded Rituals backdrop -->
+    <div class="rituals-backdrop" aria-hidden="true">
+      <header class="bg-header">
+        <span class="bg-brand">Strive</span>
+        <span class="bg-avatar"></span>
+      </header>
+      <main class="bg-main">
+        <div class="bg-title-row">
+          <span class="bg-title">Rituals</span>
+          <span class="bg-pill"></span>
+        </div>
+        <div class="bg-card"></div>
+        <div class="bg-card"></div>
+      </main>
+    </div>
+    <div class="backdrop-overlay" aria-hidden="true"></div>
+
+    <!-- Bottom sheet (form modal) -->
+    <section class="sheet" role="dialog" aria-labelledby="sheet-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <header class="sheet-header">
+        <h2 class="sheet-title" id="sheet-title">Define a ritual</h2>
+        <button class="icon-btn" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </header>
+
+      <form class="form" onsubmit="event.preventDefault()">
+        <!-- Name -->
+        <div class="field">
+          <input type="text" class="text-input focused" value="Run a half marathon" placeholder="Name your ritual" aria-label="Ritual name" />
+        </div>
+
+        <!-- Type (One-time selected — variant from rituals-define.html) -->
+        <div class="field">
+          <span class="field-label">Type</span>
+          <div class="segmented" role="radiogroup" aria-label="Ritual type">
+            <button class="seg" type="button" role="radio" aria-checked="false">Recurring</button>
+            <button class="seg active" type="button" role="radio" aria-checked="true">One-time</button>
+            <button class="seg" type="button" role="radio" aria-checked="false">Open</button>
+          </div>
+        </div>
+
+        <!--
+          Conditional swap: when Type = One-time, the Cadence + Target +
+          scheduling refinement blocks (visible in rituals-define.html) are
+          replaced by this single Date picker. Maps to schema column due_date.
+          A one_time ritual MUST have a due_date (DB constraint).
+        -->
+        <div class="field">
+          <span class="field-label">Date</span>
+          <button class="date-picker" type="button" aria-label="Pick a date">
+            <svg class="date-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 2v4"/>
+              <path d="M16 2v4"/>
+              <rect width="18" height="18" x="3" y="4" rx="2"/>
+              <path d="M3 10h18"/>
+            </svg>
+            Sat, Jun 14
+            <span class="date-meta">in 4 weeks</span>
+          </button>
+          <!--
+            Set a time = optional refinement for events that have a specific time
+            (e.g., a medical appointment at 14:30, even if it's outside Strive's
+            ritual-tracking philosophy). Maps to schema scheduled_time.
+            Like in the Recurring variant, this is dev phase 2 (may ship without).
+          -->
+          <button class="opt-link date-refine" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            Set a time
+          </button>
+        </div>
+
+        <!-- Category (chips wrap using real seeded names, + New at end) -->
+        <div class="field">
+          <span class="field-label">Category</span>
+          <div class="chips-row" role="radiogroup" aria-label="Category">
+            <button class="chip selected" type="button" role="radio" aria-checked="true">Sport</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">Nutrition</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">Well-being</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">Personal development</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">Sleep</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">Creativity</button>
+            <button class="chip new" type="button">+ New</button>
+          </div>
+        </div>
+
+        <!-- Optional form-level note (description) -->
+        <button class="opt-link opt-standalone" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Add a note
+        </button>
+      </form>
+
+      <!-- Sticky primary CTA -->
+      <div class="cta-bar">
+        <button class="cta-primary" type="button">Create ritual</button>
+      </div>
+    </section>
+  </div>
+
+<script>
+  const root = document.documentElement;
+  const isEmbedded = window.parent !== window;
+  const isClean = new URLSearchParams(window.location.search).has("clean");
+  if (isEmbedded || isClean) root.classList.add("embedded");
+  const initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  root.dataset.theme = initial;
+  document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.setTheme;
+      root.dataset.theme = t;
+      document.querySelectorAll(".wf-controls [data-set-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>
