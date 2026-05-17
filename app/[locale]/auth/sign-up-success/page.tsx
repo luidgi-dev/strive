@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { defaultLocale } from "@/i18n";
+import { defaultLocale } from "@/lib/locales";
 
 type SignUpSuccessPageProps = {
   params: Promise<{ locale: string }>;
@@ -25,7 +25,8 @@ export default async function SignUpSuccessPage({ params }: SignUpSuccessPagePro
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-md space-y-8">
         <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm border border-border/70">
-          <Image src="/icon.svg" alt={logoAlt} width={64} height={64} className="block" />
+          <Image src="/strive-app-dark.svg" alt={logoAlt} width={64} height={64} className="hidden dark:block" />
+          <Image src="/strive-app-light.svg" alt={logoAlt} width={64} height={64} className="block dark:hidden" />
         </div>
 
         <Card className="border-border bg-card shadow-lg">

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
-import { defaultLocale } from "@/i18n";
+import { defaultLocale } from "@/lib/locales";
 
 type ConfirmedPageProps = {
   params: Promise<{ locale: string }>;
@@ -20,11 +20,18 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
       <div className="max-w-md space-y-8">
         <div className="w-fit mx-auto overflow-hidden rounded-2xl shadow-sm mb-4">
           <Image
-            src="/icon.svg"
+            src="/strive-app-dark.svg"
             alt={`${tCommon("appName")} logo`}
             width={80}
             height={80}
-            className="block"
+            className="hidden dark:block"
+          />
+          <Image
+            src="/strive-app-light.svg"
+            alt={`${tCommon("appName")} logo`}
+            width={80}
+            height={80}
+            className="block dark:hidden"
           />
         </div>
 

@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Chat — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.28 0.005 200);
+    --primary: oklch(0.20 0.005 200);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 200);
+    --muted: oklch(0.96 0.002 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --accent: oklch(0.96 0.002 200);
+    --border: oklch(0.92 0.002 200);
+    --input: oklch(0.92 0.002 200);
+    --ring: oklch(0.80 0.01 200);
+    --momentum: oklch(0.62 0.12 154);
+    --caution: oklch(0.68 0.14 72);
+    --missed: oklch(0.62 0.17 27);
+    --radius: 0.75rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --font-heading: "Sora", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --card: oklch(0.22 0.006 200);
+    --card-foreground: oklch(0.86 0.006 200);
+    --primary: oklch(0.88 0.008 200);
+    --primary-foreground: oklch(0.18 0.006 200);
+    --secondary: oklch(0.26 0.006 200);
+    --muted: oklch(0.26 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --accent: oklch(0.26 0.006 200);
+    --border: oklch(1 0 0 / 0.07);
+    --input: oklch(1 0 0 / 0.09);
+    --ring: oklch(0.40 0.01 200);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+  }
+
+  /* Wireframe theme switcher */
+  .wf-controls {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    font-size: 11px;
+  }
+  .wf-controls button {
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font: inherit;
+  }
+  .wf-controls button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Mobile-style frame */
+  .frame {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  /* Faded Rhythm backdrop (visible behind floating chat bubble) */
+  .rhythm-backdrop {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    filter: blur(2px);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .bg-header {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+  }
+  .bg-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .bg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .bg-main {
+    flex: 1;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .bg-day {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 4px 6px;
+  }
+  .bg-day-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .bg-line {
+    height: 12px;
+    width: 110px;
+    background: var(--muted);
+    border-radius: 4px;
+  }
+  .bg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    height: 110px;
+    flex-shrink: 0;
+  }
+  /* Uniform light overlay to soften backdrop around the floating panel */
+  .backdrop-overlay {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--background) 22%, transparent);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Floating chat bubble (anchored above the FAB) */
+  .chat-panel {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: 76px;
+    bottom: 140px;
+    background: color-mix(in oklch, var(--card) 88%, transparent);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+    border-radius: var(--radius-2xl);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+    box-shadow:
+      0 24px 50px oklch(0 0 0 / 0.32),
+      0 8px 20px oklch(0 0 0 / 0.18);
+  }
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 12px 18px;
+    border-bottom: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+    flex-shrink: 0;
+  }
+  .sheet-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sheet-title svg { width: 16px; height: 16px; }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover { background: var(--accent); color: var(--foreground); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* Conversation -------------------------------------------------- */
+  .conversation {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    overflow-y: auto;
+  }
+  .msg {
+    max-width: 84%;
+    font-size: 13.5px;
+    line-height: 1.45;
+    word-wrap: break-word;
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: color-mix(in oklch, var(--foreground) 9%, transparent);
+    padding: 8px 12px;
+    border-radius: 18px 18px 4px 18px;
+    color: var(--foreground);
+  }
+  .msg.ai {
+    align-self: flex-start;
+    background: var(--accent);
+    padding: 8px 12px;
+    border-radius: 18px 18px 18px 4px;
+    color: var(--foreground);
+  }
+
+  /* Voice bubble (user, special variant) */
+  .msg.voice {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px 8px 8px;
+  }
+  .voice-play {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .voice-play svg { width: 10px; height: 10px; }
+  .waveform {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 20px;
+  }
+  .waveform i {
+    display: block;
+    width: 2px;
+    background: color-mix(in oklch, var(--foreground) 55%, transparent);
+    border-radius: 1px;
+  }
+  .voice-duration {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    letter-spacing: 0.02em;
+    margin-left: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Action card (inside AI message) */
+  .action-card {
+    margin-top: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .action-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+  }
+  .action-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--momentum);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .action-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .action-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: -0.005em;
+    color: var(--foreground);
+    line-height: 1.3;
+  }
+  .action-meta {
+    font-size: 11.5px;
+    color: var(--muted-foreground);
+    letter-spacing: 0.01em;
+  }
+  .action-buttons {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .btn-confirm,
+  .btn-edit {
+    flex: 1;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+  }
+  .btn-confirm {
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+  }
+  .btn-edit {
+    background: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+  .btn-edit:hover { border-color: color-mix(in oklch, var(--foreground) 35%, transparent); }
+
+  /* Chips (ritual selection) */
+  .chips {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .chip {
+    background: transparent;
+    border: 1px solid color-mix(in oklch, var(--foreground) 25%, transparent);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--foreground);
+    cursor: pointer;
+  }
+  .chip:hover {
+    background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  }
+
+  /* Input bar ------------------------------------------------------ */
+  .input-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: var(--card);
+    flex-shrink: 0;
+  }
+  .input-bar input {
+    flex: 1;
+    background: var(--accent);
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--foreground);
+    outline: none;
+    min-width: 0;
+  }
+  .input-bar input::placeholder {
+    color: var(--muted-foreground);
+  }
+  .input-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .input-btn:hover { color: var(--foreground); background: var(--accent); }
+  .input-btn svg { width: 18px; height: 18px; }
+  .input-btn.mic { opacity: 0.6; }
+  .input-btn.mic:hover { opacity: 1; }
+  .input-btn.send {
+    background: var(--foreground);
+    color: var(--background);
+    opacity: 1;
+  }
+  .input-btn.send:hover { background: var(--foreground); color: var(--background); }
+  .input-btn.send svg { width: 14px; height: 14px; }
+
+  /* Hide wireframe chrome when embedded */
+  .embedded .wf-controls { display: none; }
+
+  /* FAB (sharp, anchors the chat bubble) */
+  .fab {
+    position: absolute;
+    right: 20px;
+    bottom: calc(64px + env(safe-area-inset-bottom) + 18px);
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px oklch(0 0 0 / 0.18), 0 2px 6px oklch(0 0 0 / 0.1);
+    z-index: 5;
+  }
+  .fab svg { width: 22px; height: 22px; }
+
+  /* Bottom nav (sharp, app shell stays anchored) */
+  .bottom-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--border);
+    background: color-mix(in oklch, var(--background) 80%, transparent);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 5;
+  }
+  .nav-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 64px;
+    min-height: 48px;
+    color: var(--muted-foreground);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .nav-item.active { color: var(--foreground); }
+</style>
+</head>
+<body>
+  <div class="wf-controls" role="group" aria-label="Wireframe theme">
+    <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
+    <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+  </div>
+
+  <div class="frame">
+    <!-- Faded Rhythm backdrop ------------------------------------- -->
+    <div class="rhythm-backdrop" aria-hidden="true">
+      <header class="bg-header">
+        <span class="bg-brand">Strive</span>
+        <span class="bg-avatar"></span>
+      </header>
+      <main class="bg-main">
+        <div class="bg-day">
+          <span class="bg-day-title">Today</span>
+          <span class="bg-line"></span>
+        </div>
+        <div class="bg-card"></div>
+        <div class="bg-card"></div>
+        <div class="bg-card"></div>
+      </main>
+    </div>
+    <div class="backdrop-overlay" aria-hidden="true"></div>
+
+    <!-- Floating chat bubble (anchored above the FAB) -->
+    <section class="chat-panel" role="dialog" aria-labelledby="sheet-title">
+      <header class="sheet-header">
+        <span class="sheet-title" id="sheet-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+            <path d="M20 3v4"/>
+            <path d="M22 5h-4"/>
+            <path d="M4 17v2"/>
+            <path d="M5 18H3"/>
+          </svg>
+          My Strive
+        </span>
+        <button class="icon-btn" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="conversation">
+        <!-- Exchange 1: voice user → AI action card -->
+        <div class="msg user voice" aria-label="Voice message, 8 seconds">
+          <button class="voice-play" type="button" aria-label="Play voice">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21"/></svg>
+          </button>
+          <div class="waveform" aria-hidden="true">
+            <i style="height:6px"></i><i style="height:10px"></i><i style="height:4px"></i><i style="height:13px"></i>
+            <i style="height:8px"></i><i style="height:16px"></i><i style="height:10px"></i><i style="height:14px"></i>
+            <i style="height:6px"></i><i style="height:12px"></i><i style="height:5px"></i><i style="height:11px"></i>
+            <i style="height:15px"></i><i style="height:8px"></i><i style="height:10px"></i><i style="height:6px"></i>
+          </div>
+          <span class="voice-duration">0:08</span>
+        </div>
+
+        <div class="msg ai">
+          Got it.
+          <div class="action-card">
+            <div class="action-top">
+              <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+              </svg>
+              <div class="action-text">
+                <span class="action-title">Log Morning meditation</span>
+                <span class="action-meta">20 min · today</span>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn-confirm" type="button">Confirm</button>
+              <button class="btn-edit" type="button">Edit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exchange 2: ambiguous text → chips → resolution -->
+        <div class="msg user">Did my workout.</div>
+
+        <div class="msg ai">
+          Which ritual?
+          <div class="chips">
+            <button class="chip" type="button">Morning run</button>
+            <button class="chip" type="button">Strength training</button>
+          </div>
+        </div>
+
+        <div class="msg user">Morning run</div>
+
+        <div class="msg ai">Logged. 3 of 5 this week.</div>
+      </div>
+
+      <form class="input-bar" onsubmit="event.preventDefault()">
+        <input type="text" placeholder="What did you do today?" aria-label="Message" />
+        <button class="input-btn mic" type="button" aria-label="Voice message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <path d="M12 19v3"/>
+            <path d="M8 22h8"/>
+          </svg>
+        </button>
+        <button class="input-btn send" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5"/>
+            <path d="m5 12 7-7 7 7"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- FAB: anchors the chat bubble -->
+    <button class="fab" type="button" aria-label="Talk to My Strive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        <path d="M20 3v4"/>
+        <path d="M22 5h-4"/>
+        <path d="M4 17v2"/>
+        <path d="M5 18H3"/>
+      </svg>
+    </button>
+
+    <!-- Bottom nav: app shell stays visible -->
+    <nav class="bottom-nav" aria-label="Primary">
+      <button class="nav-item active" type="button" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/>
+        </svg>
+        <span class="nav-label">Rhythm</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08v0c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"/>
+          <path d="m18 15-2-2"/>
+          <path d="m15 18-2-2"/>
+        </svg>
+        <span class="nav-label">Rituals</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="nav-label">Circles</span>
+      </button>
+    </nav>
+  </div>
+
+<script>
+  const root = document.documentElement;
+  const isEmbedded = window.parent !== window;
+  const isClean = new URLSearchParams(window.location.search).has("clean");
+  if (isEmbedded || isClean) root.classList.add("embedded");
+  const initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  root.dataset.theme = initial;
+  document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.setTheme;
+      root.dataset.theme = t;
+      document.querySelectorAll(".wf-controls [data-set-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>

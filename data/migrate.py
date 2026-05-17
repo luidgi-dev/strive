@@ -13,6 +13,7 @@ load_dotenv(ENV_PATH)
 TABLES = [
     'ritual_categories.sql',
     'profiles.sql',
+    'user_credits.sql',
     'rituals.sql',
     'log_statuses.sql',
     'ritual_logs.sql',
@@ -62,8 +63,6 @@ def migrate() -> None:
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
         conn.autocommit = True
         cursor = conn.cursor()
-
-        print("db_url: " + os.environ['DATABASE_URL'])
 
         print('running tables...')
         run(cursor, 'tables', TABLES)

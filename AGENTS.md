@@ -57,6 +57,8 @@ When writing code or docs:
 - Assuming a different Next.js version than the repo actually uses (it's Next.js 16).
 - Adding documentation that duplicates `docs/UX_WRITING.md` — link to it instead.
 - Bypassing `proxy.ts` for auth checks inside individual routes.
+- Using `next/link` for internal routes — it loses the locale prefix and the proxy silently rewrites French URLs back to English. Always import `Link` from `@/lib/i18n/navigation` for any path under `[locale]/`.
+- Calling `useTranslations` from `next-intl` in a Server Component — the sync hook can fall back to `defaultLocale` mid-tree. In Server Components use `await getTranslations(ns)` from `next-intl/server`; reserve `useTranslations` for Client Components (`"use client"`).
 
 ## Quick self-check (one minute, before finishing)
 - [ ] Did I cross-check user-facing copy against `docs/UX_WRITING.md`?

@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rhythm — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.28 0.005 200);
+    --primary: oklch(0.20 0.005 200);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 200);
+    --muted: oklch(0.96 0.002 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --accent: oklch(0.96 0.002 200);
+    --border: oklch(0.92 0.002 200);
+    --input: oklch(0.92 0.002 200);
+    --ring: oklch(0.80 0.01 200);
+    --momentum: oklch(0.62 0.12 154);
+    --caution: oklch(0.68 0.14 72);
+    --missed: oklch(0.62 0.17 27);
+    --radius: 0.75rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --font-heading: "Sora", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --card: oklch(0.22 0.006 200);
+    --card-foreground: oklch(0.86 0.006 200);
+    --primary: oklch(0.88 0.008 200);
+    --primary-foreground: oklch(0.18 0.006 200);
+    --secondary: oklch(0.26 0.006 200);
+    --muted: oklch(0.26 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --accent: oklch(0.26 0.006 200);
+    --border: oklch(1 0 0 / 0.07);
+    --input: oklch(1 0 0 / 0.09);
+    --ring: oklch(0.40 0.01 200);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+  }
+
+  /* Wireframe theme switcher */
+  .wf-controls {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    font-size: 11px;
+  }
+  .wf-controls button {
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font: inherit;
+  }
+  .wf-controls button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Mobile-style frame */
+  .frame {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  /* App header */
+  .page-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: color-mix(in oklch, var(--background) 80%, transparent);
+    backdrop-filter: blur(12px);
+  }
+  .brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .avatar-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    overflow: hidden;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .avatar-btn svg { width: 100%; height: 100%; display: block; }
+
+  /* Content */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px 20px 112px;
+  }
+
+  /* Day hero */
+  .day-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 4px 6px;
+  }
+  .day-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .day-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .day-date {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    letter-spacing: 0.02em;
+  }
+  .day-coach {
+    font-size: 13px;
+    color: var(--muted-foreground);
+    letter-spacing: 0.01em;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  /* Ritual card */
+  .ritual-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 20px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    transition: border-color 0.2s ease;
+  }
+  /* Logged today — subtle off-white outline (same pattern as Strive plans selection) */
+  .ritual-card.logged {
+    border-color: color-mix(in oklch, var(--foreground) 22%, transparent);
+  }
+  .ritual-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .ritual-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--accent);
+    color: var(--muted-foreground);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .ritual-icon svg { width: 21px; height: 21px; }
+  .ritual-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .ritual-name {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    line-height: 1.25;
+  }
+  .ritual-meta {
+    font-size: 11px;
+    color: var(--muted-foreground);
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .meta-period { font-weight: 500; }
+  .meta-status {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .meta-status.on-track { color: var(--momentum); }
+  .meta-status.steady   { color: var(--caution); }
+  .meta-status.resting  { color: var(--muted-foreground); }
+
+  /* Colored dot — used inline both in card meta and coach line */
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--muted-foreground);
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .status-dot.on-track { background: var(--momentum); }
+  .status-dot.steady   { background: var(--caution); }
+  .status-dot.resting  { background: var(--muted-foreground); }
+
+  .ritual-score {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .ritual-score .denom {
+    font-family: var(--font-sans);
+    color: var(--muted-foreground);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .ritual-score.empty { color: var(--muted-foreground); }
+
+  /* Quick log icon button (default state — no logs today) */
+  .btn-log {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1.5px solid color-mix(in oklch, var(--muted-foreground) 35%, transparent);
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn-log svg { width: 15px; height: 15px; }
+  .btn-log:hover {
+    border-color: var(--foreground);
+    color: var(--foreground);
+  }
+
+  /* Stepper (appears after first log today) — achromatic, green is reserved for the bar */
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .stepper button {
+    width: 28px;
+    height: 100%;
+    background: transparent;
+    border: 0;
+    color: var(--foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stepper button:hover { background: color-mix(in oklch, var(--foreground) 6%, transparent); }
+  .stepper button svg { width: 12px; height: 12px; stroke-width: 2.25; }
+  .stepper .count {
+    min-width: 18px;
+    text-align: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: -0.02em;
+    padding: 0 2px;
+    color: var(--foreground);
+  }
+
+  /* Progress bar */
+  .progress-track {
+    width: 100%;
+    height: 5px;
+    background: color-mix(in oklch, var(--muted-foreground) 14%, transparent);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+  .progress-fill.momentum { background: var(--momentum); }
+  .progress-fill.caution { background: var(--caution); }
+  .progress-fill.missed { background: var(--missed); }
+
+  /* Add ritual link */
+  .add-link {
+    align-self: center;
+    margin-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px dashed color-mix(in oklch, var(--muted-foreground) 28%, transparent);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted-foreground);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .add-link svg { width: 13px; height: 13px; }
+  .add-link:hover { color: var(--foreground); border-color: var(--border); }
+
+  /* Floating action button — Strive AI (foreground/background pair, inverts per theme) */
+  .fab {
+    position: absolute;
+    right: 20px;
+    bottom: calc(64px + env(safe-area-inset-bottom) + 18px);
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px oklch(0 0 0 / 0.18), 0 2px 6px oklch(0 0 0 / 0.1);
+    z-index: 40;
+  }
+  .fab svg { width: 22px; height: 22px; }
+
+  /* Hide wireframe-only chrome when embedded in an iframe (landing preview) */
+  .embedded .wf-controls { display: none; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--border);
+    background: color-mix(in oklch, var(--background) 80%, transparent);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .nav-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 64px;
+    min-height: 48px;
+    color: var(--muted-foreground);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .nav-item.active { color: var(--foreground); }
+</style>
+</head>
+<body>
+  <div class="wf-controls" role="group" aria-label="Wireframe theme">
+    <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
+    <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+  </div>
+
+  <div class="frame">
+    <header class="page-header">
+      <span class="brand">Strive</span>
+      <button class="avatar-btn" type="button" aria-label="Open profile">
+        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="1024" height="1024" fill="#272526"/>
+          <g transform="translate(0,1024) scale(0.1,-0.1)">
+            <g transform="translate(5138 5118) scale(1.2) translate(-5138 -5118)">
+              <path fill="#cab695" stroke="none" fill-rule="evenodd"
+                    d="M6717 6618 c-4 -169 -8 -212 -24 -258 -38 -104 -76 -165 -147 -236 -113 -113 -236 -164 -401 -164 -103 0 -178 19 -290 75 -99 49 -168 99 -385 280 -210 175 -277 227 -371 288 -161 104 -338 179 -457 194 -35 4 -49 9 -40 14 7 5 487 9 1067 9 l1054 0 -6 -202z M4261 6713 c-37 -23 -98 -74 -147 -126 -176 -184 -245 -420 -195 -661 56 -271 248 -512 582 -729 109 -72 311 -182 569 -312 511 -257 708 -398 839 -599 148 -228 137 -503 -29 -696 l-30 -35 21 49 c17 40 21 63 17 122 -13 195 -185 374 -513 535 -187 91 -390 161 -722 248 -251 66 -369 105 -478 157 -303 143 -528 409 -613 723 -23 86 -26 114 -26 276 0 166 2 188 27 279 96 345 305 598 622 752 127 62 168 71 76 17z M4359 6628 c-20 -35 -17 -155 5 -213 50 -131 180 -256 386 -372 82 -47 319 -145 460 -192 69 -23 238 -73 375 -111 282 -78 346 -100 486 -169 296 -147 502 -371 595 -648 87 -258 67 -574 -52 -832 -110 -238 -310 -436 -555 -550 -115 -53 -145 -61 -88 -22 67 45 175 147 219 206 50 68 93 154 122 245 32 105 33 290 0 403 -78 272 -281 497 -652 723 -52 31 -246 135 -430 229 -509 261 -647 350 -804 516 -135 143 -196 281 -196 438 0 124 27 214 98 323 36 55 56 73 31 26z M4295 4247 c146 -51 195 -82 435 -277 199 -162 346 -274 440 -337 152 -102 323 -172 465 -191 133 -18 -279 -25 -1180 -19 -506 4 -921 7 -922 7 -11 1 0 324 13 388 44 217 200 389 405 447 81 23 253 14 344 -18z"/>
+            </g>
+          </g>
+        </svg>
+      </button>
+    </header>
+
+    <main class="content">
+      <div class="day-bar">
+        <div class="day-line">
+          <h2 class="day-title">Today</h2>
+          <span class="day-date">Sat, May 16</span>
+        </div>
+        <span class="day-coach"><span class="status-dot on-track"></span>2 of 3 logged</span>
+      </div>
+
+      <!-- Card — Evening journal: WEEKLY 5×, not logged today, steady. (Sorted first: action needed.) -->
+      <article class="ritual-card">
+        <div class="ritual-top">
+          <div class="ritual-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 7v14"/>
+              <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>
+            </svg>
+          </div>
+          <div class="ritual-info">
+            <span class="ritual-name">Evening journal</span>
+            <span class="ritual-meta">
+              <span class="meta-period">Weekly</span>
+              <span class="status-dot steady"></span>
+              <span class="meta-status steady">Steady</span>
+            </span>
+          </div>
+          <span class="ritual-score">3<span class="denom">/5</span></span>
+          <button class="btn-log" type="button" aria-label="Log Evening journal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill caution" style="width: 60%;"></div>
+        </div>
+      </article>
+
+      <!-- Card — Morning meditation: DAILY, logged 1× today, week on track -->
+      <article class="ritual-card logged">
+        <div class="ritual-top">
+          <div class="ritual-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
+              <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+              <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+            </svg>
+          </div>
+          <div class="ritual-info">
+            <span class="ritual-name">Morning meditation</span>
+            <span class="ritual-meta">
+              <span class="meta-period">Daily</span>
+              <span class="status-dot on-track"></span>
+              <span class="meta-status on-track">On track</span>
+            </span>
+          </div>
+          <span class="ritual-score">6<span class="denom">/7</span></span>
+          <div class="stepper" role="group" aria-label="Adjust today's logs">
+            <button type="button" aria-label="Undo last log">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+            </button>
+            <span class="count">1</span>
+            <button type="button" aria-label="Log again">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill momentum" style="width: 86%;"></div>
+        </div>
+      </article>
+
+      <!-- Card — Long run: MONTHLY 3×, logged 1× today -->
+      <article class="ritual-card logged">
+        <div class="ritual-top">
+          <div class="ritual-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2h4"/>
+              <path d="m12 14 3-3"/>
+              <circle cx="12" cy="14" r="8"/>
+            </svg>
+          </div>
+          <div class="ritual-info">
+            <span class="ritual-name">Long run</span>
+            <span class="ritual-meta">
+              <span class="meta-period">Monthly</span>
+              <span class="status-dot on-track"></span>
+              <span class="meta-status on-track">On track</span>
+            </span>
+          </div>
+          <span class="ritual-score">2<span class="denom">/3</span></span>
+          <div class="stepper" role="group" aria-label="Adjust today's logs">
+            <button type="button" aria-label="Undo last log">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+            </button>
+            <span class="count">1</span>
+            <button type="button" aria-label="Log again">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill momentum" style="width: 67%;"></div>
+        </div>
+      </article>
+
+      <!-- Discreet add ritual -->
+      <button class="add-link" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        Add a ritual
+      </button>
+    </main>
+
+    <!-- FAB: Strive AI -->
+    <button class="fab" type="button" aria-label="Talk to Strive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        <path d="M20 3v4"/>
+        <path d="M22 5h-4"/>
+        <path d="M4 17v2"/>
+        <path d="M5 18H3"/>
+      </svg>
+    </button>
+
+    <!-- Bottom nav -->
+    <nav class="bottom-nav" aria-label="Primary">
+      <button class="nav-item active" type="button" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/>
+        </svg>
+        <span class="nav-label">Rhythm</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08v0c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"/>
+          <path d="m18 15-2-2"/>
+          <path d="m15 18-2-2"/>
+        </svg>
+        <span class="nav-label">Rituals</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="nav-label">Circles</span>
+      </button>
+    </nav>
+  </div>
+
+<script>
+  const root = document.documentElement;
+  const isEmbedded = window.parent !== window;
+  const isClean = new URLSearchParams(window.location.search).has("clean");
+  if (isEmbedded || isClean) root.classList.add("embedded");
+  const initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  root.dataset.theme = initial;
+  document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.setTheme;
+      root.dataset.theme = t;
+      document.querySelectorAll(".wf-controls [data-set-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>

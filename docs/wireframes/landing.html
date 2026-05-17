@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Landing — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* =========================================================
+     Tokens (mirror app/globals.css)
+     ========================================================= */
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.28 0.005 200);
+    --primary: oklch(0.20 0.005 200);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 200);
+    --muted: oklch(0.96 0.002 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --accent: oklch(0.96 0.002 200);
+    --border: oklch(0.92 0.002 200);
+    --ring: oklch(0.80 0.01 200);
+    --momentum: oklch(0.62 0.12 154);
+    --radius: 0.75rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --font-heading: "Sora", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --card: oklch(0.22 0.006 200);
+    --card-foreground: oklch(0.86 0.006 200);
+    --primary: oklch(0.88 0.008 200);
+    --primary-foreground: oklch(0.18 0.006 200);
+    --secondary: oklch(0.26 0.006 200);
+    --muted: oklch(0.26 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --accent: oklch(0.26 0.006 200);
+    --border: oklch(1 0 0 / 0.07);
+    --ring: oklch(0.40 0.01 200);
+  }
+
+  /* =========================================================
+     Base
+     ========================================================= */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    transition: background 0.2s ease, color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; border: 0; background: transparent; color: inherit; }
+
+  /* =========================================================
+     Wireframe-only controls (top-right toggle).
+     Not part of the production page — in prod the user switches
+     theme via their device setting only.
+     ========================================================= */
+  .wf-controls {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    font-size: 11px;
+    box-shadow: 0 2px 8px oklch(0 0 0 / 0.04);
+  }
+  .wf-controls button {
+    color: var(--muted-foreground);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+  }
+  .wf-controls button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px oklch(0 0 0 / 0.06);
+  }
+
+  /* =========================================================
+     Layout helpers
+     ========================================================= */
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .container-wide {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  section {
+    padding: 80px 0;
+  }
+  @media (min-width: 768px) {
+    section { padding: 120px 0; }
+  }
+  .divider {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+  }
+  .divider::before {
+    content: "";
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: var(--border);
+  }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--muted-foreground);
+    text-transform: none;
+    margin-bottom: 32px;
+  }
+  .section-title {
+    font-size: 30px;
+    margin-bottom: 32px;
+  }
+  @media (min-width: 768px) {
+    .section-title { font-size: 36px; margin-bottom: 40px; }
+  }
+
+  /* =========================================================
+     Buttons
+     ========================================================= */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    padding: 0 40px;
+    border-radius: 9999px;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 17px;
+    font-weight: 500;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .btn-primary:hover { transform: scale(1.02); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* =========================================================
+     Section 1 — Hero
+     ========================================================= */
+  .hero {
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  .hero-logo {
+    width: 88px;
+    height: 88px;
+    border-radius: 22%;
+    overflow: hidden;
+    box-shadow: 0 1px 3px oklch(0 0 0 / 0.06);
+    border: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .hero-logo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+  /* Light/dark logo switch — mirrors the production pattern */
+  .logo-light { display: block; }
+  .logo-dark { display: none; }
+  [data-theme="dark"] .logo-light { display: none; }
+  [data-theme="dark"] .logo-dark { display: block; }
+
+  .hero h1 {
+    font-size: 56px;
+    margin-bottom: 24px;
+  }
+  @media (min-width: 768px) {
+    .hero h1 { font-size: 80px; }
+  }
+  .hero-tagline {
+    font-size: 20px;
+    color: var(--muted-foreground);
+    max-width: 480px;
+    margin-bottom: 48px;
+    line-height: 1.4;
+  }
+  .hero-tagline strong {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+  @media (min-width: 768px) {
+    .hero-tagline { font-size: 22px; }
+  }
+
+  /* =========================================================
+     Section 2 — Screenshots
+     ========================================================= */
+  .screenshots-row {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 24px 24px;
+    margin: 0 -24px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .screenshots-row::-webkit-scrollbar { display: none; }
+  .screenshot-card {
+    flex: 0 0 260px;
+    scroll-snap-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .screenshot-mockup {
+    aspect-ratio: 9 / 19;
+    border-radius: var(--radius-2xl);
+    background: linear-gradient(135deg, var(--muted), var(--card));
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-foreground);
+    position: relative;
+    overflow: hidden;
+  }
+  .screenshot-mockup svg {
+    width: 56px;
+    height: 56px;
+    opacity: 0.4;
+  }
+  .screenshot-mockup::after {
+    content: "placeholder";
+    position: absolute;
+    bottom: 16px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted-foreground);
+    opacity: 0.5;
+  }
+  .screenshot-caption-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .screenshot-caption-desc {
+    font-size: 14px;
+    color: var(--muted-foreground);
+  }
+  @media (min-width: 768px) {
+    .screenshots-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      overflow: visible;
+      padding: 0;
+      margin: 0;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .screenshot-card { flex: initial; }
+    .screenshot-mockup { aspect-ratio: 9 / 19; }
+  }
+
+  /* =========================================================
+     Section 3 — Pillars
+     ========================================================= */
+  .pillars-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  @media (min-width: 768px) {
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+  }
+  .pillar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .pillar-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--foreground);
+    opacity: 0.85;
+  }
+  .pillar h3 {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .pillar p {
+    font-size: 15px;
+    color: var(--muted-foreground);
+    line-height: 1.55;
+  }
+
+  /* =========================================================
+     Section 4 — Philosophy
+     ========================================================= */
+  .philosophy-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: oklch(from var(--foreground) l c h / 0.8);
+  }
+  @media (min-width: 768px) {
+    .philosophy-body { font-size: 18px; }
+  }
+
+  /* =========================================================
+     Section 5 — Vocabulary
+     ========================================================= */
+  .vocab-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .vocab-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .vocab-from {
+    min-width: 110px;
+    padding-top: 2px;
+    text-align: right;
+    font-size: 14px;
+    color: oklch(from var(--muted-foreground) l c h / 0.6);
+    text-decoration: line-through;
+  }
+  .vocab-to-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .vocab-to-desc {
+    font-size: 14px;
+    color: var(--muted-foreground);
+    margin-top: 2px;
+  }
+
+  /* =========================================================
+     Section 6 — CTA Final + Footer
+     ========================================================= */
+  .cta-final {
+    text-align: center;
+    padding: 120px 24px;
+  }
+  .cta-final h2 {
+    font-size: 40px;
+    margin-bottom: 40px;
+  }
+  @media (min-width: 768px) {
+    .cta-final h2 { font-size: 56px; }
+  }
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted-foreground);
+  }
+  .site-footer a {
+    color: var(--muted-foreground);
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .site-footer a:hover {
+    color: var(--foreground);
+    border-bottom-color: var(--border);
+  }
+
+  /* =========================================================
+     PWA Install Notice — floating button
+     ========================================================= */
+  .pwa-fab {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background: oklch(from var(--background) l c h / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    box-shadow: 0 2px 8px oklch(0 0 0 / 0.06);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .pwa-fab:hover { background: var(--card); transform: translateY(-1px); }
+  .pwa-fab svg { width: 18px; height: 18px; }
+  @media (min-width: 768px) {
+    .pwa-fab { top: 24px; right: 24px; }
+  }
+
+  /* =========================================================
+     PWA Install Notice — bottom sheet
+     ========================================================= */
+  .pwa-sheet-overlay {
+    position: fixed;
+    inset: 0;
+    background: oklch(0 0 0 / 0.4);
+    z-index: 60;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .pwa-sheet-overlay[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .pwa-sheet {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 70;
+    background: var(--card);
+    color: var(--card-foreground);
+    border-top: 1px solid var(--border);
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    padding: 24px 24px calc(env(safe-area-inset-bottom) + 32px);
+    max-width: 540px;
+    margin: 0 auto;
+    transform: translateY(100%);
+    transition: transform 0.25s ease-out;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 -12px 40px oklch(0 0 0 / 0.12);
+  }
+  .pwa-sheet[data-open="true"] { transform: translateY(0); }
+  .pwa-sheet-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 0 auto 20px;
+  }
+  .pwa-sheet h2 {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+  .pwa-sheet-sub {
+    font-size: 14px;
+    color: var(--muted-foreground);
+    margin-bottom: 24px;
+  }
+  .pwa-tabs {
+    display: flex;
+    background: var(--muted);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+  .pwa-tab {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+  .pwa-tab[aria-selected="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px oklch(0 0 0 / 0.06);
+  }
+  .pwa-panel { display: none; }
+  .pwa-panel[data-active="true"] { display: block; }
+  .pwa-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none;
+    counter-reset: step;
+  }
+  .pwa-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    counter-increment: step;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .pwa-step::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    background: var(--muted);
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .pwa-step svg {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    vertical-align: -3px;
+    color: var(--muted-foreground);
+  }
+  .pwa-android-install {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .pwa-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pwa-close:hover { background: var(--muted); color: var(--foreground); }
+</style>
+</head>
+<body>
+
+<!-- Wireframe controls (not part of the page) -->
+<div class="wf-controls" role="group" aria-label="Theme">
+  <button id="wf-light" aria-pressed="true">Light</button>
+  <button id="wf-dark" aria-pressed="false">Dark</button>
+</div>
+
+<!-- =========================================================
+     SECTION 1 — HERO
+     ========================================================= -->
+<section class="hero">
+  <div class="hero-logo">
+    <img class="logo-light" src="../../public/strive-app-light.svg" alt="Strive logo" />
+    <img class="logo-dark" src="../../public/strive-app-dark.svg" alt="Strive logo" />
+  </div>
+
+  <h1>Strive</h1>
+
+  <!-- TAGLINE — single line, with emphasis on the brand phrase.
+       Mirrors the existing pre-auth pattern: muted body + emphasized phrase.
+       Alternates to consider:
+         An app for people who think in weeks, not days.
+         Built for the long game. Designed for <strong>consistency over intensity</strong>.
+  -->
+  <p class="hero-tagline">
+    An app for people who prefer <strong>consistency over intensity</strong>.
+  </p>
+
+  <!-- CTA OPTIONS (early access phase). Post-launch alternates: "Find your rhythm" / "Try Strive" -->
+  <a href="#" class="btn-primary">Get early access</a>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     SECTION 2 — SCREENSHOTS
+     ========================================================= -->
+<section>
+  <div class="container-wide">
+    <p class="eyebrow" style="text-align: center;">See it in action</p>
+    <h2 class="section-title" style="text-align: center;">A calm dashboard for your week.</h2>
+
+    <div class="screenshots-row">
+      <div class="screenshot-card">
+        <div class="screenshot-mockup">
+          <!-- Lucide: list -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <div>
+          <p class="screenshot-caption-title">Rhythm</p>
+          <p class="screenshot-caption-desc">Today's rituals at a glance.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <div class="screenshot-mockup">
+          <!-- Lucide: grid -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <div>
+          <p class="screenshot-caption-title">The Arc</p>
+          <p class="screenshot-caption-desc">Twelve weeks of consistency, visualized.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <div class="screenshot-mockup">
+          <!-- Lucide: message-circle -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <div>
+          <p class="screenshot-caption-title">AI chat</p>
+          <p class="screenshot-caption-desc">Log a ritual in your own words.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     SECTION 3 — PILLARS
+     ========================================================= -->
+<section>
+  <div class="container">
+    <p class="eyebrow">Why Strive</p>
+    <h2 class="section-title">Three quiet ideas.</h2>
+
+    <div class="pillars-grid">
+      <div class="pillar">
+        <!-- Lucide: repeat -->
+        <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        <h3>Flexible targets</h3>
+        <!-- ALT: "Weekly goals, not daily pressure." / "Your week, your pace." -->
+        <p>Miss a day. Still win the week.</p>
+      </div>
+
+      <div class="pillar">
+        <!-- Lucide: zap -->
+        <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <h3>Zero-friction logging</h3>
+        <!-- ALT: "Log in seconds, or talk to the AI." / "Two seconds to log a ritual." -->
+        <p>One tap. Or just tell the AI.</p>
+      </div>
+
+      <div class="pillar">
+        <!-- Lucide: trending-up -->
+        <svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        <h3>Momentum, not streaks</h3>
+        <!-- ALT: "Momentum builds quietly." / "No streaks to break." -->
+        <p>Progress that decays slowly, never resets to zero.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     SECTION 4 — PHILOSOPHY
+     ========================================================= -->
+<section>
+  <div class="container">
+    <p class="eyebrow">Philosophy</p>
+    <h2 class="section-title">A calm coach, not a drill sergeant.</h2>
+    <div class="philosophy-body">
+      <p>We do not worship hustle. We do not celebrate grind. Strive comes from one simple belief: lasting progress grows from calm, not pressure.</p>
+      <p>We celebrate momentum, the quiet strength that settles in when you honor your own rhythm. Every ritual you log traces an arc you can see over time.</p>
+      <p>No guilt. No aggressive reminders. Just space to build, day by day, with intention.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     SECTION 5 — VOCABULARY
+     ========================================================= -->
+<section>
+  <div class="container">
+    <p class="eyebrow">Vocabulary</p>
+    <h2 class="section-title">Words matter.</h2>
+
+    <div class="vocab-list">
+      <div class="vocab-row">
+        <span class="vocab-from">Habit</span>
+        <div>
+          <div class="vocab-to-title">Ritual</div>
+          <p class="vocab-to-desc">Every recurring action deserves respect.</p>
+        </div>
+      </div>
+      <div class="vocab-row">
+        <span class="vocab-from">Series, streak</span>
+        <div>
+          <div class="vocab-to-title">Rhythm</div>
+          <p class="vocab-to-desc">Your personal cadence, not a race.</p>
+        </div>
+      </div>
+      <div class="vocab-row">
+        <span class="vocab-from">Score</span>
+        <div>
+          <div class="vocab-to-title">Momentum</div>
+          <p class="vocab-to-desc">A signal of progress, not a verdict.</p>
+        </div>
+      </div>
+      <div class="vocab-row">
+        <span class="vocab-from">Failure</span>
+        <div>
+          <div class="vocab-to-title">Missed</div>
+          <p class="vocab-to-desc">A softer day. Tomorrow is new.</p>
+        </div>
+      </div>
+      <div class="vocab-row">
+        <span class="vocab-from">Skip</span>
+        <div>
+          <div class="vocab-to-title">Rest</div>
+          <p class="vocab-to-desc">An intentional pause, not walking away.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     SECTION 6 — CTA FINAL + FOOTER
+     ========================================================= -->
+<section class="cta-final">
+  <!-- HEADLINE OPTIONS:
+       <h2>Start where you are.</h2>
+       <h2>Your consistency starts today.</h2>
+       <h2>Small steps. Real momentum.</h2>
+       <h2>Begin quietly.</h2>
+  -->
+  <h2>Find your rhythm.</h2>
+  <a href="#" class="btn-primary">Get early access</a>
+</section>
+
+<footer class="site-footer">
+  <span>&copy; 2026 Strive · Built by <a href="https://github.com/luidgi-dev" target="_blank" rel="noreferrer">Luidgi</a></span>
+</footer>
+
+<!-- =========================================================
+     PWA INSTALL NOTICE — floating FAB
+     ========================================================= -->
+<button class="pwa-fab" id="pwa-fab" aria-label="Install Strive on your phone">
+  <!-- Lucide: download -->
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+</button>
+
+<!-- PWA INSTALL NOTICE — sheet overlay + sheet -->
+<div class="pwa-sheet-overlay" id="pwa-overlay"></div>
+<div class="pwa-sheet" id="pwa-sheet" role="dialog" aria-modal="true" aria-labelledby="pwa-sheet-title">
+  <div class="pwa-sheet-handle"></div>
+  <button class="pwa-close" id="pwa-close" aria-label="Close">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+
+  <h2 id="pwa-sheet-title">Install Strive on your phone</h2>
+  <p class="pwa-sheet-sub">Get the full app experience. No browser chrome.</p>
+
+  <div class="pwa-tabs" role="tablist">
+    <button class="pwa-tab" data-tab="ios" role="tab" aria-selected="true">iOS</button>
+    <button class="pwa-tab" data-tab="android" role="tab" aria-selected="false">Android</button>
+  </div>
+
+  <div class="pwa-panel" data-panel="ios" data-active="true" role="tabpanel">
+    <ol class="pwa-steps">
+      <li class="pwa-step">Open this page in Safari.</li>
+      <li class="pwa-step">
+        Tap the Share button
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        at the bottom of the screen.
+      </li>
+      <li class="pwa-step">
+        Scroll down and tap "Add to Home Screen"
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        .
+      </li>
+      <li class="pwa-step">Tap "Add".</li>
+    </ol>
+  </div>
+
+  <div class="pwa-panel" data-panel="android" data-active="false" role="tabpanel">
+    <!-- If beforeinstallprompt was captured, show this button. In wireframe it's always shown. -->
+    <button class="pwa-android-install">Install Strive</button>
+    <p class="pwa-sheet-sub" style="margin-bottom: 16px; text-align: center;">Or do it manually:</p>
+    <ol class="pwa-steps">
+      <li class="pwa-step">Open this page in Chrome.</li>
+      <li class="pwa-step">
+        Tap the menu
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        in the top right.
+      </li>
+      <li class="pwa-step">Tap "Add to Home Screen" or "Install app".</li>
+      <li class="pwa-step">Confirm.</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+  // ---- Theme toggle ----
+  const lightBtn = document.getElementById('wf-light');
+  const darkBtn = document.getElementById('wf-dark');
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    lightBtn.setAttribute('aria-pressed', String(theme === 'light'));
+    darkBtn.setAttribute('aria-pressed', String(theme === 'dark'));
+  }
+  lightBtn.addEventListener('click', () => setTheme('light'));
+  darkBtn.addEventListener('click', () => setTheme('dark'));
+  // Respect system preference initially
+  setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  // ---- PWA sheet toggle ----
+  const fab = document.getElementById('pwa-fab');
+  const sheet = document.getElementById('pwa-sheet');
+  const overlay = document.getElementById('pwa-overlay');
+  const closeBtn = document.getElementById('pwa-close');
+  function openSheet() {
+    sheet.setAttribute('data-open', 'true');
+    overlay.setAttribute('data-open', 'true');
+  }
+  function closeSheet() {
+    sheet.setAttribute('data-open', 'false');
+    overlay.setAttribute('data-open', 'false');
+  }
+  fab.addEventListener('click', openSheet);
+  overlay.addEventListener('click', closeSheet);
+  closeBtn.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+  // ---- PWA tabs ----
+  const tabs = document.querySelectorAll('.pwa-tab');
+  const panels = document.querySelectorAll('.pwa-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+      panels.forEach(p => p.setAttribute('data-active', String(p.dataset.panel === target)));
+    });
+  });
+
+  // ---- Auto-hide PWA fab in standalone (real PWA install case) ----
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+  if (isStandalone) {
+    fab.style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

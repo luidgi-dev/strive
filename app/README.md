@@ -6,16 +6,42 @@ Locale-aware routing for the Strive web app. All user-facing routes live under `
 
 ```
 app/
+├── layout.tsx                  # Root layout: <html>/<body>, fonts, ThemeProvider
 ├── [locale]/
-│   ├── page.tsx         # Landing
-│   ├── layout.tsx       # Root layout (theme, providers, intl)
-│   ├── auth/            # Auth flow (see below)
-│   └── protected/       # Authenticated routes (Rhythm, Rituals, Circles, Settings)
-├── globals.css          # Color tokens, typography, base styles
+│   ├── layout.tsx              # Locale validation + NextIntlClientProvider
+│   ├── page.tsx                # Landing
+│   ├── auth/                   # Auth flow (see below)
+│   └── protected/              # Authenticated routes
+│       ├── layout.tsx          # Auth gate + <ProtectedHeader />
+│       ├── loading.tsx         # Suspense fallback (spinner) for the protected segment
+│       ├── page.tsx            # Legacy protected landing
+│       └── (app)/              # Route group: in-app shell with BottomNav
+│           ├── layout.tsx      # Wraps children with padding + <BottomNav />
+│           ├── flow/page.tsx       # "Rhythm" — daily momentum
+│           ├── rituals/page.tsx    # Rituals list
+│           ├── circles/page.tsx    # Circles
+│           └── settings/           # User settings (see "Settings" below)
+│               ├── layout.tsx      # Wraps {children} with SettingsTransition
+│               ├── page.tsx
+│               ├── loading.tsx     # Shimmer skeleton matching page.tsx structure
+│               ├── action.ts       # updateUsername, updateAvatar
+│               ├── settings-transition.tsx  # Client wrapper: slide-in-from-right + fade-in
+│               └── components/     # Profile, Preferences, Membership, DangerZone
+├── globals.css                 # Color tokens, typography, base styles
 ├── favicon.ico
 ├── icon.svg
-└── README.md            # This file
+└── README.md                   # This file
 ```
+
+### Layout split (root vs locale)
+
+`<html>`, `<body>`, fonts and the `ThemeProvider` live in the **root** layout (`app/layout.tsx`). The `[locale]/layout.tsx` only validates the locale and wraps children in `NextIntlClientProvider`. Switching locale therefore re-mounts only the intl provider, not the theme — this avoids the React 19 "scripts inside React components are never executed when rendering on the client" warning that next-themes' anti-FOUC inline script otherwise triggers on every locale change. `<html lang>` is resolved server-side via `getLocale()` from `next-intl/server`.
+
+The browser/OS status bar — visible on the PWA installed to a home screen — is owned entirely by [`DynamicThemeColor`](../components/providers/dynamic-theme-color.tsx), a tiny `"use client"` side-effect component mounted inside `ThemeProvider`. It reads `resolvedTheme` from `next-themes` and the current `pathname`, then appends a fresh `<meta name="theme-color">` node tagged with `data-dynamic-theme-color` whenever either changes. The pathname dependency matters because iOS PWA WebView caches the meta across soft navigations (Link clicks, chevron back) and only re-evaluates the status bar when a brand-new node is appended. Without it, toggling the theme inside Settings and clicking back leaves the iOS status bar stuck on the old color while the app content is on the new one. On subsequent changes it removes only its previously-tagged nodes and appends a new one. Removing only its own nodes is critical: React 19 + Next 16 track meta tags rendered via the `viewport.themeColor` export, and stripping those out from under React triggers a `Cannot read properties of null (reading 'removeChild')` crash on the next unmount. Appending a fresh node (rather than mutating `content`) is also intentional — iOS PWA WebView only re-evaluates the status bar when a `theme-color` meta is *added*; mutating an existing node leaves the bar stale until the next navigation gesture (swipe-back, App Switcher).
+
+The layout therefore does **not** export `viewport.themeColor`. The trade-off is a ~50–100 ms flash of the browser-default status bar before hydration injects the right color. On installed PWAs this is masked by the splash screen; in a regular browser tab it's barely perceptible. The shared hex constants `THEME_COLOR_LIGHT` and `THEME_COLOR_DARK` live in [`lib/theme-colors.ts`](../lib/theme-colors.ts) (a neutral module — kept generic so any future server-side consumer can still import it). Hex values are required because the `<meta name="theme-color">` tag and `public/site.webmanifest` cannot reference CSS tokens; the manifest pins `theme_color` and `background_color` to the dark value since Strive is dark-by-default.
+
+On iOS, an installed PWA shortcut caches the `site.webmanifest` at install time, so changes to `theme_color` will not propagate until the shortcut is removed and re-added from Safari. The dynamic meta sync above is what makes the status bar follow the in-app toggle once the app is running.
 
 ### Auth flow (`[locale]/auth/`)
 
@@ -23,14 +49,46 @@ app/
 
 ### Protected routes (`[locale]/protected/`)
 
-Anything here requires a Supabase session. Session refresh and auth gating happen in [`proxy.ts`](../proxy.ts) (Next.js 16 Proxy API), not in individual pages.
+Anything under `protected/` requires a Supabase session. Session refresh and auth gating happen in two layers:
+
+1. [`proxy.ts`](../proxy.ts) (Next.js 16 Proxy API) refreshes the auth cookie on every request.
+2. `protected/layout.tsx` calls [`getAuthenticatedProfile()`](../lib/profile.ts) and redirects to `/[locale]/auth/login` when no user is present. It also fetches the `profiles` row used to render the header `UserAvatar`.
+
+Individual pages don't repeat the auth check.
+
+### The `(app)` route group
+
+`(app)/` is a route group (parentheses → no URL segment), so its children live at `/[locale]/protected/flow`, `/rituals`, `/circles`, `/settings`. The group exists to scope the in-app shell — `(app)/layout.tsx` injects the [`BottomNav`](../components/ui/bottom-nav.tsx) and content padding for tabbed pages.
+
+Some routes inside the group intentionally render full-bleed without the shared chrome (no header, no bottom nav). `settings/` is the first of those — it provides its own in-page back header. Hiding works as follows: [`ProtectedHeader`](../components/layout/protected-header.tsx) and [`BottomNav`](../components/ui/bottom-nav.tsx) are client components that read `usePathname()` from [`@/lib/i18n/navigation`](../lib/i18n/navigation.ts) and return `null` for `/protected/settings`. Add other "destination" routes to those guards instead of moving them out of the group.
+
+The header app-name link points to `/[locale]/protected/flow` — Flow is the default in-app destination after sign-in.
+
+### Settings (`(app)/settings/`)
+
+Server-rendered page that fetches the user's profile and membership in parallel via [`getAuthenticatedProfile()`](../lib/profile.ts) and [`getMembership()`](../lib/profile.ts). Four client sections handle interactivity:
+
+- `ProfileSection` — avatar upload (Server Action → `user-assets` bucket) and inline username edit.
+- `PreferencesSection` — language (next-intl), theme (next-themes), Smart reminders placeholder.
+- `MembershipSection` — tier badge, monthly credits, reset date, "Voir les formules" sheet listing the three tiers.
+- `DangerZoneSection` — logout (reuses [`LogoutButton`](../components/forms/logout-button.tsx)) and two-step delete-account confirmation.
+
+Mutations live in [`settings/action.ts`](./[locale]/protected/(app)/settings/action.ts): `updateUsername` (regex + length validation, maps Postgres `23505` to a `usernameTaken` i18n key) and `updateAvatar` (MIME + size whitelist, uploads to `avatars/{user.id}/{uuid}.{ext}` for cache-busted URLs).
+
+Because Settings is a full-bleed destination route (no shared header, no bottom nav), it opens with a brief slide-in to read as a panel rather than a hard page swap. `settings-transition.tsx` is a small Server Component wrapper that applies `animate-in slide-in-from-right-4 fade-in duration-300 ease-out` from `tw-animate-css` — the animation is CSS-only (no state, no effects), so the wrapper stays server-rendered. It is mounted by `settings/layout.tsx` (not `page.tsx`) so the animation runs **once on route entry** and spans both the Suspense fallback (`loading.tsx`) and the resolved page content — the layout does not re-mount when `loading.tsx` is replaced by `page.tsx`. Wrapping `page.tsx` directly would have animated the content only after data resolved, leaving the skeleton to appear without animation. The wrapper itself lives next to the route rather than in `settings/components/` because that folder is reserved for content sections; it's also not in the root `components/` because it's settings-specific, not a reusable primitive.
+
+### Loading UI
+
+`protected/loading.tsx` is the Suspense boundary for the whole protected segment. Per-route loading files can be added alongside any `page.tsx` when a tighter boundary is useful — `settings/loading.tsx` does this, rendering a shimmer skeleton that mirrors the page's header + avatar + sections layout so the swap-in feels seamless. The skeleton inherits the slide-in animation from `settings/layout.tsx` because the layout wraps `{children}`, which is what Next.js fills with the loading fallback before swapping in the page. The header (back chevron + "Settings" title) renders fully — no shimmer — because both are static and i18n is already available from the parent locale layout's `setRequestLocale`; this means the title and the way out of the route are usable from the first frame of the skeleton.
 
 ## Conventions
 
-- **Server Components by default**; only add `"use client"` when you genuinely need browser-only behavior.
-- All user-facing strings go through `next-intl`. Add the key in both [`messages/en.json`](../messages/en.json) and [`messages/fr.json`](../messages/fr.json) — never hardcode in the component.
-- Auth helpers come from [`lib/supabase/server.ts`](../lib/supabase/server.ts) (server-side) and [`lib/supabase/client.ts`](../lib/supabase/client.ts) (client-side).
-- Page filenames are lowercase (`page.tsx`, `layout.tsx`); route segments are kebab-case (`forgot-password/`, `sign-up-success/`).
+- **Server Components by default**; only add `"use client"` when you genuinely need browser-only behavior. The protected layout and feature pages are server components.
+- All user-facing strings go through `next-intl`. Add the key in both [`messages/en.json`](../messages/en.json) and [`messages/fr.json`](../messages/fr.json) — never hardcode in the component. Navigation labels live under `navigation.*`, per-feature copy under `app.<feature>.*`.
+- In Server Components, prefer the async API: `await getTranslations(ns)` from `next-intl/server`. The sync `useTranslations` hook is reserved for Client Components (`"use client"`).
+- For internal links, import `Link` from [`@/lib/i18n/navigation`](../lib/i18n/navigation.ts) — it prefixes the current locale automatically. Plain `next/link` will lose the locale and silently fall back to English via the proxy rewrite.
+- Auth + profile helper: [`lib/profile.ts`](../lib/profile.ts) (`getAuthenticatedProfile()`). Raw Supabase clients come from [`lib/supabase/server.ts`](../lib/supabase/server.ts) and [`lib/supabase/client.ts`](../lib/supabase/client.ts).
+- Page filenames are lowercase (`page.tsx`, `layout.tsx`, `loading.tsx`); route segments are kebab-case (`forgot-password/`, `sign-up-success/`).
 
 ## Where the product spec lives
 

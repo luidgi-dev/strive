@@ -103,6 +103,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          tier: string
           timezone: string
           updated_at: string
           username: string
@@ -112,6 +113,7 @@ export type Database = {
           created_at?: string
           id: string
           is_active?: boolean
+          tier?: string
           timezone?: string
           updated_at?: string
           username: string
@@ -121,6 +123,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          tier?: string
           timezone?: string
           updated_at?: string
           username?: string
@@ -336,6 +339,38 @@ export type Database = {
             foreignKeyName: "rituals_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_credits: {
+        Row: {
+          balance: number
+          reset_at: string
+          updated_at: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          reset_at?: string
+          updated_at?: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          reset_at?: string
+          updated_at?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
