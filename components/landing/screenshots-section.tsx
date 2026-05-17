@@ -26,11 +26,19 @@ const screenshots: Screenshot[] = [
     icon: LayoutGrid,
     title: "The Arc",
     caption: "Twelve weeks of consistency, visualized.",
+    preview: {
+      light: "/wireframes/the-arc-light.png",
+      dark: "/wireframes/the-arc-dark.png",
+    },
   },
   {
     icon: MessageCircle,
     title: "AI chat",
     caption: "Log a ritual in your own words.",
+    preview: {
+      light: "/wireframes/ai-chat-light.png",
+      dark: "/wireframes/ai-chat-dark.png",
+    },
   },
 ];
 
