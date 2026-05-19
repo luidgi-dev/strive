@@ -1,5 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Button } from "@/components/ui/button";
+
+import { DefineRitualButton } from "@/components/rituals/define-ritual-button";
+import { RitualsEmptyState } from "@/components/rituals/rituals-empty-state";
+import { RitualsList } from "@/components/rituals/rituals-list";
+import { getRitualsForActiveUser } from "@/lib/data/rituals";
+import { createClient } from "@/lib/supabase/server";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -7,23 +12,23 @@ export default async function RitualsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const tNav = await getTranslations("navigation");
-  const tApp = await getTranslations("app.rituals");
-  const tLanding = await getTranslations("landing.hero");
+  const t = await getTranslations("rituals");
+  const supabase = await createClient();
+  const { rituals, progressByRitualId } = await getRitualsForActiveUser(supabase);
+
+  if (rituals.length === 0) {
+    return <RitualsEmptyState />;
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-      <h1 className="text-4xl font-bold tracking-tighter">
-        {tNav("rituals")}
-      </h1>
-
-      <p className="text-muted-foreground max-w-[250px]">
-        {tApp("description")}
-      </p>
-
-      <Button disabled size="lg" variant="outline" className="mt-4 min-h-[44px] min-w-[44px] px-6 border-dashed opacity-50">
-        {tLanding("cta")}
-      </Button>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <h1 className="font-heading text-[22px] font-bold tracking-tight">
+          {t("title")}
+        </h1>
+        <DefineRitualButton variant="pill" />
+      </div>
+      <RitualsList rituals={rituals} progressByRitualId={progressByRitualId} />
     </div>
   );
 }
