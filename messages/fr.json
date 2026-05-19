@@ -257,15 +257,100 @@
       "resting": "En repos"
     },
     "category": {
-      "other": "Autre"
+      "other": "Autre",
+      "new": "+ Nouvelle",
+      "comingSoon": {
+        "title": "Catégories personnalisées",
+        "body": "La création de vos propres catégories arrive bientôt."
+      }
     },
     "create": {
-      "title": "Définir un rituel",
-      "placeholder": "Le formulaire de création arrive bientôt."
+      "title": "Définir un rituel"
+    },
+    "edit": {
+      "title": "Modifier le rituel"
     },
     "comingSoon": {
       "title": "Détail du rituel",
       "body": "L'accès au détail d'un rituel arrive bientôt."
+    },
+    "actions": {
+      "openLabel": "Ouvrir les actions du rituel",
+      "edit": "Modifier le rituel",
+      "archive": "Archiver",
+      "archiving": "Archivage...",
+      "archiveConfirmTitle": "Archiver ce rituel ?",
+      "archiveConfirmBody": "Il sortira de votre liste active. L'historique est conservé.",
+      "archiveConfirm": "Archiver",
+      "archiveCancel": "Le garder"
+    },
+    "form": {
+      "fields": {
+        "name": "Nom",
+        "type": "Type",
+        "cadence": "Cadence",
+        "target": "Objectif",
+        "date": "Date",
+        "category": "Catégorie",
+        "note": "Note",
+        "time": "Heure"
+      },
+      "placeholders": {
+        "name": "Nommez votre rituel",
+        "note": "De quoi parle ce rituel ?"
+      },
+      "type": {
+        "recurring": "Récurrent",
+        "oneTime": "Ponctuel",
+        "open": "Libre"
+      },
+      "cadence": {
+        "daily": "Quotidien",
+        "weekly": "Hebdo",
+        "monthly": "Mensuel"
+      },
+      "target": {
+        "unit": {
+          "week": "× par semaine",
+          "month": "× par mois"
+        }
+      },
+      "icon": {
+        "toggle": "Choisir une icône",
+        "clear": "Retirer l'icône"
+      },
+      "days": {
+        "toggle": "Choisir des jours précis",
+        "mon": "L",
+        "tue": "M",
+        "wed": "M",
+        "thu": "J",
+        "fri": "V",
+        "sat": "S",
+        "sun": "D"
+      },
+      "time": {
+        "toggle": "Définir une heure"
+      },
+      "note": {
+        "toggle": "Ajouter une note"
+      },
+      "actions": {
+        "create": "Créer le rituel",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "close": "Fermer"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis",
+        "nameTooLong": "Le nom est trop long",
+        "dateInvalid": "Choisissez une date valide",
+        "timeInvalid": "Choisissez une heure valide",
+        "validationFailed": "Certains champs nécessitent une correction",
+        "unauthorized": "Veuillez vous reconnecter",
+        "notFound": "Ce rituel est introuvable",
+        "unknown": "Une erreur est survenue. Réessayez."
+      }
     },
     "ai": {
       "openLabel": "Parler à l'IA Strive"
