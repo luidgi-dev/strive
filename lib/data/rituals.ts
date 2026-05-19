@@ -12,12 +12,31 @@ export type RitualRow = Pick<
   | "name"
   | "icon"
   | "color"
+  | "description"
   | "ritual_type"
   | "frequency_unit"
   | "frequency_value"
   | "due_date"
+  | "scheduled_days"
+  | "scheduled_time"
   | "category_id"
   | "created_at"
+>;
+
+export type RitualForEditRow = Pick<
+  Tables<"rituals">,
+  | "id"
+  | "name"
+  | "icon"
+  | "color"
+  | "description"
+  | "ritual_type"
+  | "frequency_unit"
+  | "frequency_value"
+  | "due_date"
+  | "scheduled_days"
+  | "scheduled_time"
+  | "category_id"
 >;
 
 export type RitualCategoryRow = Pick<
@@ -40,7 +59,10 @@ export type RitualsData = {
 };
 
 const RITUAL_COLUMNS =
-  "id, name, icon, color, ritual_type, frequency_unit, frequency_value, due_date, category_id, created_at" as const;
+  "id, name, icon, color, description, ritual_type, frequency_unit, frequency_value, due_date, scheduled_days, scheduled_time, category_id, created_at" as const;
+
+const RITUAL_EDIT_COLUMNS =
+  "id, name, icon, color, description, ritual_type, frequency_unit, frequency_value, due_date, scheduled_days, scheduled_time, category_id" as const;
 
 export async function getRitualsForActiveUser(
   client: SupabaseClient<Database>,
@@ -80,6 +102,32 @@ export async function getRitualsForActiveUser(
   }
 
   return { rituals, progressByRitualId };
+}
+
+export async function getVisibleCategoriesForUser(
+  client: SupabaseClient<Database>,
+): Promise<RitualCategoryRow[]> {
+  const { data, error } = await client
+    .from("ritual_categories")
+    .select("id, name")
+    .order("name", { ascending: true });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getRitualById(
+  client: SupabaseClient<Database>,
+  id: string,
+): Promise<RitualForEditRow | null> {
+  const { data, error } = await client
+    .from("rituals")
+    .select(RITUAL_EDIT_COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
 }
 
 export function deriveMomentumStatus(
