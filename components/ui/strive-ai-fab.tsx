@@ -2,12 +2,24 @@
 
 import { Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useSyncExternalStore } from "react";
 
 import { usePathname } from "@/lib/i18n/navigation";
 
+const subscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function StriveAiFab() {
+  const isClient = useSyncExternalStore(
+    subscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const pathname = usePathname();
   const t = useTranslations("rituals.ai");
+
+  if (!isClient) return null;
 
   if (
     pathname === "/protected/settings" ||
