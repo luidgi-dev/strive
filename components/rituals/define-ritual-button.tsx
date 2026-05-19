@@ -4,21 +4,19 @@ import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import type { RitualCategoryRow } from "@/lib/data/rituals";
 import { cn } from "@/lib/utils";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "@/components/ui/sheet";
+
+import { RitualFormSheet } from "./ritual-form-sheet";
 
 type Variant = "pill" | "cta";
 
 type Props = {
   variant: Variant;
+  categories: RitualCategoryRow[];
 };
 
-export function DefineRitualButton({ variant }: Props) {
+export function DefineRitualButton({ variant, categories }: Props) {
   const t = useTranslations("rituals");
   const [open, setOpen] = useState(false);
 
@@ -45,12 +43,12 @@ export function DefineRitualButton({ variant }: Props) {
         {triggerLabel}
       </button>
 
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent>
-          <SheetTitle>{t("create.title")}</SheetTitle>
-          <SheetDescription>{t("create.placeholder")}</SheetDescription>
-        </SheetContent>
-      </Sheet>
+      <RitualFormSheet
+        open={open}
+        onOpenChange={setOpen}
+        mode="create"
+        categories={categories}
+      />
     </>
   );
 }

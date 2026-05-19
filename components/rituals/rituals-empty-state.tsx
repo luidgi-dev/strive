@@ -1,9 +1,15 @@
 import { HeartHandshake } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import type { RitualCategoryRow } from "@/lib/data/rituals";
+
 import { DefineRitualButton } from "./define-ritual-button";
 
-export async function RitualsEmptyState() {
+type Props = {
+  categories: RitualCategoryRow[];
+};
+
+export async function RitualsEmptyState({ categories }: Props) {
   const t = await getTranslations("rituals");
 
   return (
@@ -20,7 +26,7 @@ export async function RitualsEmptyState() {
       <p className="max-w-[280px] text-[13.5px] leading-relaxed text-muted-foreground">
         {t("empty.body")}
       </p>
-      <DefineRitualButton variant="cta" />
+      <DefineRitualButton variant="cta" categories={categories} />
     </div>
   );
 }

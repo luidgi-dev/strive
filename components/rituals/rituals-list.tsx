@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import {
   groupRitualsByCategory,
+  type RitualCategoryRow,
   type RitualWithCategory,
   type RitualProgressEntry,
 } from "@/lib/data/rituals";
@@ -12,9 +13,14 @@ import { RitualCard } from "./ritual-card";
 type Props = {
   rituals: RitualWithCategory[];
   progressByRitualId: Map<string, RitualProgressEntry>;
+  categories: RitualCategoryRow[];
 };
 
-export async function RitualsList({ rituals, progressByRitualId }: Props) {
+export async function RitualsList({
+  rituals,
+  progressByRitualId,
+  categories,
+}: Props) {
   const t = await getTranslations("rituals.category");
   const groups = groupRitualsByCategory(rituals);
 
@@ -31,6 +37,7 @@ export async function RitualsList({ rituals, progressByRitualId }: Props) {
                 key={ritual.id}
                 ritual={ritual}
                 progress={progressByRitualId.get(ritual.id)}
+                categories={categories}
               />
             ))}
           </div>
