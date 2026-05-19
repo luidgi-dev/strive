@@ -232,5 +232,43 @@
     "flow": {
       "description": "Votre dynamique quotidienne, visualisée."
     }
+  },
+  "rituals": {
+    "title": "Rituels",
+    "defineCta": "Définir un rituel",
+    "defineFirst": "Définir votre premier rituel",
+    "newCategory": "Nouvelle catégorie",
+    "empty": {
+      "title": "Vos rituels prendront place ici.",
+      "body": "Définissez-en un pour commencer à bâtir votre rythme."
+    },
+    "frequency": {
+      "daily": "Quotidien",
+      "weekly": "Hebdo · {n}×",
+      "monthly": "Mensuel · {n}×"
+    },
+    "type": {
+      "oneTime": "Ponctuel",
+      "open": "Libre"
+    },
+    "status": {
+      "strong": "Solide",
+      "steady": "Régulier",
+      "resting": "En repos"
+    },
+    "category": {
+      "other": "Autre"
+    },
+    "create": {
+      "title": "Définir un rituel",
+      "placeholder": "Le formulaire de création arrive bientôt."
+    },
+    "comingSoon": {
+      "title": "Détail du rituel",
+      "body": "L'accès au détail d'un rituel arrive bientôt."
+    },
+    "ai": {
+      "openLabel": "Parler à l'IA Strive"
+    }
   }
 }

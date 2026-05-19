@@ -232,6 +232,44 @@
     "flow": {
       "description": "Your daily momentum, visualized."
     }
+  },
+  "rituals": {
+    "title": "Rituals",
+    "defineCta": "Define a ritual",
+    "defineFirst": "Define your first ritual",
+    "newCategory": "New category",
+    "empty": {
+      "title": "Your rituals will live here.",
+      "body": "Define one to start building rhythm."
+    },
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly · {n}×",
+      "monthly": "Monthly · {n}×"
+    },
+    "type": {
+      "oneTime": "One-time",
+      "open": "Open"
+    },
+    "status": {
+      "strong": "Strong",
+      "steady": "Steady",
+      "resting": "Resting"
+    },
+    "category": {
+      "other": "Other"
+    },
+    "create": {
+      "title": "Define a ritual",
+      "placeholder": "The ritual creation form is coming soon."
+    },
+    "comingSoon": {
+      "title": "Ritual detail",
+      "body": "Tapping in to a ritual is coming soon."
+    },
+    "ai": {
+      "openLabel": "Talk to Strive AI"
+    }
   }
 }
 
