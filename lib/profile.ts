@@ -1,4 +1,7 @@
 // lib/profile.ts
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import type { Database } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
 
 export type Tier = "lite" | "premium" | "lifetime";
@@ -14,6 +17,36 @@ const TIERS: ReadonlySet<Tier> = new Set(["lite", "premium", "lifetime"]);
 
 function toTier(value: string | null | undefined): Tier {
   return value && TIERS.has(value as Tier) ? (value as Tier) : "lite";
+}
+
+// Ensures the authenticated user has a profiles row. Heals legacy/Studio
+// accounts where the handle_new_user trigger never fired, which otherwise
+// causes a 23503 FK violation on the first write referencing profiles(id).
+export async function ensureProfile(
+  supabase: SupabaseClient<Database>,
+  user: { id: string; email?: string | null },
+): Promise<boolean> {
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (existing) return true;
+
+  const base =
+    (user.email?.split("@")[0] ?? "").trim() || `user-${user.id.slice(0, 8)}`;
+  // Always append a short random suffix to avoid the username UNIQUE
+  // constraint; this is a fallback identity the user can edit later.
+  const username = `${base}-${Math.random().toString(36).slice(2, 6)}`;
+
+  const { error } = await supabase
+    .from("profiles")
+    .insert({ id: user.id, username }); // other columns use DB defaults
+  if (error) {
+    console.error("[ensureProfile] insert failed", error);
+    return false;
+  }
+  return true;
 }
 
 export async function getAuthenticatedProfile() {

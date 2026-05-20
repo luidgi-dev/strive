@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { ritualFormSchema, type RitualFormValues } from "@/lib/data/rituals-schema";
+import { ensureProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 import type { TablesInsert, TablesUpdate } from "@/lib/supabase/database.types";
 
@@ -95,6 +96,9 @@ export async function createRitual(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+
+  const healed = await ensureProfile(supabase, user);
+  if (!healed) return { ok: false, error: "unknown" };
 
   const { data, error } = await supabase
     .from("rituals")
