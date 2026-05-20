@@ -276,11 +276,18 @@
       "logged": "Enregistrés",
       "started": "Démarré",
       "logAria": "Enregistrer {name}",
+      "log": {
+        "logAgain": "Enregistrer à nouveau",
+        "undo": "Annuler le dernier",
+        "adjust": "Ajuster les logs du jour",
+        "markDone": "Marquer comme fait",
+        "undoDone": "Annuler"
+      },
       "arc": {
         "label": "L'Arc",
         "labelWeeks": "L'Arc · {weeks, plural, one {# semaine} other {# semaines}}",
         "chartLabel": "Décompte hebdomadaire sur {weeks, plural, one {# semaine} other {# semaines}}",
-        "target": "{n}×",
+        "targetLabel": "Objectif {n}×",
         "weekOf": "Semaine du {date}",
         "meta": "{n} sur {target}",
         "metaCount": "{n} enregistrés",
