@@ -270,9 +270,37 @@
     "edit": {
       "title": "Modifier le rituel"
     },
-    "comingSoon": {
-      "title": "Détail du rituel",
-      "body": "L'accès au détail d'un rituel arrive bientôt."
+    "detail": {
+      "back": "Retour aux rituels",
+      "momentum": "Momentum",
+      "logged": "Enregistrés",
+      "started": "Démarré",
+      "logAria": "Enregistrer {name}",
+      "arc": {
+        "label": "L'Arc",
+        "labelWeeks": "L'Arc · {weeks, plural, one {# semaine} other {# semaines}}",
+        "chartLabel": "Décompte hebdomadaire sur {weeks, plural, one {# semaine} other {# semaines}}",
+        "target": "{n}×",
+        "weekOf": "Semaine du {date}",
+        "meta": "{n} sur {target}",
+        "metaCount": "{n} enregistrés",
+        "selectWeek": "Afficher la semaine du {date}",
+        "emptyTitle": "L'Arc se dessine avec le temps",
+        "emptyBody": "Enregistre ce rituel et ton rythme au fil des semaines apparaîtra ici."
+      },
+      "oneTime": {
+        "status": {
+          "upcoming": "À venir",
+          "done": "Fait",
+          "overdue": "Échéance passée"
+        },
+        "dueOn": "Prévu le {date}",
+        "loggedOn": "Loggé le {date}",
+        "early": "{n, plural, one {# jour en avance} other {# jours en avance}}",
+        "late": "{n, plural, one {# jour en retard} other {# jours en retard}}",
+        "onTime": "Le jour même",
+        "note": "Toujours d'actualité ? Loggue-le ou reprogramme la date."
+      }
     },
     "actions": {
       "openLabel": "Ouvrir les actions du rituel",

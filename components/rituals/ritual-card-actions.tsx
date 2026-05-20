@@ -24,9 +24,21 @@ import { RitualFormSheet } from "./ritual-form-sheet";
 type Props = {
   ritual: RitualWithCategory;
   categories: RitualCategoryRow[];
+  /** Trigger styling. Defaults to the right edge of a ritual card. */
+  triggerClassName?: string;
+  /** Side the menu opens towards. Cards open upward; the detail header downward. */
+  menuSide?: "top" | "bottom";
 };
 
-export function RitualCardActions({ ritual, categories }: Props) {
+const DEFAULT_TRIGGER_CLASS =
+  "flex size-11 shrink-0 items-center justify-center rounded-r-xl text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground data-[popup-open]:bg-foreground/5 data-[popup-open]:text-foreground";
+
+export function RitualCardActions({
+  ritual,
+  categories,
+  triggerClassName,
+  menuSide = "top",
+}: Props) {
   const t = useTranslations("rituals");
   const [menuOpen, setMenuOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -64,12 +76,12 @@ export function RitualCardActions({ ritual, categories }: Props) {
       <Menu.Root open={menuOpen} onOpenChange={setMenuOpen}>
         <Menu.Trigger
           aria-label={t("actions.openLabel")}
-          className="flex size-11 shrink-0 items-center justify-center rounded-r-xl text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground data-[popup-open]:bg-foreground/5 data-[popup-open]:text-foreground"
+          className={triggerClassName ?? DEFAULT_TRIGGER_CLASS}
         >
           <MoreHorizontal aria-hidden className="size-4" />
         </Menu.Trigger>
         <Menu.Portal>
-          <Menu.Positioner side="top" align="end" sideOffset={6} className="z-50">
+          <Menu.Positioner side={menuSide} align="end" sideOffset={6} className="z-50">
             <Menu.Popup
               className={cn(
                 "min-w-[10rem] overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg outline-none",

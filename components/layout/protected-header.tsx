@@ -17,6 +17,11 @@ export function ProtectedHeader({ avatarUrl, displayName }: Props) {
     return null;
   }
 
+  // Ritual detail pages provide their own back header.
+  if (pathname.startsWith("/protected/rituals/")) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between bg-background px-6">
       <Link href="/protected/flow" className="text-2xl font-bold tracking-tighter">

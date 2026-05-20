@@ -48,6 +48,15 @@ export type RitualWithCategory = RitualRow & {
   category: RitualCategoryRow | null;
 };
 
+export type RitualDetailRow = RitualWithCategory &
+  Pick<Tables<"rituals">, "started_at">;
+
+/** A single completed/rest/missed entry, as exposed by ritual_log_history. */
+export type RitualLogHistoryEntry = Pick<
+  Tables<"ritual_log_history">,
+  "logged_at" | "status_id" | "note"
+>;
+
 export type RitualProgressEntry = {
   completionRate: number | null;
   logsThisPeriod: number | null;
@@ -63,6 +72,8 @@ const RITUAL_COLUMNS =
 
 const RITUAL_EDIT_COLUMNS =
   "id, name, icon, color, description, ritual_type, frequency_unit, frequency_value, due_date, scheduled_days, scheduled_time, category_id" as const;
+
+const RITUAL_DETAIL_COLUMNS = `${RITUAL_COLUMNS}, started_at` as const;
 
 export async function getRitualsForActiveUser(
   client: SupabaseClient<Database>,
@@ -128,6 +139,86 @@ export async function getRitualById(
 
   if (error) throw error;
   return data;
+}
+
+export async function getRitualDetail(
+  client: SupabaseClient<Database>,
+  id: string,
+): Promise<RitualDetailRow | null> {
+  const { data, error } = await client
+    .from("rituals")
+    .select(RITUAL_DETAIL_COLUMNS)
+    .eq("id", id)
+    .eq("is_active", true)
+    .is("archived_at", null)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  let category: RitualCategoryRow | null = null;
+  if (data.category_id) {
+    const { data: cat, error: catError } = await client
+      .from("ritual_categories")
+      .select("id, name")
+      .eq("id", data.category_id)
+      .maybeSingle();
+    if (catError) throw catError;
+    category = cat;
+  }
+
+  return { ...data, category };
+}
+
+export async function getRitualProgress(
+  client: SupabaseClient<Database>,
+  ritualId: string,
+): Promise<RitualProgressEntry | null> {
+  const { data, error } = await client
+    .from("ritual_progress")
+    .select("completion_rate, logs_this_period")
+    .eq("ritual_id", ritualId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    completionRate: data.completion_rate,
+    logsThisPeriod: data.logs_this_period,
+  };
+}
+
+export async function getRitualArcLogs(
+  client: SupabaseClient<Database>,
+  ritualId: string,
+  since: string,
+): Promise<RitualLogHistoryEntry[]> {
+  const { data, error } = await client
+    .from("ritual_log_history")
+    .select("logged_at, status_id, note")
+    .eq("ritual_id", ritualId)
+    .gte("logged_at", since)
+    .order("logged_at", { ascending: true });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getLatestCompletedLog(
+  client: SupabaseClient<Database>,
+  ritualId: string,
+): Promise<string | null> {
+  const { data, error } = await client
+    .from("ritual_logs")
+    .select("logged_at")
+    .eq("ritual_id", ritualId)
+    .eq("status_id", "completed")
+    .order("logged_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data?.logged_at ?? null;
 }
 
 export function deriveMomentumStatus(

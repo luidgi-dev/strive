@@ -270,9 +270,37 @@
     "edit": {
       "title": "Edit ritual"
     },
-    "comingSoon": {
-      "title": "Ritual detail",
-      "body": "Tapping in to a ritual is coming soon."
+    "detail": {
+      "back": "Back to rituals",
+      "momentum": "Momentum",
+      "logged": "Logged",
+      "started": "Started",
+      "logAria": "Log {name}",
+      "arc": {
+        "label": "The Arc",
+        "labelWeeks": "The Arc · {weeks, plural, one {# week} other {# weeks}}",
+        "chartLabel": "Weekly count over {weeks, plural, one {# week} other {# weeks}}",
+        "target": "{n}×",
+        "weekOf": "Week of {date}",
+        "meta": "{n} of {target}",
+        "metaCount": "{n} logged",
+        "selectWeek": "Show week of {date}",
+        "emptyTitle": "The Arc takes shape with time",
+        "emptyBody": "Log this ritual and your rhythm over the weeks will appear here."
+      },
+      "oneTime": {
+        "status": {
+          "upcoming": "Upcoming",
+          "done": "Done",
+          "overdue": "Past due"
+        },
+        "dueOn": "Due {date}",
+        "loggedOn": "Logged {date}",
+        "early": "{n, plural, one {# day early} other {# days early}}",
+        "late": "{n, plural, one {# day late} other {# days late}}",
+        "onTime": "On the day",
+        "note": "Still relevant? Log it or reschedule the date."
+      }
     },
     "actions": {
       "openLabel": "Open ritual actions",
