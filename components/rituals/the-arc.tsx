@@ -65,9 +65,16 @@ export function TheArc({ model }: Props) {
   return (
     <section className="flex flex-col gap-3.5 rounded-xl border border-border bg-card p-4 text-foreground">
       <div className="flex flex-col gap-2.5">
-        <span className="px-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-          {t("labelWeeks", { weeks: weeks.length })}
-        </span>
+        <div className="flex items-center justify-between gap-2 px-0.5">
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+            {t("labelWeeks", { weeks: weeks.length })}
+          </span>
+          {weeklyTarget !== null ? (
+            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+              {t("targetLabel", { n: weeklyTarget })}
+            </span>
+          ) : null}
+        </div>
 
         <div className="relative h-24 w-full">
           <svg
@@ -153,12 +160,6 @@ export function TheArc({ model }: Props) {
               </button>
             );
           })}
-
-          {weeklyTarget !== null ? (
-            <span className="pointer-events-none absolute right-0 top-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
-              {t("target", { n: weeklyTarget })}
-            </span>
-          ) : null}
         </div>
 
         <div className="flex justify-between text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
