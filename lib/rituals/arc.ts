@@ -156,6 +156,36 @@ export function buildArcModel({
 }
 
 /**
+ * Overlay an optimistic count for today onto a built model, so the chart and
+ * heatmap react instantly while a log/unlog server action is in flight.
+ * Returns the same model reference when nothing changes.
+ */
+export function applyOptimisticToday(
+  model: ArcModel,
+  today: string,
+  newCount: number,
+): ArcModel {
+  let delta = 0;
+  const weeks = model.weeks.map((week) => {
+    const index = week.days.findIndex((day) => day.date === today);
+    if (index === -1) return week;
+    const day = week.days[index];
+    delta = newCount - day.count;
+    if (delta === 0) return week;
+    const days = week.days.slice();
+    days[index] = {
+      ...day,
+      count: newCount,
+      status: newCount > 0 ? "logged" : "rest",
+    };
+    return { ...week, days, count: week.count + delta };
+  });
+
+  if (delta === 0) return model;
+  return { ...model, weeks, totalLogs: model.totalLogs + delta };
+}
+
+/**
  * Span from the ritual's first week up to the current week, capped at maxWeeks.
  * Rituals with no known start (or starting in the future) fall back to maxWeeks.
  */

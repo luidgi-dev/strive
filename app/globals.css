@@ -141,3 +141,23 @@
     @apply font-heading tracking-tight;
   }
 }
+
+/* A momentum-green ring briefly illuminates the log control on each log. */
+@keyframes log-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--momentum) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 10px color-mix(in oklch, var(--momentum) 0%, transparent);
+  }
+}
+
+.animate-log-pulse {
+  animation: log-pulse 0.45s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-log-pulse {
+    animation: none;
+  }
+}

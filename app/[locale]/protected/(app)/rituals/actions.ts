@@ -182,3 +182,100 @@ export async function archiveRitual(id: string): Promise<ActionResult> {
   revalidatePath("/protected/rituals");
   return { ok: true };
 }
+
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+function revalidateRitual(ritualId: string) {
+  revalidatePath(`/protected/rituals/${ritualId}`);
+  revalidatePath("/protected/rituals");
+}
+
+export async function logRitual(
+  ritualId: string,
+  loggedAt: string,
+): Promise<ActionResult> {
+  if (typeof ritualId !== "string" || ritualId.length === 0) {
+    return { ok: false, error: "validationFailed" };
+  }
+  if (!DATE_REGEX.test(loggedAt)) {
+    return { ok: false, error: "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  const healed = await ensureProfile(supabase, user);
+  if (!healed) return { ok: false, error: "unknown" };
+
+  const { error } = await supabase.from("ritual_logs").insert({
+    ritual_id: ritualId,
+    user_id: user.id,
+    status_id: "completed",
+    logged_at: loggedAt,
+    logged_via: "manual",
+  });
+
+  if (error) {
+    console.error("[logRitual] insert failed", error);
+    return { ok: false, error: "unknown" };
+  }
+
+  revalidateRitual(ritualId);
+  return { ok: true };
+}
+
+export async function unlogRitual(
+  ritualId: string,
+  loggedAt: string,
+  // One-time rituals undo their single completion regardless of the date it
+  // was logged; recurring/open undo the latest completion for that day.
+  anyDate = false,
+): Promise<ActionResult> {
+  if (typeof ritualId !== "string" || ritualId.length === 0) {
+    return { ok: false, error: "validationFailed" };
+  }
+  if (!DATE_REGEX.test(loggedAt)) {
+    return { ok: false, error: "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  // Remove the most recent completed log for that ritual.
+  let query = supabase
+    .from("ritual_logs")
+    .select("id")
+    .eq("ritual_id", ritualId)
+    .eq("status_id", "completed");
+  if (!anyDate) query = query.eq("logged_at", loggedAt);
+
+  const { data: latest, error: findError } = await query
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (findError) {
+    console.error("[unlogRitual] find failed", findError);
+    return { ok: false, error: "unknown" };
+  }
+  if (!latest) return { ok: true }; // nothing to undo
+
+  const { error } = await supabase
+    .from("ritual_logs")
+    .delete()
+    .eq("id", latest.id);
+
+  if (error) {
+    console.error("[unlogRitual] delete failed", error);
+    return { ok: false, error: "unknown" };
+  }
+
+  revalidateRitual(ritualId);
+  return { ok: true };
+}

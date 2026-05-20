@@ -276,11 +276,18 @@
       "logged": "Logged",
       "started": "Started",
       "logAria": "Log {name}",
+      "log": {
+        "logAgain": "Log again",
+        "undo": "Undo last log",
+        "adjust": "Adjust today's logs",
+        "markDone": "Mark as done",
+        "undoDone": "Undo"
+      },
       "arc": {
         "label": "The Arc",
         "labelWeeks": "The Arc · {weeks, plural, one {# week} other {# weeks}}",
         "chartLabel": "Weekly count over {weeks, plural, one {# week} other {# weeks}}",
-        "target": "{n}×",
+        "targetLabel": "Target {n}×",
         "weekOf": "Week of {date}",
         "meta": "{n} of {target}",
         "metaCount": "{n} logged",

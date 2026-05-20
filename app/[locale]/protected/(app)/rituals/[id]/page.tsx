@@ -1,12 +1,14 @@
-import { ChevronLeft, Minus, Plus, TrendingUp } from "lucide-react";
+import { ChevronLeft, Minus, TrendingUp } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { OneTimeStatus } from "@/components/rituals/one-time-status";
 import { RitualCardActions } from "@/components/rituals/ritual-card-actions";
+import { RitualLogControl } from "@/components/rituals/ritual-log-control";
+import { RitualLogProvider } from "@/components/rituals/ritual-log-provider";
 import { RitualMeta } from "@/components/rituals/ritual-meta";
-import { TheArc } from "@/components/rituals/the-arc";
+import { TheArcLive } from "@/components/rituals/the-arc-live";
 import { Link } from "@/lib/i18n/navigation";
 import {
   deriveMomentumStatus,
@@ -80,6 +82,13 @@ export default async function RitualDetailPage({ params }: Props) {
     ? await getLatestCompletedLog(supabase, id)
     : null;
 
+  // One-time logging is a single done flag; recurring/open count today's logs.
+  const todayCount = logs.filter(
+    (log) =>
+      log.status_id === "completed" && log.logged_at?.slice(0, 10) === today,
+  ).length;
+  const initialLogCount = isOneTime ? (completedAt ? 1 : 0) : todayCount;
+
   const subtitle = buildSubtitle();
   const status = deriveMomentumStatus(
     ritual.ritual_type,
@@ -112,81 +121,81 @@ export default async function RitualDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <header className="-mx-2 flex items-center justify-between">
-        <Link
-          href="/protected/rituals"
-          aria-label={tDetail("back")}
-          className="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent"
-        >
-          <ChevronLeft aria-hidden className="size-5" />
-        </Link>
-        <RitualCardActions
-          ritual={ritual}
-          categories={categories}
-          menuSide="bottom"
-          triggerClassName="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent data-[popup-open]:bg-accent"
-        />
-      </header>
+    <RitualLogProvider
+      ritualId={id}
+      today={today}
+      initialCount={initialLogCount}
+      ritualType={ritual.ritual_type}
+    >
+      <div className="flex flex-col gap-4">
+        <header className="-mx-2 flex items-center justify-between">
+          <Link
+            href="/protected/rituals"
+            aria-label={tDetail("back")}
+            className="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent"
+          >
+            <ChevronLeft aria-hidden className="size-5" />
+          </Link>
+          <RitualCardActions
+            ritual={ritual}
+            categories={categories}
+            menuSide="bottom"
+            triggerClassName="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent data-[popup-open]:bg-accent"
+          />
+        </header>
 
-      <div className="flex items-end justify-between gap-3 px-1 pb-1">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h1 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-foreground">
-            {ritual.name}
-          </h1>
-          <span className="text-[13px] font-medium leading-snug text-muted-foreground">
-            {subtitle}
-          </span>
-          {ritual.description ? (
-            <p className="text-[13px] leading-snug text-muted-foreground/80">
-              {ritual.description}
-            </p>
-          ) : null}
-        </div>
-        {/* Quick log button: visual only for now; wiring lands in the logging issue. */}
-        <button
-          type="button"
-          aria-label={tDetail("logAria", { name: ritual.name })}
-          className="flex size-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-muted-foreground/35 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
-        >
-          <Plus aria-hidden className="size-4" />
-        </button>
-      </div>
-
-      {isOneTime ? (
-        <OneTimeStatus
-          dueDate={ritual.due_date}
-          completedAt={completedAt}
-          today={today}
-        />
-      ) : (
-        <>
-          <div className="grid grid-cols-2 gap-2.5">
-            {status ? (
-              <KpiCard label={tDetail("momentum")}>
-                <span className="inline-flex items-center gap-1.5">
-                  {t(`status.${status}`)}
-                  <MomentumIcon status={status} />
-                </span>
-              </KpiCard>
-            ) : (
-              <KpiCard label={tDetail("logged")}>{model.totalLogs}</KpiCard>
-            )}
-            <KpiCard label={tDetail("started")}>
-              {format.dateTime(new Date(startedAt), { dateStyle: "medium" })}
-            </KpiCard>
+        <div className="flex items-end justify-between gap-3 px-1 pb-1">
+          <div className="flex min-w-0 flex-col gap-1">
+            <h1 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-foreground">
+              {ritual.name}
+            </h1>
+            <span className="text-[13px] font-medium leading-snug text-muted-foreground">
+              {subtitle}
+            </span>
+            {ritual.description ? (
+              <p className="text-[13px] leading-snug text-muted-foreground/80">
+                {ritual.description}
+              </p>
+            ) : null}
           </div>
+          <RitualLogControl name={ritual.name} />
+        </div>
 
-          <TheArc model={model} />
-        </>
-      )}
+        {isOneTime ? (
+          <OneTimeStatus
+            dueDate={ritual.due_date}
+            completedAt={completedAt}
+            today={today}
+          />
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-2.5">
+              {status ? (
+                <KpiCard label={tDetail("momentum")}>
+                  <span className="inline-flex items-center gap-1.5">
+                    {t(`status.${status}`)}
+                    <MomentumIcon status={status} />
+                  </span>
+                </KpiCard>
+              ) : (
+                <KpiCard label={tDetail("logged")}>{model.totalLogs}</KpiCard>
+              )}
+              <KpiCard label={tDetail("started")}>
+                {format.dateTime(new Date(startedAt), { dateStyle: "medium" })}
+              </KpiCard>
+            </div>
 
-      <RitualMeta
-        category={ritual.category?.name ?? null}
-        scheduledDays={ritual.scheduled_days}
-        scheduledTime={ritual.scheduled_time}
-      />
-    </div>
+            <TheArcLive baseModel={model} today={today} />
+          </>
+        )}
+
+        <RitualMeta
+          category={ritual.category?.name ?? null}
+          scheduledDays={ritual.scheduled_days}
+          scheduledTime={ritual.scheduled_time}
+        />
+      </div>
+    </RitualLogProvider>
   );
 }
 
