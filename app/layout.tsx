@@ -31,6 +31,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Strive",
   description: "Consistency over intensity.",
+  manifest: "/site.webmanifest",
   icons: {
     icon: [
       {
