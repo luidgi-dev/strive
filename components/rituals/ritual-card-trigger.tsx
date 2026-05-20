@@ -23,7 +23,7 @@ export function RitualCardTrigger({ children }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group flex w-full min-h-[44px] items-center gap-3 rounded-xl border border-border bg-card px-3.5 py-3 text-left text-card-foreground transition-colors hover:border-foreground/20"
+        className="group flex flex-1 min-w-0 items-center gap-3 rounded-l-xl py-3 pl-3.5 pr-2 text-left text-card-foreground transition-colors hover:bg-foreground/5 min-h-[44px]"
       >
         {children}
       </button>

@@ -257,15 +257,100 @@
       "resting": "Resting"
     },
     "category": {
-      "other": "Other"
+      "other": "Other",
+      "new": "+ New",
+      "comingSoon": {
+        "title": "Custom categories",
+        "body": "Creating your own categories is coming soon."
+      }
     },
     "create": {
-      "title": "Define a ritual",
-      "placeholder": "The ritual creation form is coming soon."
+      "title": "Define a ritual"
+    },
+    "edit": {
+      "title": "Edit ritual"
     },
     "comingSoon": {
       "title": "Ritual detail",
       "body": "Tapping in to a ritual is coming soon."
+    },
+    "actions": {
+      "openLabel": "Open ritual actions",
+      "edit": "Edit ritual",
+      "archive": "Archive",
+      "archiving": "Archiving...",
+      "archiveConfirmTitle": "Archive this ritual?",
+      "archiveConfirmBody": "It will move out of your active list. History is kept.",
+      "archiveConfirm": "Archive",
+      "archiveCancel": "Keep it"
+    },
+    "form": {
+      "fields": {
+        "name": "Name",
+        "type": "Type",
+        "cadence": "Cadence",
+        "target": "Target",
+        "date": "Date",
+        "category": "Category",
+        "note": "Note",
+        "time": "Time"
+      },
+      "placeholders": {
+        "name": "Name your ritual",
+        "note": "What is this ritual about?"
+      },
+      "type": {
+        "recurring": "Recurring",
+        "oneTime": "One-time",
+        "open": "Open"
+      },
+      "cadence": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "target": {
+        "unit": {
+          "week": "× per week",
+          "month": "× per month"
+        }
+      },
+      "icon": {
+        "toggle": "Pick an icon",
+        "clear": "Remove icon"
+      },
+      "days": {
+        "toggle": "Pick specific days",
+        "mon": "M",
+        "tue": "T",
+        "wed": "W",
+        "thu": "T",
+        "fri": "F",
+        "sat": "S",
+        "sun": "S"
+      },
+      "time": {
+        "toggle": "Set a time"
+      },
+      "note": {
+        "toggle": "Add a note"
+      },
+      "actions": {
+        "create": "Create ritual",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "close": "Close"
+      },
+      "errors": {
+        "nameRequired": "Name is required",
+        "nameTooLong": "Name is too long",
+        "dateInvalid": "Pick a valid date",
+        "timeInvalid": "Pick a valid time",
+        "validationFailed": "Some fields need attention",
+        "unauthorized": "Please sign in again",
+        "notFound": "This ritual could not be found",
+        "unknown": "Something went wrong. Try again."
+      }
     },
     "ai": {
       "openLabel": "Talk to Strive AI"
