@@ -193,13 +193,13 @@ function DayCell({ day, letter }: { day: ArcDay; letter: string }) {
     <div
       className={cn(
         "flex flex-col items-center gap-2 rounded-md border border-border bg-background py-2.5",
-        day.status === "today" && "border-foreground/35 bg-foreground/[0.04]",
+        day.isToday && "border-foreground/35 bg-foreground/[0.04]",
       )}
     >
       <span
         className={cn(
           "text-[10px] font-bold uppercase tracking-[0.08em]",
-          day.status === "logged" || day.status === "today"
+          day.status === "logged" || day.isToday
             ? "text-foreground"
             : day.status === "future"
               ? "text-muted-foreground/55"
@@ -211,11 +211,13 @@ function DayCell({ day, letter }: { day: ArcDay; letter: string }) {
       <span
         className={cn(
           "size-3 rounded-full",
-          day.status === "logged" && "bg-foreground",
+          // A halo ring marks days with more than one log (flexible targets).
+          day.status === "logged" &&
+            (day.count > 1
+              ? "bg-foreground ring-2 ring-foreground/30"
+              : "bg-foreground"),
           day.status === "rest" &&
             "border border-dashed border-muted-foreground/35 bg-transparent",
-          day.status === "today" &&
-            "border-[1.5px] border-foreground/50 bg-transparent",
           day.status === "future" &&
             "border border-dashed border-muted-foreground/20 bg-transparent",
         )}

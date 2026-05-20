@@ -3,12 +3,16 @@
 // component renders the result. Dates are handled as plain YYYY-MM-DD strings
 // in UTC to avoid timezone/DST drift.
 
-export type ArcDayStatus = "logged" | "rest" | "today" | "future";
+export type ArcDayStatus = "logged" | "rest" | "future";
 
 export type ArcDay = {
   /** Calendar day, YYYY-MM-DD. */
   date: string;
   status: ArcDayStatus;
+  /** Completed logs on that day (multiple per day are allowed). */
+  count: number;
+  /** Whether this day is the reference "today". */
+  isToday: boolean;
 };
 
 export type ArcWeek = {
@@ -128,11 +132,10 @@ export function buildArcModel({
 
       let status: ArcDayStatus;
       if (date > today) status = "future";
-      else if (date === today) status = "today";
       else if (logged > 0) status = "logged";
       else status = "rest";
 
-      days.push({ date, status });
+      days.push({ date, status, count: logged, isToday: date === today });
     }
 
     totalLogs += count;
