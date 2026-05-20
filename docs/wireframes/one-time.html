@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -72,7 +72,7 @@
     padding: 4px;
     font-size: 11px;
     flex-wrap: wrap;
-    max-width: 220px;
+    max-width: 240px;
   }
   .wf-controls button {
     background: transparent;
@@ -292,9 +292,9 @@
 </head>
 <body>
   <div class="wf-controls" role="group" aria-label="Wireframe controls">
-    <button type="button" data-set-state="upcoming" aria-pressed="true">À venir</button>
-    <button type="button" data-set-state="done" aria-pressed="false">Fait</button>
-    <button type="button" data-set-state="overdue" aria-pressed="false">Passé</button>
+    <button type="button" data-set-state="upcoming" aria-pressed="true">Upcoming</button>
+    <button type="button" data-set-state="done" aria-pressed="false">Done</button>
+    <button type="button" data-set-state="overdue" aria-pressed="false">Past due</button>
     <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
     <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
   </div>
@@ -313,8 +313,8 @@
       <div class="day-bar">
         <div class="day-bar-text">
           <h2 class="day-title">Eat the cake</h2>
-          <span class="day-coach">One-time · 14 juin 2026</span>
-          <span class="day-desc">Gâteau d'anniversaire</span>
+          <span class="day-coach">One-time · Jun 14, 2026</span>
+          <span class="day-desc">Birthday treat</span>
         </div>
         <button class="btn-log" type="button" aria-label="Log Eat the cake">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
@@ -325,18 +325,18 @@
       <div class="hero upcoming" id="hero">
         <div class="hero-top">
           <span class="hero-icon" id="hero-icon" hidden></span>
-          <span class="hero-label" id="hero-label">À venir</span>
+          <span class="hero-label" id="hero-label">Upcoming</span>
         </div>
         <div class="hero-main">
-          <span class="hero-value" id="hero-value">Dans 5 jours</span>
-          <span class="hero-sub" id="hero-sub">14 juin 2026 · 07:00</span>
+          <span class="hero-value" id="hero-value">In 5 days</span>
+          <span class="hero-sub" id="hero-sub">Jun 14, 2026 · 07:00</span>
         </div>
         <p class="hero-note" id="hero-note" hidden></p>
       </div>
 
       <!-- Metadata row (category + schedule, no create date) -->
       <div class="meta-row">
-        <span>Bien-être</span>
+        <span>Well-being</span>
         <span class="dot">·</span>
         <span>07:00</span>
       </div>
@@ -372,14 +372,14 @@
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
   const STATES = {
     upcoming: {
-      label: "À venir", value: "Dans 5 jours", sub: "14 juin 2026 · 07:00", icon: null, note: null,
+      label: "Upcoming", value: "In 5 days", sub: "Jun 14, 2026 · 07:00", icon: null, note: null,
     },
     done: {
-      label: "Fait", value: "Loggé le 12 juin", sub: "2 jours en avance", icon: CHECK, note: null,
+      label: "Done", value: "Logged Jun 12", sub: "2 days early", icon: CHECK, note: null,
     },
     overdue: {
-      label: "Échéance passée", value: "Prévu le 14 juin", sub: "il y a 3 jours", icon: null,
-      note: "Toujours d'actualité ? Loggue-le ou reprogramme la date.",
+      label: "Past due", value: "Due Jun 14", sub: "3 days ago", icon: null,
+      note: "Still relevant? Log it or reschedule the date.",
     },
   };
   const hero = document.getElementById("hero");
