@@ -63,7 +63,7 @@ export async function RitualCard({ ritual, progress, categories }: Props) {
 
   return (
     <div className="flex items-stretch rounded-xl border border-border bg-card transition-colors hover:border-foreground/20">
-      <RitualCardTrigger>
+      <RitualCardTrigger ritualId={ritual.id}>
         <span
           aria-hidden
           className="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-base text-muted-foreground"
