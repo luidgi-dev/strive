@@ -330,19 +330,6 @@
     stroke-dasharray: 4 4;
     opacity: 0.22;
   }
-  .arc-target-label {
-    position: absolute;
-    /* Sits just above the dashed target line (line at ~16px display y) */
-    top: 2px;
-    right: 0;
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted-foreground);
-    pointer-events: none;
-  }
   .arc-area { fill: url(#arcFill); }
   .arc-line {
     fill: none;
@@ -432,6 +419,18 @@
   .day-cell.future .day-letter {
     color: color-mix(in oklch, var(--muted-foreground) 55%, transparent);
   }
+
+  /* Metadata row (category + schedule) */
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    padding: 0 4px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+  }
+  .meta-row .dot { color: color-mix(in oklch, var(--muted-foreground) 50%, transparent); }
 
   /* Floating action button — Strive AI */
   .fab {
@@ -553,6 +552,7 @@
         <div class="arc-section">
           <div class="arc-head">
             <span class="arc-label">The Arc · 12 weeks</span>
+            <span class="arc-label">Target 5×</span>
           </div>
           <div class="arc-svg-wrap">
             <svg class="arc-svg" viewBox="0 0 330 100" preserveAspectRatio="none" role="img" aria-label="Weekly run count over the last 12 weeks">
@@ -586,7 +586,6 @@
               <circle class="arc-point-ring" cx="330" cy="50" r="6"/>
               <circle class="arc-point selected" cx="330" cy="50" r="3.5"/>
             </svg>
-            <span class="arc-target-label">5×</span>
           </div>
           <div class="arc-axis">
             <span>Feb 17</span>
@@ -611,6 +610,15 @@
             <div class="day-cell future"><span class="day-letter">Su</span><span class="day-dot"></span></div>
           </div>
         </div>
+      </div>
+
+      <!-- Metadata row (category + schedule) -->
+      <div class="meta-row">
+        <span>Sport</span>
+        <span class="dot">·</span>
+        <span>Mon/Wed/Fri</span>
+        <span class="dot">·</span>
+        <span>07:00</span>
       </div>
     </main>
 
