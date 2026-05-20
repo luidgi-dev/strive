@@ -39,6 +39,12 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     startupImage: appleSplashScreens,
   },
+  // Next emits the standard `mobile-web-app-capable` but not Apple's legacy
+  // tag, which iOS still needs to honor apple-touch-startup-image (the launch
+  // screen) even when the manifest already puts the PWA in standalone mode.
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
   icons: {
     icon: [
       {
