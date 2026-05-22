@@ -4,6 +4,7 @@ import { DefineRitualButton } from "@/components/rituals/define-ritual-button";
 import { RitualsEmptyState } from "@/components/rituals/rituals-empty-state";
 import { RitualsList } from "@/components/rituals/rituals-list";
 import {
+  countArchivedRituals,
   getRitualsForActiveUser,
   getVisibleCategoriesForUser,
 } from "@/lib/data/rituals";
@@ -17,13 +18,17 @@ export default async function RitualsPage({ params }: Props) {
 
   const t = await getTranslations("rituals");
   const supabase = await createClient();
-  const [{ rituals, progressByRitualId }, categories] = await Promise.all([
-    getRitualsForActiveUser(supabase),
-    getVisibleCategoriesForUser(supabase),
-  ]);
+  const [{ rituals, progressByRitualId }, categories, archivedCount] =
+    await Promise.all([
+      getRitualsForActiveUser(supabase),
+      getVisibleCategoriesForUser(supabase),
+      countArchivedRituals(supabase),
+    ]);
 
   if (rituals.length === 0) {
-    return <RitualsEmptyState categories={categories} />;
+    return (
+      <RitualsEmptyState categories={categories} archivedCount={archivedCount} />
+    );
   }
 
   return (
@@ -38,6 +43,7 @@ export default async function RitualsPage({ params }: Props) {
         rituals={rituals}
         progressByRitualId={progressByRitualId}
         categories={categories}
+        archivedCount={archivedCount}
       />
     </div>
   );

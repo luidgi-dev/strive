@@ -187,6 +187,37 @@ export async function archiveRitual(id: string): Promise<ActionResult> {
   return { ok: true };
 }
 
+export async function restoreRitual(id: string): Promise<ActionResult> {
+  if (typeof id !== "string" || id.length === 0) {
+    return { ok: false, error: "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("rituals")
+    .update({ archived_at: null, is_active: true, updated_at: now })
+    .eq("id", id)
+    .select("id");
+
+  if (error) {
+    console.error("[restoreRitual] update failed", error);
+    return { ok: false, error: "unknown" };
+  }
+  if (!data || data.length === 0) {
+    return { ok: false, error: "notFound" };
+  }
+
+  revalidatePath("/protected/rituals");
+  revalidatePath("/protected/rituals/archived");
+  return { ok: true };
+}
+
 export async function createCategory(
   rawName: string,
 ): Promise<ActionResult<{ id: string }>> {
