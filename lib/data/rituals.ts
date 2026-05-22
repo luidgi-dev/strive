@@ -85,6 +85,14 @@ const RITUAL_ARCHIVED_COLUMNS = "id, name, icon, category_id, archived_at" as co
 
 const CATEGORY_COLUMNS = "id, name, slug, user_id" as const;
 
+function indexCategoriesById(
+  categories: RitualCategoryRow[] | null,
+): Map<string, RitualCategoryRow> {
+  const map = new Map<string, RitualCategoryRow>();
+  for (const cat of categories ?? []) map.set(cat.id, cat);
+  return map;
+}
+
 export async function getRitualsForActiveUser(
   client: SupabaseClient<Database>,
 ): Promise<RitualsData> {
@@ -105,10 +113,7 @@ export async function getRitualsForActiveUser(
   if (categoriesRes.error) throw categoriesRes.error;
   if (progressRes.error) throw progressRes.error;
 
-  const categoriesById = new Map<string, RitualCategoryRow>();
-  for (const cat of categoriesRes.data ?? []) {
-    categoriesById.set(cat.id, cat);
-  }
+  const categoriesById = indexCategoriesById(categoriesRes.data);
 
   const rituals: RitualWithCategory[] = (ritualsRes.data ?? []).map((r) => ({
     ...r,
@@ -198,10 +203,7 @@ export async function getArchivedRitualsForActiveUser(
   if (archivedRes.error) throw archivedRes.error;
   if (categoriesRes.error) throw categoriesRes.error;
 
-  const categoriesById = new Map<string, RitualCategoryRow>();
-  for (const cat of categoriesRes.data ?? []) {
-    categoriesById.set(cat.id, cat);
-  }
+  const categoriesById = indexCategoriesById(categoriesRes.data);
 
   return (archivedRes.data ?? []).map((r) => ({
     id: r.id,
