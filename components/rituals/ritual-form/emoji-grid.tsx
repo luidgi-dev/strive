@@ -8,7 +8,7 @@ const CURATED_EMOJIS = [
   // Movement
   "🏃", "🧘", "🏋️", "🚴", "🌄",
   // Mind & Focus
-  "📚", "✍️", "🧠", "🎯", "💻", "🎵",
+  "📚", "✍️", "🧠", "🎯", "💻",
   // Body & Self-care
   "🥗", "💧", "🌙", "🪞", "❤️",
   // Life & Home
