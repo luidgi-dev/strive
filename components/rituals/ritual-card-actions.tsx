@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
 import { archiveRitual } from "@/app/[locale]/protected/(app)/rituals/actions";
+import { useRouter } from "@/lib/i18n/navigation";
 import {
   Sheet,
   SheetClose,
@@ -28,6 +29,12 @@ type Props = {
   triggerClassName?: string;
   /** Side the menu opens towards. Cards open upward; the detail header downward. */
   menuSide?: "top" | "bottom";
+  /**
+   * Route to navigate to once a ritual is archived. Used by the detail page,
+   * whose own route 404s after archiving since the ritual is no longer queryable.
+   * Cards omit this and stay in place.
+   */
+  redirectOnArchiveTo?: string;
 };
 
 const DEFAULT_TRIGGER_CLASS =
@@ -38,8 +45,10 @@ export function RitualCardActions({
   categories,
   triggerClassName,
   menuSide = "top",
+  redirectOnArchiveTo,
 }: Props) {
   const t = useTranslations("rituals");
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -66,6 +75,11 @@ export function RitualCardActions({
         return;
       }
       setConfirmOpen(false);
+      if (redirectOnArchiveTo) {
+        // Replace, not push: the archived detail page no longer exists, so it
+        // must not stay in history (back would land on a 404).
+        router.replace(redirectOnArchiveTo);
+      }
     });
   };
 

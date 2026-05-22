@@ -140,6 +140,7 @@ export default async function RitualDetailPage({ params }: Props) {
             ritual={ritual}
             categories={categories}
             menuSide="bottom"
+            redirectOnArchiveTo="/protected/rituals"
             triggerClassName="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent data-[popup-open]:bg-accent"
           />
         </header>
