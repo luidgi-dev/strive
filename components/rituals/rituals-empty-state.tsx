@@ -3,13 +3,15 @@ import { getTranslations } from "next-intl/server";
 
 import type { RitualCategoryRow } from "@/lib/data/rituals";
 
+import { ArchivedRitualsLink } from "./archived-rituals-link";
 import { DefineRitualButton } from "./define-ritual-button";
 
 type Props = {
   categories: RitualCategoryRow[];
+  archivedCount: number;
 };
 
-export async function RitualsEmptyState({ categories }: Props) {
+export async function RitualsEmptyState({ categories, archivedCount }: Props) {
   const t = await getTranslations("rituals");
 
   return (
@@ -27,6 +29,11 @@ export async function RitualsEmptyState({ categories }: Props) {
         {t("empty.body")}
       </p>
       <DefineRitualButton variant="cta" categories={categories} />
+      {archivedCount > 0 ? (
+        <div className="mt-2 w-full max-w-[280px]">
+          <ArchivedRitualsLink count={archivedCount} />
+        </div>
+      ) : null}
     </div>
   );
 }

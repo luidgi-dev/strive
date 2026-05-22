@@ -238,6 +238,16 @@
     "defineCta": "Define a ritual",
     "defineFirst": "Define your first ritual",
     "newCategory": "New category",
+    "archived": {
+      "title": "Archived rituals",
+      "link": "{count, plural, one {# archived ritual} other {# archived rituals}}",
+      "empty": "No archived rituals.",
+      "archivedOn": "Archived {date}",
+      "restore": "Restore",
+      "restoring": "Restoring…",
+      "retry": "Retry",
+      "back": "Back to rituals"
+    },
     "empty": {
       "title": "Your rituals will live here.",
       "body": "Define one to start building rhythm."

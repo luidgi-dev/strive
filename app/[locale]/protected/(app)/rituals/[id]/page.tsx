@@ -8,6 +8,7 @@ import { RitualCardActions } from "@/components/rituals/ritual-card-actions";
 import { RitualLogControl } from "@/components/rituals/ritual-log-control";
 import { RitualLogProvider } from "@/components/rituals/ritual-log-provider";
 import { RitualMeta } from "@/components/rituals/ritual-meta";
+import { TheArc } from "@/components/rituals/the-arc";
 import { TheArcLive } from "@/components/rituals/the-arc-live";
 import { Link } from "@/lib/i18n/navigation";
 import {
@@ -96,6 +97,23 @@ export default async function RitualDetailPage({ params }: Props) {
     progress?.completionRate ?? null,
   );
 
+  // Archived rituals are viewable read-only: no log control, no edit/archive
+  // menu, static Arc, and the back arrow returns to the archived screen.
+  const isArchived = ritual.archived_at != null;
+  const backHref = isArchived
+    ? "/protected/rituals/archived"
+    : "/protected/rituals";
+  const archivedLabel =
+    isArchived && ritual.archived_at
+      ? t("archived.archivedOn", {
+          date: format.dateTime(new Date(ritual.archived_at), {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
+        })
+      : null;
+
   function buildSubtitle(): string {
     if (ritual!.ritual_type === "one_time") {
       if (!ritual!.due_date) return t("type.oneTime");
@@ -121,22 +139,17 @@ export default async function RitualDetailPage({ params }: Props) {
     }
   }
 
-  return (
-    <RitualLogProvider
-      ritualId={id}
-      today={today}
-      initialCount={initialLogCount}
-      ritualType={ritual.ritual_type}
-    >
-      <div className="flex flex-col gap-4">
-        <header className="-mx-2 flex items-center justify-between">
-          <Link
-            href="/protected/rituals"
-            aria-label={tDetail("back")}
-            className="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent"
-          >
-            <ChevronLeft aria-hidden className="size-5" />
-          </Link>
+  const content = (
+    <div className="flex flex-col gap-4">
+      <header className="-mx-2 flex items-center justify-between">
+        <Link
+          href={backHref}
+          aria-label={tDetail("back")}
+          className="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent"
+        >
+          <ChevronLeft aria-hidden className="size-5" />
+        </Link>
+        {!isArchived ? (
           <RitualCardActions
             ritual={ritual}
             categories={categories}
@@ -144,63 +157,87 @@ export default async function RitualDetailPage({ params }: Props) {
             redirectOnArchiveTo="/protected/rituals"
             triggerClassName="flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent data-[popup-open]:bg-accent"
           />
-        </header>
+        ) : null}
+      </header>
 
-        <div className="flex items-end justify-between gap-3 px-1 pb-1">
-          <div className="flex min-w-0 flex-col gap-1">
-            <h1 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-foreground">
-              {ritual.name}
-            </h1>
-            <span className="text-[13px] font-medium leading-snug text-muted-foreground">
-              {subtitle}
+      <div className="flex items-end justify-between gap-3 px-1 pb-1">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h1 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-foreground">
+            {ritual.name}
+          </h1>
+          <span className="text-[13px] font-medium leading-snug text-muted-foreground">
+            {subtitle}
+          </span>
+          {ritual.description ? (
+            <p className="text-[13px] leading-snug text-muted-foreground/80">
+              {ritual.description}
+            </p>
+          ) : null}
+          {archivedLabel ? (
+            <span className="text-[12px] font-medium leading-snug text-muted-foreground/70">
+              {archivedLabel}
             </span>
-            {ritual.description ? (
-              <p className="text-[13px] leading-snug text-muted-foreground/80">
-                {ritual.description}
-              </p>
-            ) : null}
-          </div>
-          <RitualLogControl name={ritual.name} />
+          ) : null}
         </div>
-
-        {isOneTime ? (
-          <OneTimeStatus
-            dueDate={ritual.due_date}
-            completedAt={completedAt}
-            today={today}
-          />
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-2.5">
-              {status ? (
-                <KpiCard label={tDetail("momentum")}>
-                  <span className="inline-flex items-center gap-1.5">
-                    {t(`status.${status}`)}
-                    <MomentumIcon status={status} />
-                  </span>
-                </KpiCard>
-              ) : (
-                <KpiCard label={tDetail("logged")}>{model.totalLogs}</KpiCard>
-              )}
-              <KpiCard label={tDetail("started")}>
-                {format.dateTime(new Date(startedAt), { dateStyle: "medium" })}
-              </KpiCard>
-            </div>
-
-            <TheArcLive baseModel={model} today={today} />
-          </>
-        )}
-
-        <RitualMeta
-          category={
-            ritual.category
-              ? getCategoryLabel(ritual.category, t, t("category.other"))
-              : null
-          }
-          scheduledDays={ritual.scheduled_days}
-          scheduledTime={ritual.scheduled_time}
-        />
+        {!isArchived ? <RitualLogControl name={ritual.name} /> : null}
       </div>
+
+      {isOneTime ? (
+        <OneTimeStatus
+          dueDate={ritual.due_date}
+          completedAt={completedAt}
+          today={today}
+        />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-2.5">
+            {status ? (
+              <KpiCard label={tDetail("momentum")}>
+                <span className="inline-flex items-center gap-1.5">
+                  {t(`status.${status}`)}
+                  <MomentumIcon status={status} />
+                </span>
+              </KpiCard>
+            ) : (
+              <KpiCard label={tDetail("logged")}>{model.totalLogs}</KpiCard>
+            )}
+            <KpiCard label={tDetail("started")}>
+              {format.dateTime(new Date(startedAt), { dateStyle: "medium" })}
+            </KpiCard>
+          </div>
+
+          {isArchived ? (
+            <TheArc model={model} />
+          ) : (
+            <TheArcLive baseModel={model} today={today} />
+          )}
+        </>
+      )}
+
+      <RitualMeta
+        category={
+          ritual.category
+            ? getCategoryLabel(ritual.category, t, t("category.other"))
+            : null
+        }
+        scheduledDays={ritual.scheduled_days}
+        scheduledTime={ritual.scheduled_time}
+      />
+    </div>
+  );
+
+  // Active rituals need the log provider (control + optimistic Arc); archived
+  // rituals are read-only, so the provider is skipped entirely.
+  if (isArchived) return content;
+
+  return (
+    <RitualLogProvider
+      ritualId={id}
+      today={today}
+      initialCount={initialLogCount}
+      ritualType={ritual.ritual_type}
+    >
+      {content}
     </RitualLogProvider>
   );
 }
