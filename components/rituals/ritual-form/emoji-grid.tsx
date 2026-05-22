@@ -5,30 +5,16 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 const CURATED_EMOJIS = [
-  "🏃",
-  "🧘",
-  "📚",
-  "📓",
-  "🥗",
-  "💧",
-  "😴",
-  "🎨",
-  "💪",
-  "🚴",
-  "🏊",
-  "🧠",
-  "🌿",
-  "☀️",
-  "🌙",
-  "🎯",
-  "✍️",
-  "🎵",
-  "🎬",
-  "🍵",
-  "📞",
-  "🦷",
-  "🏥",
-  "⭐",
+  // Movement
+  "🏃", "🧘", "🏋️", "🚴", "🌄",
+  // Mind & Focus
+  "📚", "✍️", "🧠", "🎯", "💻",
+  // Body & Self-care
+  "🥗", "💧", "🌙", "🪞", "❤️",
+  // Life & Home
+  "🏠", "☀️", "📅", "🎨", "✈️",
+  // Others
+  "🛒", "💰", " 👥", "🐕",
 ] as const;
 
 type Props = {

@@ -259,6 +259,8 @@
     "category": {
       "other": "Other",
       "new": "+ New",
+      "collapse": "Hide {category} rituals",
+      "expand": "Show {category} rituals",
       "comingSoon": {
         "title": "Custom categories",
         "body": "Creating your own categories is coming soon."

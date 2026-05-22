@@ -223,7 +223,6 @@ export function RitualForm({
             aria-label={t("fields.name")}
             placeholder={t("placeholders.name")}
             autoComplete="off"
-            autoFocus={mode === "create"}
             className="flex-1 rounded-lg border border-transparent bg-accent px-3.5 py-3 text-base font-medium text-foreground outline-none focus:border-foreground/35 focus:bg-card placeholder:text-muted-foreground"
           />
         </div>
