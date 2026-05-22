@@ -20,6 +20,7 @@ import {
   type MomentumStatus,
 } from "@/lib/data/rituals";
 import { buildArcModel } from "@/lib/rituals/arc";
+import { getCategoryLabel } from "@/lib/rituals/category-label";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
@@ -191,7 +192,11 @@ export default async function RitualDetailPage({ params }: Props) {
         )}
 
         <RitualMeta
-          category={ritual.category?.name ?? null}
+          category={
+            ritual.category
+              ? getCategoryLabel(ritual.category, t, t("category.other"))
+              : null
+          }
           scheduledDays={ritual.scheduled_days}
           scheduledTime={ritual.scheduled_time}
         />

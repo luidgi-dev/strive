@@ -259,11 +259,38 @@
     "category": {
       "other": "Autre",
       "new": "+ Nouvelle",
-      "collapse": "Masquer les rituals {category}",
-      "expand": "Afficher les rituals {category}",
-      "comingSoon": {
-        "title": "Catégories personnalisées",
-        "body": "La création de vos propres catégories arrive bientôt."
+      "collapse": "Masquer les rituels {category}",
+      "expand": "Afficher les rituels {category}",
+      "system": {
+        "movement": "Mouvement",
+        "nutrition": "Nutrition",
+        "balance": "Équilibre",
+        "learning": "Apprentissage",
+        "creativity": "Créativité",
+        "focus": "Focus"
+      },
+      "manage": {
+        "createTitle": "Nouvelle catégorie",
+        "editTitle": "Modifier la catégorie",
+        "nameLabel": "Nom de la catégorie",
+        "namePlaceholder": "Nommez votre catégorie",
+        "create": "Créer la catégorie",
+        "save": "Enregistrer",
+        "edit": "Modifier",
+        "archive": "Archiver",
+        "menuLabel": "Gérer {category}",
+        "empty": "Aucun rituel pour l'instant.",
+        "archiveConfirmTitle": "Archiver la catégorie ?",
+        "archiveConfirmBody": "Elle n'apparaîtra plus à la création d'un rituel, et ses rituels passent dans « Autre ».",
+        "archiveCancel": "La garder",
+        "archiveConfirm": "Archiver",
+        "errors": {
+          "nameRequired": "Veuillez saisir un nom.",
+          "nameTooLong": "Limitez-vous à 50 caractères.",
+          "notFound": "Cette catégorie n'existe plus.",
+          "validationFailed": "Vérifiez le nom et réessayez.",
+          "unknown": "Une erreur est survenue. Réessayez."
+        }
       }
     },
     "create": {

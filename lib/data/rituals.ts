@@ -41,7 +41,7 @@ export type RitualForEditRow = Pick<
 
 export type RitualCategoryRow = Pick<
   Tables<"ritual_categories">,
-  "id" | "name"
+  "id" | "name" | "slug" | "user_id"
 >;
 
 export type RitualWithCategory = RitualRow & {
@@ -75,6 +75,8 @@ const RITUAL_EDIT_COLUMNS =
 
 const RITUAL_DETAIL_COLUMNS = `${RITUAL_COLUMNS}, started_at` as const;
 
+const CATEGORY_COLUMNS = "id, name, slug, user_id" as const;
+
 export async function getRitualsForActiveUser(
   client: SupabaseClient<Database>,
 ): Promise<RitualsData> {
@@ -85,7 +87,9 @@ export async function getRitualsForActiveUser(
       .eq("is_active", true)
       .is("archived_at", null)
       .order("created_at", { ascending: true }),
-    client.from("ritual_categories").select("id, name"),
+    // Only active categories resolve; a ritual still pointing at an archived
+    // category (e.g. a failed detach) gracefully falls back to "Other".
+    client.from("ritual_categories").select(CATEGORY_COLUMNS).eq("is_active", true),
     client.from("ritual_progress").select("ritual_id, completion_rate, logs_this_period"),
   ]);
 
@@ -120,7 +124,8 @@ export async function getVisibleCategoriesForUser(
 ): Promise<RitualCategoryRow[]> {
   const { data, error } = await client
     .from("ritual_categories")
-    .select("id, name")
+    .select(CATEGORY_COLUMNS)
+    .eq("is_active", true)
     .order("name", { ascending: true });
 
   if (error) throw error;
@@ -160,7 +165,7 @@ export async function getRitualDetail(
   if (data.category_id) {
     const { data: cat, error: catError } = await client
       .from("ritual_categories")
-      .select("id, name")
+      .select(CATEGORY_COLUMNS)
       .eq("id", data.category_id)
       .maybeSingle();
     if (catError) throw catError;
@@ -232,13 +237,16 @@ export function deriveMomentumStatus(
   return "resting";
 }
 
+export type RitualGroup = {
+  key: string;
+  category: RitualCategoryRow | null;
+  rituals: RitualWithCategory[];
+};
+
 export function groupRitualsByCategory(
   rituals: RitualWithCategory[],
-): { key: string; categoryName: string | null; rituals: RitualWithCategory[] }[] {
-  const buckets = new Map<
-    string,
-    { key: string; categoryName: string | null; rituals: RitualWithCategory[] }
-  >();
+): RitualGroup[] {
+  const buckets = new Map<string, RitualGroup>();
 
   for (const ritual of rituals) {
     const key = ritual.category?.id ?? "__other__";
@@ -248,19 +256,19 @@ export function groupRitualsByCategory(
     } else {
       buckets.set(key, {
         key,
-        categoryName: ritual.category?.name ?? null,
+        category: ritual.category ?? null,
         rituals: [ritual],
       });
     }
   }
 
   const groups = Array.from(buckets.values());
-  // Sort by category name (alpha), nulls last.
+  // Sort by category name (alpha), nulls ("Other") last.
   groups.sort((a, b) => {
-    if (a.categoryName === null && b.categoryName === null) return 0;
-    if (a.categoryName === null) return 1;
-    if (b.categoryName === null) return -1;
-    return a.categoryName.localeCompare(b.categoryName);
+    if (a.category === null && b.category === null) return 0;
+    if (a.category === null) return 1;
+    if (b.category === null) return -1;
+    return a.category.name.localeCompare(b.category.name);
   });
   return groups;
 }

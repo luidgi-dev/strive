@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
-import { ritualFormSchema, type RitualFormValues } from "@/lib/data/rituals-schema";
+import {
+  categoryNameSchema,
+  ritualFormSchema,
+  type RitualFormValues,
+} from "@/lib/data/rituals-schema";
 import { ensureProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 import type { TablesInsert, TablesUpdate } from "@/lib/supabase/database.types";
@@ -177,6 +181,119 @@ export async function archiveRitual(id: string): Promise<ActionResult> {
   }
   if (!data || data.length === 0) {
     return { ok: false, error: "notFound" };
+  }
+
+  revalidatePath("/protected/rituals");
+  return { ok: true };
+}
+
+export async function createCategory(
+  rawName: string,
+): Promise<ActionResult<{ id: string }>> {
+  const parsed = categoryNameSchema.safeParse(rawName);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  const healed = await ensureProfile(supabase, user);
+  if (!healed) return { ok: false, error: "unknown" };
+
+  const { data, error } = await supabase
+    .from("ritual_categories")
+    .insert({ user_id: user.id, name: parsed.data })
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("[createCategory] insert failed", error);
+    return { ok: false, error: "unknown" };
+  }
+
+  revalidatePath("/protected/rituals");
+  return { ok: true, data: { id: data.id } };
+}
+
+export async function updateCategory(
+  id: string,
+  rawName: string,
+): Promise<ActionResult> {
+  if (typeof id !== "string" || id.length === 0) {
+    return { ok: false, error: "validationFailed" };
+  }
+  const parsed = categoryNameSchema.safeParse(rawName);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  // RLS limits this to the caller's own categories; system rows (user_id null)
+  // and others' rows match no row and surface as notFound.
+  const { data, error } = await supabase
+    .from("ritual_categories")
+    .update({ name: parsed.data, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select("id");
+
+  if (error) {
+    console.error("[updateCategory] update failed", error);
+    return { ok: false, error: "unknown" };
+  }
+  if (!data || data.length === 0) {
+    return { ok: false, error: "notFound" };
+  }
+
+  revalidatePath("/protected/rituals");
+  return { ok: true };
+}
+
+export async function archiveCategory(id: string): Promise<ActionResult> {
+  if (typeof id !== "string" || id.length === 0) {
+    return { ok: false, error: "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("ritual_categories")
+    .update({ is_active: false, updated_at: now })
+    .eq("id", id)
+    .select("id");
+
+  if (error) {
+    console.error("[archiveCategory] update failed", error);
+    return { ok: false, error: "unknown" };
+  }
+  if (!data || data.length === 0) {
+    return { ok: false, error: "notFound" };
+  }
+
+  // Detach the rituals so they fall back to "Other" instead of lingering under
+  // the now-hidden category. RLS scopes this to the caller's own rituals.
+  const { error: detachError } = await supabase
+    .from("rituals")
+    .update({ category_id: null, updated_at: now })
+    .eq("category_id", id);
+
+  if (detachError) {
+    console.error("[archiveCategory] detach rituals failed", detachError);
+    return { ok: false, error: "unknown" };
   }
 
   revalidatePath("/protected/rituals");

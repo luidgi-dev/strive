@@ -261,9 +261,36 @@
       "new": "+ New",
       "collapse": "Hide {category} rituals",
       "expand": "Show {category} rituals",
-      "comingSoon": {
-        "title": "Custom categories",
-        "body": "Creating your own categories is coming soon."
+      "system": {
+        "movement": "Movement",
+        "nutrition": "Nutrition",
+        "balance": "Balance",
+        "learning": "Learning",
+        "creativity": "Creativity",
+        "focus": "Focus"
+      },
+      "manage": {
+        "createTitle": "New category",
+        "editTitle": "Edit category",
+        "nameLabel": "Category name",
+        "namePlaceholder": "Name your category",
+        "create": "Create category",
+        "save": "Save",
+        "edit": "Edit",
+        "archive": "Archive",
+        "menuLabel": "Manage {category}",
+        "empty": "No rituals yet.",
+        "archiveConfirmTitle": "Archive category?",
+        "archiveConfirmBody": "It will no longer appear when creating a ritual, and its rituals move to Other.",
+        "archiveCancel": "Keep it",
+        "archiveConfirm": "Archive",
+        "errors": {
+          "nameRequired": "Please enter a name.",
+          "nameTooLong": "Keep it under 50 characters.",
+          "notFound": "This category no longer exists.",
+          "validationFailed": "Please check the name and try again.",
+          "unknown": "Something went wrong. Try again."
+        }
       }
     },
     "create": {

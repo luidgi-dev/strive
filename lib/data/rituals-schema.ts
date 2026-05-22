@@ -54,3 +54,9 @@ export type RitualFormType = RitualFormValues["ritual_type"];
 
 export const RITUAL_TYPES = ["recurring", "one_time", "open"] as const;
 export const FREQUENCY_UNITS = ["day", "week", "month"] as const;
+
+export const categoryNameSchema = z
+  .string()
+  .trim()
+  .min(1, "nameRequired")
+  .max(50, "nameTooLong");
