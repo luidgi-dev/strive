@@ -49,7 +49,13 @@ export type RitualWithCategory = RitualRow & {
 };
 
 export type RitualDetailRow = RitualWithCategory &
-  Pick<Tables<"rituals">, "started_at">;
+  Pick<Tables<"rituals">, "started_at" | "archived_at">;
+
+/** A row on the archived rituals screen — no momentum/schedule, just identity + archive date. */
+export type ArchivedRitualRow = Pick<
+  Tables<"rituals">,
+  "id" | "name" | "icon" | "archived_at"
+> & { category: RitualCategoryRow | null };
 
 /** A single completed/rest/missed entry, as exposed by ritual_log_history. */
 export type RitualLogHistoryEntry = Pick<
@@ -73,7 +79,9 @@ const RITUAL_COLUMNS =
 const RITUAL_EDIT_COLUMNS =
   "id, name, icon, color, description, ritual_type, frequency_unit, frequency_value, due_date, scheduled_days, scheduled_time, category_id" as const;
 
-const RITUAL_DETAIL_COLUMNS = `${RITUAL_COLUMNS}, started_at` as const;
+const RITUAL_DETAIL_COLUMNS = `${RITUAL_COLUMNS}, started_at, archived_at` as const;
+
+const RITUAL_ARCHIVED_COLUMNS = "id, name, icon, category_id, archived_at" as const;
 
 const CATEGORY_COLUMNS = "id, name, slug, user_id" as const;
 
@@ -150,12 +158,12 @@ export async function getRitualDetail(
   client: SupabaseClient<Database>,
   id: string,
 ): Promise<RitualDetailRow | null> {
+  // No is_active/archived filter: archived rituals are viewable read-only.
+  // RLS still scopes this to the current user.
   const { data, error } = await client
     .from("rituals")
     .select(RITUAL_DETAIL_COLUMNS)
     .eq("id", id)
-    .eq("is_active", true)
-    .is("archived_at", null)
     .maybeSingle();
 
   if (error) throw error;
@@ -173,6 +181,47 @@ export async function getRitualDetail(
   }
 
   return { ...data, category };
+}
+
+export async function getArchivedRitualsForActiveUser(
+  client: SupabaseClient<Database>,
+): Promise<ArchivedRitualRow[]> {
+  const [archivedRes, categoriesRes] = await Promise.all([
+    client
+      .from("rituals")
+      .select(RITUAL_ARCHIVED_COLUMNS)
+      .not("archived_at", "is", null)
+      .order("archived_at", { ascending: false }),
+    client.from("ritual_categories").select(CATEGORY_COLUMNS),
+  ]);
+
+  if (archivedRes.error) throw archivedRes.error;
+  if (categoriesRes.error) throw categoriesRes.error;
+
+  const categoriesById = new Map<string, RitualCategoryRow>();
+  for (const cat of categoriesRes.data ?? []) {
+    categoriesById.set(cat.id, cat);
+  }
+
+  return (archivedRes.data ?? []).map((r) => ({
+    id: r.id,
+    name: r.name,
+    icon: r.icon,
+    archived_at: r.archived_at,
+    category: r.category_id ? categoriesById.get(r.category_id) ?? null : null,
+  }));
+}
+
+export async function countArchivedRituals(
+  client: SupabaseClient<Database>,
+): Promise<number> {
+  const { count, error } = await client
+    .from("rituals")
+    .select("id", { count: "exact", head: true })
+    .not("archived_at", "is", null);
+
+  if (error) throw error;
+  return count ?? 0;
 }
 
 export async function getRitualProgress(
