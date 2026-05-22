@@ -9,6 +9,7 @@ import {
 } from "@/lib/data/rituals";
 import { getCategoryLabel } from "@/lib/rituals/category-label";
 
+import { ArchivedRitualsLink } from "./archived-rituals-link";
 import { CategorySection } from "./category-section";
 import { NewCategoryButton } from "./new-category-button";
 import { RitualCard } from "./ritual-card";
@@ -17,12 +18,14 @@ type Props = {
   rituals: RitualWithCategory[];
   progressByRitualId: Map<string, RitualProgressEntry>;
   categories: RitualCategoryRow[];
+  archivedCount: number;
 };
 
 export async function RitualsList({
   rituals,
   progressByRitualId,
   categories,
+  archivedCount,
 }: Props) {
   const t = await getTranslations("rituals");
   const otherLabel = t("category.other");
@@ -83,6 +86,7 @@ export async function RitualsList({
       ))}
 
       <NewCategoryButton />
+      <ArchivedRitualsLink count={archivedCount} />
     </div>
   );
 }
