@@ -1,18 +1,13 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import type { RitualCategoryRow } from "@/lib/data/rituals";
+import { getCategoryLabel } from "@/lib/rituals/category-label";
 import { cn } from "@/lib/utils";
+
+import { CategoryFormSheet } from "../category-form-sheet";
 
 type Props = {
   value: string | null;
@@ -22,7 +17,24 @@ type Props = {
 
 export function CategoryChips({ value, onChange, categories }: Props) {
   const t = useTranslations("rituals");
-  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  // Categories created from within this form, kept locally so they appear and
+  // stay selected before the server list revalidates.
+  const [created, setCreated] = useState<RitualCategoryRow[]>([]);
+
+  const allCategories = useMemo(() => {
+    const ids = new Set(categories.map((c) => c.id));
+    return [...categories, ...created.filter((c) => !ids.has(c.id))];
+  }, [categories, created]);
+
+  const handleCreated = (cat: { id: string; name: string }) => {
+    setCreated((prev) =>
+      prev.some((c) => c.id === cat.id)
+        ? prev
+        : [...prev, { id: cat.id, name: cat.name, slug: null, user_id: null }],
+    );
+    onChange(cat.id);
+  };
 
   return (
     <>
@@ -31,7 +43,7 @@ export function CategoryChips({ value, onChange, categories }: Props) {
         aria-label={t("form.fields.category")}
         className="flex flex-wrap gap-1.5"
       >
-        {categories.map((category) => {
+        {allCategories.map((category) => {
           const active = category.id === value;
           return (
             <button
@@ -47,36 +59,25 @@ export function CategoryChips({ value, onChange, categories }: Props) {
                   : "border-border bg-transparent text-foreground hover:bg-foreground/5",
               )}
             >
-              {category.name}
+              {getCategoryLabel(category, t, category.name)}
             </button>
           );
         })}
         <button
           type="button"
-          onClick={() => setComingSoonOpen(true)}
+          onClick={() => setFormOpen(true)}
           className="rounded-full border border-dashed border-border px-3.5 py-2 text-xs font-medium text-muted-foreground transition-colors min-h-[44px] hover:text-foreground"
         >
           {t("category.new")}
         </button>
       </div>
 
-      <Sheet open={comingSoonOpen} onOpenChange={setComingSoonOpen}>
-        <SheetContent>
-          <header className="flex items-center justify-between gap-3 pb-1">
-            <SheetTitle>{t("category.comingSoon.title")}</SheetTitle>
-            <SheetClose
-              aria-label={t("form.actions.close")}
-              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <X aria-hidden className="size-4" />
-            </SheetClose>
-          </header>
-          <SheetDescription>{t("category.comingSoon.body")}</SheetDescription>
-          <SheetClose className="mt-2 self-start rounded-full bg-foreground/10 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-foreground/15 min-h-[44px]">
-            {t("form.actions.close")}
-          </SheetClose>
-        </SheetContent>
-      </Sheet>
+      <CategoryFormSheet
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        mode="create"
+        onCreated={handleCreated}
+      />
     </>
   );
 }
