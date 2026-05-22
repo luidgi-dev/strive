@@ -238,6 +238,16 @@
     "defineCta": "Définir un rituel",
     "defineFirst": "Définir votre premier rituel",
     "newCategory": "Nouvelle catégorie",
+    "archived": {
+      "title": "Rituels archivés",
+      "link": "{count, plural, one {# rituel archivé} other {# rituels archivés}}",
+      "empty": "Aucun rituel archivé.",
+      "archivedOn": "Archivé le {date}",
+      "restore": "Restaurer",
+      "restoring": "Restauration…",
+      "retry": "Réessayer",
+      "back": "Retour aux rituels"
+    },
     "empty": {
       "title": "Vos rituels prendront place ici.",
       "body": "Définissez-en un pour commencer à bâtir votre rythme."
