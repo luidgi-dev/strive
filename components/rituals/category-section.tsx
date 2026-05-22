@@ -28,7 +28,7 @@ export function CategorySection({ title, count, category, children }: Props) {
       onOpenChange={setOpen}
       render={<section className="flex flex-col gap-2" />}
     >
-      <div className="flex min-h-7 items-center pl-1">
+      <div className="flex min-h-8 items-center pl-1">
         <h2 className="min-w-0">
           <Collapsible.Trigger
             aria-label={t(open ? "collapse" : "expand", { category: title })}

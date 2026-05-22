@@ -57,7 +57,7 @@ export function CategoryActions({ category }: Props) {
       <Menu.Root open={menuOpen} onOpenChange={setMenuOpen}>
         <Menu.Trigger
           aria-label={t("category.manage.menuLabel", { category: category.name })}
-          className="flex h-7 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground data-[popup-open]:bg-foreground/5 data-[popup-open]:text-foreground"
+          className="flex h-8 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground data-[popup-open]:bg-foreground/5 data-[popup-open]:text-foreground"
         >
           <MoreHorizontal aria-hidden className="size-4" />
         </Menu.Trigger>
