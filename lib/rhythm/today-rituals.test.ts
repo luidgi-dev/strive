@@ -6,7 +6,7 @@ import type {
   RitualWithCategory,
 } from "@/lib/data/rituals";
 
-import { selectTodayRituals } from "./today-rituals";
+import { deriveRhythmCardView, selectTodayRituals } from "./today-rituals";
 
 // 2026-05-20 is a Wednesday (ISO weekday 3); its week starts Mon 2026-05-18.
 const TODAY = "2026-05-20";
@@ -191,5 +191,70 @@ describe("selectTodayRituals — sort order", () => {
 
     const res = run([open, daily, weekly, oneTime]);
     expect(ids(res.active)).toEqual(["once", "weekly", "daily", "open"]);
+  });
+});
+
+describe("deriveRhythmCardView", () => {
+  const OLD = "2020-01-01T00:00:00Z"; // not "fresh"
+
+  it("shows logs/target + completion bar for a weekly ritual", () => {
+    const ritual = makeRitual({
+      frequency_unit: "week",
+      frequency_value: 5,
+      created_at: OLD,
+    });
+    const view = deriveRhythmCardView(
+      { ritual, progress: { completionRate: 60, logsThisPeriod: 3 }, weekDaysCount: 0 },
+      TODAY,
+    );
+    expect(view).toMatchObject({
+      numerator: 3,
+      denominator: 5,
+      barWidth: 60,
+      status: "steady",
+      showProgress: true,
+    });
+  });
+
+  it("shows X/7 with pace-aware momentum for a daily ritual", () => {
+    const ritual = makeRitual({ frequency_unit: "day", created_at: OLD });
+    // Sunday (ISO 7): 6 of 7 elapsed days done -> ~86% pace -> strong.
+    const view = deriveRhythmCardView(
+      { ritual, progress: undefined, weekDaysCount: 6 },
+      "2026-05-24",
+    );
+    expect(view.numerator).toBe(6);
+    expect(view.denominator).toBe(7);
+    expect(view.status).toBe("strong");
+    expect(view.barWidth).toBeCloseTo(85.71, 1);
+    expect(view.showProgress).toBe(true);
+  });
+
+  it("suppresses momentum for a fresh ritual with nothing logged", () => {
+    const ritual = makeRitual({
+      frequency_unit: "day",
+      created_at: new Date().toISOString(),
+    });
+    const view = deriveRhythmCardView(
+      { ritual, progress: undefined, weekDaysCount: 0 },
+      TODAY,
+    );
+    expect(view.status).toBeNull();
+    expect(view.showProgress).toBe(true); // still shows 0/7
+    expect(view.barWidth).toBe(0);
+  });
+
+  it("shows no fraction/bar for open and one-time rituals", () => {
+    const open = makeRitual({ ritual_type: "open", created_at: OLD });
+    const oneTime = makeRitual({ ritual_type: "one_time", created_at: OLD });
+    for (const ritual of [open, oneTime]) {
+      const view = deriveRhythmCardView(
+        { ritual, progress: undefined, weekDaysCount: 0 },
+        TODAY,
+      );
+      expect(view.showProgress).toBe(false);
+      expect(view.numerator).toBeNull();
+      expect(view.status).toBeNull();
+    }
   });
 });
