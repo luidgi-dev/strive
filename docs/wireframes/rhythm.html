@@ -215,6 +215,8 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
   }
   .ritual-icon svg { width: 21px; height: 21px; }
   .ritual-info {
@@ -245,7 +247,7 @@
     font-weight: 600;
     letter-spacing: 0.04em;
   }
-  .meta-status.on-track { color: var(--momentum); }
+  .meta-status.strong  { color: var(--momentum); }
   .meta-status.steady   { color: var(--caution); }
   .meta-status.resting  { color: var(--muted-foreground); }
 
@@ -258,7 +260,7 @@
     flex-shrink: 0;
     display: inline-block;
   }
-  .status-dot.on-track { background: var(--momentum); }
+  .status-dot.strong  { background: var(--momentum); }
   .status-dot.steady   { background: var(--caution); }
   .status-dot.resting  { background: var(--muted-foreground); }
 
@@ -502,33 +504,75 @@
           <h2 class="day-title">Today</h2>
           <span class="day-date">Sat, May 16</span>
         </div>
-        <span class="day-coach"><span class="status-dot"></span>2 of 3 logged</span>
+        <span class="day-coach"><span class="status-dot"></span>2 of 4 logged</span>
       </div>
 
-      <!-- Card — Evening journal: WEEKLY 5×, not logged today, steady. (Sorted first: action needed.) -->
+      <!-- Active — not yet cleared for the day, sorted action-needed first. -->
+
+      <!-- Evening journal: WEEKLY 5×, 4/5, strong -->
       <article class="ritual-card">
         <div class="ritual-top">
-          <div class="ritual-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 7v14"/>
-              <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>
-            </svg>
-          </div>
+          <div class="ritual-icon" aria-hidden="true">✍️</div>
           <div class="ritual-info">
             <span class="ritual-name">Evening journal</span>
             <span class="ritual-meta">
-              <span class="meta-period">Weekly</span>
-              <span class="status-dot steady"></span>
-              <span class="meta-status steady">Steady</span>
+              <span class="meta-period">Weekly · 5×</span>
+              <span class="status-dot strong"></span>
+              <span class="meta-status strong">Strong</span>
             </span>
           </div>
-          <span class="ritual-score">3<span class="denom">/5</span></span>
+          <span class="ritual-score">4<span class="denom">/5</span></span>
           <button class="btn-log" type="button" aria-label="Log Evening journal">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           </button>
         </div>
         <div class="progress-track">
-          <div class="progress-fill caution" style="width: 60%;"></div>
+          <div class="progress-fill momentum" style="width: 80%;"></div>
+        </div>
+      </article>
+
+      <!-- Strength: WEEKLY 3×, 1/3, steady -->
+      <article class="ritual-card">
+        <div class="ritual-top">
+          <div class="ritual-icon" aria-hidden="true">🏋️</div>
+          <div class="ritual-info">
+            <span class="ritual-name">Strength</span>
+            <span class="ritual-meta">
+              <span class="meta-period">Weekly · 3×</span>
+              <span class="status-dot steady"></span>
+              <span class="meta-status steady">Steady</span>
+            </span>
+          </div>
+          <span class="ritual-score">1<span class="denom">/3</span></span>
+          <button class="btn-log" type="button" aria-label="Log Strength">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill caution" style="width: 33%;"></div>
+        </div>
+      </article>
+
+      <!-- Hydrate: OPEN, logged 2× today. Open rituals have no target, stay
+           active all day (no Done-today), and are excluded from the day count. -->
+      <article class="ritual-card logged">
+        <div class="ritual-top">
+          <div class="ritual-icon" aria-hidden="true">💧</div>
+          <div class="ritual-info">
+            <span class="ritual-name">Hydrate</span>
+            <span class="ritual-meta">
+              <span class="meta-period">Open</span>
+            </span>
+          </div>
+          <div class="stepper" role="group" aria-label="Adjust today's logs">
+            <button type="button" aria-label="Undo last log">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+            </button>
+            <span class="count">2</span>
+            <button type="button" aria-label="Log again">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            </button>
+          </div>
         </div>
       </article>
 
@@ -548,22 +592,16 @@
           <span class="done-count">2</span>
         </summary>
         <div class="done-list">
-          <!-- Card — Morning meditation: DAILY, logged 1× today, week on track -->
+          <!-- Morning meditation: DAILY, logged today, 6/7 days this week, strong -->
           <article class="ritual-card logged">
             <div class="ritual-top">
-              <div class="ritual-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
-                  <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
-                  <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
-                </svg>
-              </div>
+              <div class="ritual-icon" aria-hidden="true">🧘</div>
               <div class="ritual-info">
                 <span class="ritual-name">Morning meditation</span>
                 <span class="ritual-meta">
                   <span class="meta-period">Daily</span>
-                  <span class="status-dot on-track"></span>
-                  <span class="meta-status on-track">On track</span>
+                  <span class="status-dot strong"></span>
+                  <span class="meta-status strong">Strong</span>
                 </span>
               </div>
               <span class="ritual-score">6<span class="denom">/7</span></span>
@@ -582,22 +620,16 @@
             </div>
           </article>
 
-          <!-- Card — Long run: MONTHLY 3×, logged 1× today -->
+          <!-- Long run: MONTHLY 3×, 2/3, logged today, strong -->
           <article class="ritual-card logged">
             <div class="ritual-top">
-              <div class="ritual-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M10 2h4"/>
-                  <path d="m12 14 3-3"/>
-                  <circle cx="12" cy="14" r="8"/>
-                </svg>
-              </div>
+              <div class="ritual-icon" aria-hidden="true">🏃</div>
               <div class="ritual-info">
                 <span class="ritual-name">Long run</span>
                 <span class="ritual-meta">
-                  <span class="meta-period">Monthly</span>
-                  <span class="status-dot on-track"></span>
-                  <span class="meta-status on-track">On track</span>
+                  <span class="meta-period">Monthly · 3×</span>
+                  <span class="status-dot strong"></span>
+                  <span class="meta-status strong">Strong</span>
                 </span>
               </div>
               <span class="ritual-score">2<span class="denom">/3</span></span>
