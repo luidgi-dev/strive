@@ -66,13 +66,27 @@ jobs:
       - name: Get PR diff
         id: diff
         run: |
-          git fetch origin ${{ github.base_ref }}
-          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD -- \
+          git fetch origin "${{ github.base_ref }}"
+          # -U8: extra context lines so the reviewer can judge the surrounding code
+          # without us shipping whole files (keeps within the model context budget).
+          # Generated types are excluded as noise.
+          DIFF=$(git diff -U8 "origin/${{ github.base_ref }}...HEAD" -- \
             '*.ts' '*.tsx' '*.sql' '*.css' \
-            ':!*.lock' ':!node_modules')
-          echo "diff<<EOF" >> $GITHUB_OUTPUT
-          echo "$DIFF" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+            ':!*.lock' ':!lib/supabase/database.types.ts')
+          # Cap the diff to fit the model context (GitHub Models free tier).
+          MAX_CHARS=40000
+          if [ ${#DIFF} -gt $MAX_CHARS ]; then
+            DIFF="${DIFF:0:$MAX_CHARS}
+
+          [diff truncated at ${MAX_CHARS} characters — review only the portion shown]"
+          fi
+          # Random delimiter so a literal 'EOF' line inside the diff can't break output.
+          DELIM="DIFF_EOF_$(date +%s)_${RANDOM}"
+          {
+            echo "diff<<${DELIM}"
+            echo "$DIFF"
+            echo "${DELIM}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Load system prompt
         id: prompt
@@ -86,16 +100,26 @@ jobs:
         id: review
         uses: actions/ai-inference@v1
         with:
-          model: mistral-ai/Codestral-2501
+          # Instruction-following model (GitHub Models). gpt-4o-mini balances quality
+          # vs free-tier quota; bump to openai/gpt-4.1 or openai/gpt-4o if quota allows.
+          model: openai/gpt-4o-mini
           system-prompt: ${{ steps.prompt.outputs.content }}
           prompt: |
             PR: ${{ github.event.pull_request.title }}
 
-            Review this diff and apply the rules from your system prompt:
+            CI status: TypeScript (strict), ESLint and the Next.js build have ALL PASSED
+            for this PR. Do NOT report type errors, lint violations, or build failures —
+            CI already owns those.
+
+            Review the unified diff below using the rules in your system prompt. You can
+            see ONLY this diff, not the full files. Only raise a finding for a line shown
+            as an addition (prefixed with "+"), and quote that exact line in the finding.
+            If you cannot quote a real added line, do not raise it.
 
             ${{ steps.diff.outputs.diff }}
           token: ${{ github.token }}
           max-tokens: 1500
+          temperature: 0
 
       - name: Post review comment
         uses: actions/github-script@v7
