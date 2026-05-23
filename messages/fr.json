@@ -442,5 +442,10 @@
       "title": "Votre rythme commence ici.",
       "body": "Définissez votre premier rituel pour le suivre dès aujourd'hui."
     }
+  },
+  "error": {
+    "title": "Une erreur est survenue.",
+    "body": "Une erreur inattendue a interrompu cette page. Vous pouvez réessayer.",
+    "retry": "Réessayer"
   }
 }

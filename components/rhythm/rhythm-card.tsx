@@ -3,14 +3,12 @@ import { getTranslations } from "next-intl/server";
 import { MomentumPill } from "@/components/rituals/momentum-pill";
 import { RitualLogControl } from "@/components/rituals/ritual-log-control";
 import { RitualLogProvider } from "@/components/rituals/ritual-log-provider";
-import {
-  deriveDailyMomentum,
-  deriveMomentumStatus,
-  type MomentumStatus,
-  type RitualProgressEntry,
-  type RitualWithCategory,
+import type {
+  RitualProgressEntry,
+  RitualWithCategory,
 } from "@/lib/data/rituals";
-import { isoWeekday } from "@/lib/date";
+import { deriveRhythmCardView } from "@/lib/rhythm/today-rituals";
+import { MOMENTUM_TOKENS, ritualPeriodLabel } from "@/lib/rituals/presentation";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -24,15 +22,6 @@ type Props = {
   today: string;
 };
 
-const FRESH_RITUAL_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-const DAILY_WEEK_TARGET = 7;
-
-const barClassByStatus: Record<MomentumStatus, string> = {
-  strong: "bg-momentum",
-  steady: "bg-caution",
-  resting: "bg-muted-foreground/40",
-};
-
 export async function RhythmCard({
   ritual,
   progress,
@@ -43,63 +32,9 @@ export async function RhythmCard({
   const t = await getTranslations("rituals");
 
   const loggedToday = initialLogCount > 0;
-
-  const isDaily =
-    ritual.ritual_type === "recurring" && ritual.frequency_unit === "day";
-  const isPeriodic =
-    ritual.ritual_type === "recurring" &&
-    (ritual.frequency_unit === "week" || ritual.frequency_unit === "month") &&
-    (ritual.frequency_value ?? 0) > 0;
-
-  // eslint-disable-next-line react-hooks/purity
-  const now = Date.now();
-  const isFresh =
-    now - new Date(ritual.created_at).getTime() < FRESH_RITUAL_WINDOW_MS;
-
-  // A fraction + colored bar + momentum pill only apply to rituals that
-  // accumulate over a period: daily counts distinct days this week (X/7, paced
-  // against days elapsed); weekly/monthly count logs against their target.
-  let numerator: number | null = null;
-  let denominator = 0;
-  let status: MomentumStatus | null = null;
-  let barWidth = 0;
-
-  if (isDaily) {
-    numerator = weekDaysCount;
-    denominator = DAILY_WEEK_TARGET;
-    barWidth = (weekDaysCount / DAILY_WEEK_TARGET) * 100;
-    status =
-      weekDaysCount === 0 && isFresh
-        ? null
-        : deriveDailyMomentum(weekDaysCount, isoWeekday(today));
-  } else if (isPeriodic) {
-    numerator = progress?.logsThisPeriod ?? 0;
-    denominator = ritual.frequency_value ?? 0;
-    barWidth = Math.min(100, Math.max(0, progress?.completionRate ?? 0));
-    status =
-      numerator === 0 && isFresh
-        ? null
-        : deriveMomentumStatus(ritual.ritual_type, progress?.completionRate ?? null);
-  }
-
-  const showProgress = numerator !== null;
-  const meta = buildMeta();
-
-  function buildMeta(): string {
-    if (ritual.ritual_type === "one_time") return t("type.oneTime");
-    if (ritual.ritual_type === "open") return t("type.open");
-    const value = ritual.frequency_value ?? 1;
-    switch (ritual.frequency_unit) {
-      case "day":
-        return t("frequency.daily");
-      case "week":
-        return t("frequency.weekly", { n: value });
-      case "month":
-        return t("frequency.monthly", { n: value });
-      default:
-        return t("type.open");
-    }
-  }
+  const meta = ritualPeriodLabel(ritual, t);
+  const { numerator, denominator, status, barWidth, showProgress } =
+    deriveRhythmCardView({ ritual, progress, weekDaysCount }, today);
 
   return (
     <article
@@ -156,7 +91,7 @@ export async function RhythmCard({
           <div
             className={cn(
               "h-full rounded-full transition-all",
-              barClassByStatus[status ?? "resting"],
+              MOMENTUM_TOKENS[status ?? "resting"].bar,
             )}
             style={{ width: `${barWidth}%` }}
           />

@@ -1,9 +1,15 @@
-import type {
-  CompletedLogRow,
-  RitualProgressEntry,
-  RitualWithCategory,
+import {
+  deriveDailyMomentum,
+  deriveMomentumStatus,
+  type CompletedLogRow,
+  type MomentumStatus,
+  type RitualProgressEntry,
+  type RitualWithCategory,
 } from "@/lib/data/rituals";
 import { daysInMonth, isoWeekday } from "@/lib/date";
+import { isRitualFresh } from "@/lib/rituals/presentation";
+
+const DAILY_WEEK_TARGET = 7;
 
 export type RhythmItem = {
   ritual: RitualWithCategory;
@@ -162,4 +168,67 @@ export function selectTodayRituals({
   });
 
   return { active, done };
+}
+
+export type RhythmCardView = {
+  /** Score numerator, or null when the card shows no fraction/bar. */
+  numerator: number | null;
+  denominator: number;
+  status: MomentumStatus | null;
+  /** Progress bar fill, 0–100. */
+  barWidth: number;
+  showProgress: boolean;
+};
+
+/**
+ * The display model for a Rhythm card. A fraction + colored bar + momentum pill
+ * only apply to rituals that accumulate over a period: daily counts distinct
+ * days this week (X/7, paced against days elapsed); weekly/monthly count logs
+ * against their target. Daily/open/one-time keep no bar. Momentum is suppressed
+ * for fresh rituals (created in the last 7 days) with nothing logged yet.
+ */
+export function deriveRhythmCardView(
+  { ritual, progress, weekDaysCount }: Pick<
+    RhythmItem,
+    "ritual" | "progress" | "weekDaysCount"
+  >,
+  today: string,
+): RhythmCardView {
+  const isFresh = isRitualFresh(ritual.created_at);
+  const view: RhythmCardView = {
+    numerator: null,
+    denominator: 0,
+    status: null,
+    barWidth: 0,
+    showProgress: false,
+  };
+
+  const isDaily =
+    ritual.ritual_type === "recurring" && ritual.frequency_unit === "day";
+  const isPeriodic =
+    ritual.ritual_type === "recurring" &&
+    (ritual.frequency_unit === "week" || ritual.frequency_unit === "month") &&
+    (ritual.frequency_value ?? 0) > 0;
+
+  if (isDaily) {
+    view.numerator = weekDaysCount;
+    view.denominator = DAILY_WEEK_TARGET;
+    view.barWidth = (weekDaysCount / DAILY_WEEK_TARGET) * 100;
+    view.status =
+      weekDaysCount === 0 && isFresh
+        ? null
+        : deriveDailyMomentum(weekDaysCount, isoWeekday(today));
+  } else if (isPeriodic) {
+    const logs = progress?.logsThisPeriod ?? 0;
+    view.numerator = logs;
+    view.denominator = ritual.frequency_value ?? 0;
+    view.barWidth = Math.min(100, Math.max(0, progress?.completionRate ?? 0));
+    view.status =
+      logs === 0 && isFresh
+        ? null
+        : deriveMomentumStatus(ritual.ritual_type, progress?.completionRate ?? null);
+  }
+
+  view.showProgress = view.numerator !== null;
+  return view;
 }

@@ -5,13 +5,14 @@ import { RhythmDayBar } from "@/components/rhythm/rhythm-day-bar";
 import { RhythmDoneSection } from "@/components/rhythm/rhythm-done-section";
 import { RhythmEmptyState } from "@/components/rhythm/rhythm-empty-state";
 import { DefineRitualButton } from "@/components/rituals/define-ritual-button";
-import { startOfWeek, todayInTimeZone } from "@/lib/date";
+import { startOfWeek } from "@/lib/date";
 import {
   getCompletedRitualIds,
   getRitualsForActiveUser,
   getVisibleCategoriesForUser,
   getWeekCompletedLogs,
 } from "@/lib/data/rituals";
+import { getUserToday } from "@/lib/profile";
 import { selectTodayRituals } from "@/lib/rhythm/today-rituals";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,11 +25,7 @@ export default async function RhythmPage({ params }: Props) {
   const t = await getTranslations("rhythm");
   const supabase = await createClient();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("timezone")
-    .maybeSingle();
-  const today = todayInTimeZone(profile?.timezone ?? "UTC");
+  const today = await getUserToday(supabase);
   const weekStart = startOfWeek(today);
 
   const [{ rituals, progressByRitualId }, categories, weekLogs] =

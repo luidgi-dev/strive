@@ -20,6 +20,7 @@ The full product specification lives in `[docs/PRODUCT_SPEC.md](docs/PRODUCT_SPE
 - **next-intl** for routing-aware i18n (`en`, `fr`)
 - **Tailwind CSS v4** + shadcn/Base UI primitives
 - **next-themes** for light/dark theming
+- **Vitest** for unit tests (pure logic: dates, momentum, scheduling)
 
 ## Repository structure
 
@@ -55,6 +56,8 @@ Prerequisites: Node.js 20+, npm.
   ```
 3. Open [http://localhost:3000](http://localhost:3000).
 
+Run `npm test` to execute the unit suite, `npm run lint` to lint, and `npm run build` for a production build.
+
 For database setup (migrations, seeds, RLS), see `[data/README.md](data/README.md)`. For Supabase client usage, see `[lib/README.md](lib/README.md)`.
 
 ## Internationalization
@@ -73,6 +76,17 @@ Two GitHub Actions workflows guard the repo:
 - `project-audit.yml` — periodic project-wide audit for documentation drift and architectural health.
 
 Both workflows consume prompts from `.github/prompts/`. See `[.github/WORKFLOWS.md](.github/WORKFLOWS.md)` for the full setup.
+
+## Testing
+
+Unit tests run on **Vitest** and are **co-located** with the code they cover (`*.test.ts`), focused on the pure, high-value logic that drives the app — date math, momentum derivation, and the Rhythm "what shows today" selection.
+
+```bash
+npm test            # run the suite once
+npm run test:watch  # watch mode during development
+```
+
+Coverage is intentionally scoped to pure logic for now; component and end-to-end tests are planned and would live under a top-level `tests/` folder. See `[lib/README.md](lib/README.md)` for the current test map.
 
 ## AI agent guidelines
 

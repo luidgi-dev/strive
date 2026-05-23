@@ -6,6 +6,7 @@ import {
   type RitualProgressEntry,
   type RitualWithCategory,
 } from "@/lib/data/rituals";
+import { isRitualFresh, ritualPeriodLabel } from "@/lib/rituals/presentation";
 
 import { MomentumPill } from "./momentum-pill";
 import { RitualCardActions } from "./ritual-card-actions";
@@ -17,49 +18,19 @@ type Props = {
   categories: RitualCategoryRow[];
 };
 
-const FRESH_RITUAL_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-
 export async function RitualCard({ ritual, progress, categories }: Props) {
   const t = await getTranslations("rituals");
 
   const logsThisPeriod = progress?.logsThisPeriod ?? 0;
-  // Read of Date.now() is intentional: this Server Component re-renders per
-  // request, so the value is stable within a single response and only used to
-  // suppress the momentum pill for rituals created in the last 7 days.
-  // eslint-disable-next-line react-hooks/purity
-  const now = Date.now();
-  const isFresh =
-    now - new Date(ritual.created_at).getTime() < FRESH_RITUAL_WINDOW_MS;
-
   const status =
-    logsThisPeriod === 0 && isFresh
+    logsThisPeriod === 0 && isRitualFresh(ritual.created_at)
       ? null
       : deriveMomentumStatus(
           ritual.ritual_type,
           progress?.completionRate ?? null,
         );
 
-  let meta: string;
-  if (ritual.ritual_type === "one_time") {
-    meta = t("type.oneTime");
-  } else if (ritual.ritual_type === "open") {
-    meta = t("type.open");
-  } else {
-    const value = ritual.frequency_value ?? 1;
-    switch (ritual.frequency_unit) {
-      case "day":
-        meta = t("frequency.daily");
-        break;
-      case "week":
-        meta = t("frequency.weekly", { n: value });
-        break;
-      case "month":
-        meta = t("frequency.monthly", { n: value });
-        break;
-      default:
-        meta = ritual.ritual_type;
-    }
-  }
+  const meta = ritualPeriodLabel(ritual, t);
 
   return (
     <div className="flex items-stretch rounded-xl border border-border bg-card transition-colors hover:border-foreground/20">

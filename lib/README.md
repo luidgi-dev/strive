@@ -14,6 +14,10 @@ Shared utilities and client libraries for the Strive web app.
   - `routing.ts` — `defineRouting` config (re-uses `locales`/`defaultLocale` from root `i18n.ts`, `localePrefix: "as-needed"` to match the proxy's clean-URL behavior for English)
   - `navigation.ts` — `createNavigation(routing)` re-exports: `Link`, `redirect`, `usePathname`, `useRouter`, `getPathname`. Use these instead of `next/link` / `next/navigation` for any internal route that needs to preserve the current locale.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
+- `date.ts` — Date helpers: `todayInTimeZone`, `isoWeekday`, `startOfWeek`, `daysInMonth`
+- `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `deriveMomentumStatus`, `deriveDailyMomentum`)
+- `rituals/` — Ritual presentation logic: `presentation.ts` (period label, momentum tokens, freshness), `category-label.ts`, `arc.ts`
+- `rhythm/` — `today-rituals.ts`: pure `selectTodayRituals` deciding what shows on the Rhythm home today (scope, daily quota, Done-today split)
 
 ## Usage
 
@@ -88,6 +92,18 @@ type NewLog = Database['public']['Tables']['ritual_logs']['Insert']
 Run `npm run db:types` after any schema change (new table, new column, new view, enum value, etc.). The script writes a fresh `database.types.ts` against the live Supabase project. Commit the result.
 
 > Heads-up: when run from inside the Claude Code shell with the official Supabase plugin active, a stray `<claude-code-hint .../>` line is appended to the file and breaks the TypeScript build. Strip it with `sed -i '' '/<claude-code-hint/d' lib/supabase/database.types.ts`. Not needed when run from a regular terminal.
+
+## Testing
+
+Unit tests are **co-located** with the modules they cover (Vitest, `*.test.ts`):
+
+- `date.test.ts` — `isoWeekday`, `startOfWeek`, `daysInMonth`, `todayInTimeZone`
+- `data/rituals.test.ts` — momentum derivation (`paceToStatus`, `deriveMomentumStatus`, `deriveDailyMomentum`)
+- `rhythm/today-rituals.test.ts` — `selectTodayRituals` (scope, daily quota, open handling, sort order)
+
+Run from the repo root with `npm test` (or `npm run test:watch`). Keep new unit
+tests next to their source; a top-level `tests/` folder is reserved for future
+integration / end-to-end suites.
 
 ## Conventions
 

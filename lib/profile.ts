@@ -1,6 +1,7 @@
 // lib/profile.ts
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { todayInTimeZone } from "@/lib/date";
 import type { Database } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -62,6 +63,17 @@ export async function getAuthenticatedProfile() {
     .single();
 
   return { user, profile };
+}
+
+/** Today as YYYY-MM-DD in the authenticated user's timezone (falls back to UTC). */
+export async function getUserToday(
+  supabase: SupabaseClient<Database>,
+): Promise<string> {
+  const { data } = await supabase
+    .from("profiles")
+    .select("timezone")
+    .maybeSingle();
+  return todayInTimeZone(data?.timezone ?? "UTC");
 }
 
 export async function getMembership(): Promise<Membership | null> {

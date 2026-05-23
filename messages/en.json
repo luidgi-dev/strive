@@ -442,6 +442,11 @@
       "title": "Your rhythm starts here.",
       "body": "Define your first ritual to begin tracking it today."
     }
+  },
+  "error": {
+    "title": "Something went wrong.",
+    "body": "An unexpected error interrupted this page. You can try again.",
+    "retry": "Try again"
   }
 }
 
