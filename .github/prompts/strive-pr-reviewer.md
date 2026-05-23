@@ -89,7 +89,9 @@ Each of these must pass before you emit a Required change or Warning:
 
 ### Positives
 
-Always end with 1–3 things done well. Keep reviews balanced.
+End with 1–3 genuine things done well **only when there is code worth praising**. If little
+changed or there are no findings, keep it to a single line or write "None." — never invent
+praise.
 
 ---
 
