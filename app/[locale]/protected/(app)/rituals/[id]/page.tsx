@@ -10,8 +10,8 @@ import { RitualLogProvider } from "@/components/rituals/ritual-log-provider";
 import { RitualMeta } from "@/components/rituals/ritual-meta";
 import { TheArc } from "@/components/rituals/the-arc";
 import { TheArcLive } from "@/components/rituals/the-arc-live";
-import { todayInTimeZone } from "@/lib/date";
 import { Link } from "@/lib/i18n/navigation";
+import { getUserToday } from "@/lib/profile";
 import {
   deriveMomentumStatus,
   getLatestCompletedLog,
@@ -23,6 +23,7 @@ import {
 } from "@/lib/data/rituals";
 import { buildArcModel } from "@/lib/rituals/arc";
 import { getCategoryLabel } from "@/lib/rituals/category-label";
+import { ritualPeriodLabel } from "@/lib/rituals/presentation";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
@@ -45,11 +46,7 @@ export default async function RitualDetailPage({ params }: Props) {
   const ritual = await getRitualDetail(supabase, id);
   if (!ritual) notFound();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("timezone")
-    .maybeSingle();
-  const today = todayInTimeZone(profile?.timezone ?? "UTC");
+  const today = await getUserToday(supabase);
 
   const [progress, logs, categories] = await Promise.all([
     getRitualProgress(supabase, id),
@@ -103,28 +100,17 @@ export default async function RitualDetailPage({ params }: Props) {
       : null;
 
   function buildSubtitle(): string {
-    if (ritual!.ritual_type === "one_time") {
-      if (!ritual!.due_date) return t("type.oneTime");
+    const label = ritualPeriodLabel(ritual!, t);
+    // One-time rituals append their due date to the base "One-time" label.
+    if (ritual!.ritual_type === "one_time" && ritual!.due_date) {
       const date = format.dateTime(new Date(`${ritual!.due_date}T00:00:00`), {
         day: "numeric",
         month: "long",
         year: "numeric",
       });
-      return `${t("type.oneTime")} · ${date}`;
+      return `${label} · ${date}`;
     }
-    if (ritual!.ritual_type === "open") return t("type.open");
-
-    const value = ritual!.frequency_value ?? 1;
-    switch (ritual!.frequency_unit) {
-      case "day":
-        return t("frequency.daily");
-      case "week":
-        return t("frequency.weekly", { n: value });
-      case "month":
-        return t("frequency.monthly", { n: value });
-      default:
-        return t("type.open");
-    }
+    return label;
   }
 
   const content = (

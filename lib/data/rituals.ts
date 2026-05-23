@@ -328,15 +328,20 @@ export async function getCompletedRitualIds(
   return done;
 }
 
+/** Maps a 0–100 completion/pace percentage to a momentum status. */
+export function paceToStatus(percent: number): MomentumStatus {
+  if (percent >= 80) return "strong";
+  if (percent >= 40) return "steady";
+  return "resting";
+}
+
 export function deriveMomentumStatus(
   ritualType: string,
   completionRate: number | null,
 ): MomentumStatus | null {
   if (ritualType !== "recurring") return null;
   if (completionRate === null) return "resting";
-  if (completionRate >= 80) return "strong";
-  if (completionRate >= 40) return "steady";
-  return "resting";
+  return paceToStatus(completionRate);
 }
 
 /**
@@ -349,10 +354,7 @@ export function deriveDailyMomentum(
   daysElapsed: number,
 ): MomentumStatus {
   if (daysElapsed <= 0) return "resting";
-  const pace = (daysDone / daysElapsed) * 100;
-  if (pace >= 80) return "strong";
-  if (pace >= 40) return "steady";
-  return "resting";
+  return paceToStatus((daysDone / daysElapsed) * 100);
 }
 
 export type RitualGroup = {

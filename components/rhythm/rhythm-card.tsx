@@ -11,6 +11,11 @@ import {
   type RitualWithCategory,
 } from "@/lib/data/rituals";
 import { isoWeekday } from "@/lib/date";
+import {
+  MOMENTUM_TOKENS,
+  isRitualFresh,
+  ritualPeriodLabel,
+} from "@/lib/rituals/presentation";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -24,14 +29,7 @@ type Props = {
   today: string;
 };
 
-const FRESH_RITUAL_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 const DAILY_WEEK_TARGET = 7;
-
-const barClassByStatus: Record<MomentumStatus, string> = {
-  strong: "bg-momentum",
-  steady: "bg-caution",
-  resting: "bg-muted-foreground/40",
-};
 
 export async function RhythmCard({
   ritual,
@@ -51,10 +49,7 @@ export async function RhythmCard({
     (ritual.frequency_unit === "week" || ritual.frequency_unit === "month") &&
     (ritual.frequency_value ?? 0) > 0;
 
-  // eslint-disable-next-line react-hooks/purity
-  const now = Date.now();
-  const isFresh =
-    now - new Date(ritual.created_at).getTime() < FRESH_RITUAL_WINDOW_MS;
+  const isFresh = isRitualFresh(ritual.created_at);
 
   // A fraction + colored bar + momentum pill only apply to rituals that
   // accumulate over a period: daily counts distinct days this week (X/7, paced
@@ -83,23 +78,7 @@ export async function RhythmCard({
   }
 
   const showProgress = numerator !== null;
-  const meta = buildMeta();
-
-  function buildMeta(): string {
-    if (ritual.ritual_type === "one_time") return t("type.oneTime");
-    if (ritual.ritual_type === "open") return t("type.open");
-    const value = ritual.frequency_value ?? 1;
-    switch (ritual.frequency_unit) {
-      case "day":
-        return t("frequency.daily");
-      case "week":
-        return t("frequency.weekly", { n: value });
-      case "month":
-        return t("frequency.monthly", { n: value });
-      default:
-        return t("type.open");
-    }
-  }
+  const meta = ritualPeriodLabel(ritual, t);
 
   return (
     <article
@@ -156,7 +135,7 @@ export async function RhythmCard({
           <div
             className={cn(
               "h-full rounded-full transition-all",
-              barClassByStatus[status ?? "resting"],
+              MOMENTUM_TOKENS[status ?? "resting"].bar,
             )}
             style={{ width: `${barWidth}%` }}
           />
