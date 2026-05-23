@@ -429,6 +429,19 @@
     "ai": {
       "openLabel": "Talk to Strive AI"
     }
+  },
+  "rhythm": {
+    "today": "Today",
+    "coach": {
+      "summary": "{x} of {y} logged",
+      "allDone": "You're done for today"
+    },
+    "doneToday": "Done today",
+    "addRitual": "Add a ritual",
+    "empty": {
+      "title": "Your rhythm starts here.",
+      "body": "Define your first ritual to begin tracking it today."
+    }
   }
 }
 

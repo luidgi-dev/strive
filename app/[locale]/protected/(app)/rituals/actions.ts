@@ -336,6 +336,9 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 function revalidateRitual(ritualId: string) {
   revalidatePath(`/protected/rituals/${ritualId}`);
   revalidatePath("/protected/rituals");
+  // Rhythm (the post-login home) reads the same logs, so a quick-log there must
+  // reconcile its optimistic state with fresh server data.
+  revalidatePath("/protected/flow");
 }
 
 export async function logRitual(
