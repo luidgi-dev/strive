@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Insights — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<!--
+  PHASE 4 — PREMIUM SUB-PAGE (NOT a bottom-nav tab).
+
+  ACCESS FLOW:
+    Avatar (any tab) → Settings → tap "My Insights" link → lands here.
+    This is a leaf sub-page reached from Settings. The user has to go to
+    Settings to upgrade their plan first; once upgraded, the "My Insights"
+    link appears in Settings and gives them entry. This avoids needing a
+    separate insights-locked screen and reinforces the premium feel
+    (it's not in the main nav, you find it via your account).
+
+  BOTTOM NAV stays 3 tabs (Rhythm | Rituals | Circles), no tab active
+  while on this sub-page. The back chevron in the header returns to Settings.
+
+  Architecture mapping (per LUI brief):
+    - Stats Engine (/services/insights/calculators.ts) computes raw facts from Supabase
+    - Prompt Library (/services/insights/prompts.ts) holds one specialized prompt per insight type
+    - Orchestrator (/services/insights/orchestrator.ts) glues Stats + Prompt + Gemini + cache
+    - Results stored in `insights` table with generated_at + cooldown to avoid duplicate AI calls
+    - Optional: generate N candidate insights, score by relevance, display only the top K
+
+  Refresh policy (V1):
+    - AUTO ONLY: regenerated weekly on Mondays via Edge Function / cron.
+      Covered by the tier, no per-refresh credit cost.
+    - NO MANUAL REFRESH in V1. Rationale:
+        - Aligns with Strive's "calm, not addictive" philosophy
+          (Insights are contemplative, not real-time)
+        - A full refresh = 3–5 AI prompts (one per insight type, possibly
+          multiple candidates per type if we score), which is 3–5x a chat
+          message. With Lite tier capped at 5–10 credits/month, a single
+          manual refresh would burn half the user's monthly quota.
+        - Simpler dev: no per-surface credit deduction logic on Insights,
+          no cooldown to track, no rate-limit edge cases.
+        - If users ask for it later, we can ship manual refresh in V2 as
+          a Premium-tier perk (free for Premium / Lifetime, locked for Lite).
+
+  KEPT FOR V2 (intentionally NOT wireframed here, ship small first):
+    - Manual refresh as a Premium perk (see above)
+    - Credit balance display (header chip "12 credits" or in Settings)
+    - Insights-empty state (first generation flow with onboarding CTA)
+    - Per-card AI confidence score (sorted silently for V1 — LAST N WEEKS
+      basis already acts as implicit robustness signal)
+    - "Why this insight?" expander showing the underlying stats / data
+-->
+<style>
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.28 0.005 200);
+    --primary: oklch(0.20 0.005 200);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 200);
+    --muted: oklch(0.96 0.002 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --accent: oklch(0.96 0.002 200);
+    --border: oklch(0.92 0.002 200);
+    --input: oklch(0.92 0.002 200);
+    --ring: oklch(0.80 0.01 200);
+    --momentum: oklch(0.62 0.12 154);
+    --caution: oklch(0.68 0.14 72);
+    --missed: oklch(0.62 0.17 27);
+    --radius: 0.75rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --font-heading: "Sora", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --card: oklch(0.22 0.006 200);
+    --card-foreground: oklch(0.86 0.006 200);
+    --primary: oklch(0.88 0.008 200);
+    --primary-foreground: oklch(0.18 0.006 200);
+    --secondary: oklch(0.26 0.006 200);
+    --muted: oklch(0.26 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --accent: oklch(0.26 0.006 200);
+    --border: oklch(1 0 0 / 0.07);
+    --input: oklch(1 0 0 / 0.09);
+    --ring: oklch(0.40 0.01 200);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  body { display: flex; justify-content: center; padding: 0; }
+
+  /* Wireframe theme switcher */
+  .wf-controls {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    font-size: 11px;
+  }
+  .wf-controls button {
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font: inherit;
+  }
+  .wf-controls button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Mobile-style frame */
+  .frame {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  /* App header (sub-page pattern: back chevron + more) */
+  .page-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: color-mix(in oklch, var(--background) 80%, transparent);
+    backdrop-filter: blur(12px);
+  }
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: transparent;
+    border: 0;
+    color: var(--foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover { background: var(--accent); }
+  .icon-btn svg { width: 20px; height: 20px; }
+
+  /* Content */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px 20px 112px;
+  }
+
+  /* Hero (page title + last updated) */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 4px 4px;
+  }
+  .hero-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+    line-height: 1.2;
+  }
+  .hero-meta {
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    letter-spacing: 0.01em;
+  }
+
+  /* Insight card */
+  .insight-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .insight-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 16px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .insight-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .insight-ai-icon {
+    width: 13px;
+    height: 13px;
+    color: color-mix(in oklch, var(--foreground) 55%, transparent);
+    flex-shrink: 0;
+  }
+  .insight-type {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+  .insight-headline {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.005em;
+    color: var(--foreground);
+    line-height: 1.3;
+  }
+  .insight-body {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+    letter-spacing: 0.005em;
+  }
+  .insight-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 4px;
+    flex-wrap: wrap;
+  }
+  .insight-basis {
+    font-size: 10.5px;
+    color: color-mix(in oklch, var(--muted-foreground) 80%, transparent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .insight-actions {
+    display: inline-flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .insight-btn {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font: inherit;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 11.5px;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+  }
+  .insight-btn.primary {
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+  }
+  .insight-btn.secondary {
+    background: transparent;
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+  }
+  .insight-btn.secondary:hover {
+    color: var(--foreground);
+    border-color: color-mix(in oklch, var(--foreground) 30%, transparent);
+  }
+
+  /* Auto-refresh footer note (no manual refresh in V1) */
+  .auto-refresh-note {
+    margin-top: 10px;
+    padding: 0 4px;
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    color: var(--muted-foreground);
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    align-self: center;
+  }
+  .auto-refresh-note svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0.8;
+  }
+
+  /* Floating action button — Strive AI */
+  .fab {
+    position: absolute;
+    right: 20px;
+    bottom: calc(64px + env(safe-area-inset-bottom) + 18px);
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px oklch(0 0 0 / 0.18), 0 2px 6px oklch(0 0 0 / 0.1);
+    z-index: 40;
+  }
+  .fab svg { width: 22px; height: 22px; }
+
+  /* Hide wireframe chrome when embedded */
+  .embedded .wf-controls { display: none; }
+
+  /* Bottom nav (4 tabs now: Rhythm / Rituals / Insights / Circles) */
+  .bottom-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--border);
+    background: color-mix(in oklch, var(--background) 80%, transparent);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .nav-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 56px;
+    min-height: 48px;
+    color: var(--muted-foreground);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .nav-item.active { color: var(--foreground); }
+</style>
+</head>
+<body>
+  <div class="wf-controls" role="group" aria-label="Wireframe theme">
+    <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
+    <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+  </div>
+
+  <div class="frame">
+    <header class="page-header">
+      <!-- Back to Settings (where the "My Insights" link lives) -->
+      <button class="icon-btn" type="button" aria-label="Back to Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+      </button>
+      <!--
+        ··· menu (for dev) — possible actions:
+          - View credit balance
+          - Insights frequency (weekly / bi-weekly / monthly)
+          - Dismiss all insights
+      -->
+      <button class="icon-btn" type="button" aria-label="More options">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5" cy="12" r="1"/>
+          <circle cx="12" cy="12" r="1"/>
+          <circle cx="19" cy="12" r="1"/>
+        </svg>
+      </button>
+    </header>
+
+    <main class="content">
+      <!-- Hero: title + last updated -->
+      <div class="hero">
+        <h2 class="hero-title">Insights</h2>
+        <span class="hero-meta">Updated 3 days ago</span>
+      </div>
+
+      <!-- Insight cards (mocked from the LUI brief examples) -->
+      <div class="insight-list">
+
+        <!-- CORRELATION: AI surfaces a discovered link between two rituals -->
+        <article class="insight-card">
+          <div class="insight-top">
+            <svg class="insight-ai-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+            </svg>
+            <span class="insight-type">Correlation</span>
+          </div>
+          <h3 class="insight-headline">Sleep and Sport are linked.</h3>
+          <p class="insight-body">
+            On weeks when you log Sleep at least 5 nights, your Sport completion rate is 40% higher.
+          </p>
+          <div class="insight-footer">
+            <span class="insight-basis">Last 8 weeks</span>
+            <div class="insight-actions">
+              <button class="insight-btn secondary" type="button">Dismiss</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ADJUSTMENT: AI suggests tuning a ritual's target -->
+        <article class="insight-card">
+          <div class="insight-top">
+            <svg class="insight-ai-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+            </svg>
+            <span class="insight-type">Adjustment</span>
+          </div>
+          <h3 class="insight-headline">Your Wednesday target may be too high.</h3>
+          <p class="insight-body">
+            Meditation completion drops 35% on Wednesdays vs. other weekdays. Consider lowering the target for that day.
+          </p>
+          <div class="insight-footer">
+            <span class="insight-basis">Last 4 weeks</span>
+            <div class="insight-actions">
+              <button class="insight-btn secondary" type="button">Dismiss</button>
+              <button class="insight-btn primary" type="button">Adjust target</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- SUGGESTION: AI proposes a new ritual based on notes/patterns -->
+        <article class="insight-card">
+          <div class="insight-top">
+            <svg class="insight-ai-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+            </svg>
+            <span class="insight-type">Suggestion</span>
+          </div>
+          <h3 class="insight-headline">A Wind Down ritual could help.</h3>
+          <p class="insight-body">
+            Several recent notes mention fatigue around 9pm. A short Wind Down at that time might smooth your wake-up consistency.
+          </p>
+          <div class="insight-footer">
+            <span class="insight-basis">From your notes</span>
+            <div class="insight-actions">
+              <button class="insight-btn secondary" type="button">Not now</button>
+              <button class="insight-btn primary" type="button">Define ritual</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!--
+        Auto-refresh footer note (no manual refresh in V1).
+        Just informs the user when fresh insights are coming.
+      -->
+      <p class="auto-refresh-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+          <path d="M21 3v5h-5"/>
+        </svg>
+        New insights every Monday.
+      </p>
+    </main>
+
+    <!-- FAB: Strive AI (kept across all tabs for quick chat) -->
+    <button class="fab" type="button" aria-label="Talk to Strive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        <path d="M20 3v4"/>
+        <path d="M22 5h-4"/>
+        <path d="M4 17v2"/>
+        <path d="M5 18H3"/>
+      </svg>
+    </button>
+
+    <!--
+      Bottom nav: standard 3 tabs (Rhythm | Rituals | Circles).
+      No active state because Insights is a sub-page of Settings, not a tab.
+      The back chevron in the header returns to Settings (one step back).
+    -->
+    <nav class="bottom-nav" aria-label="Primary">
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/>
+        </svg>
+        <span class="nav-label">Rhythm</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08v0c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"/>
+          <path d="m18 15-2-2"/>
+          <path d="m15 18-2-2"/>
+        </svg>
+        <span class="nav-label">Rituals</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="nav-label">Circles</span>
+      </button>
+    </nav>
+  </div>
+
+<script>
+  const root = document.documentElement;
+  const isEmbedded = window.parent !== window;
+  const isClean = new URLSearchParams(window.location.search).has("clean");
+  if (isEmbedded || isClean) root.classList.add("embedded");
+  const initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  root.dataset.theme = initial;
+  document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.setTheme;
+      root.dataset.theme = t;
+      document.querySelectorAll(".wf-controls [data-set-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>

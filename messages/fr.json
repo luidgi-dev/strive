@@ -232,5 +232,220 @@
     "flow": {
       "description": "Votre dynamique quotidienne, visualisée."
     }
+  },
+  "rituals": {
+    "title": "Rituels",
+    "defineCta": "Définir un rituel",
+    "defineFirst": "Définir votre premier rituel",
+    "newCategory": "Nouvelle catégorie",
+    "archived": {
+      "title": "Rituels archivés",
+      "link": "{count, plural, one {# rituel archivé} other {# rituels archivés}}",
+      "empty": "Aucun rituel archivé.",
+      "archivedOn": "Archivé le {date}",
+      "restore": "Restaurer",
+      "restoring": "Restauration…",
+      "retry": "Réessayer",
+      "back": "Retour aux rituels"
+    },
+    "empty": {
+      "title": "Vos rituels prendront place ici.",
+      "body": "Définissez-en un pour commencer à bâtir votre rythme."
+    },
+    "frequency": {
+      "daily": "Quotidien",
+      "weekly": "Hebdo · {n}×",
+      "monthly": "Mensuel · {n}×"
+    },
+    "type": {
+      "oneTime": "Ponctuel",
+      "open": "Libre"
+    },
+    "status": {
+      "strong": "Solide",
+      "steady": "Régulier",
+      "resting": "En repos"
+    },
+    "category": {
+      "other": "Autre",
+      "new": "+ Nouvelle",
+      "collapse": "Masquer les rituels {category}",
+      "expand": "Afficher les rituels {category}",
+      "system": {
+        "movement": "Mouvement",
+        "nutrition": "Nutrition",
+        "balance": "Équilibre",
+        "learning": "Apprentissage",
+        "creativity": "Créativité",
+        "focus": "Focus"
+      },
+      "manage": {
+        "createTitle": "Nouvelle catégorie",
+        "editTitle": "Modifier la catégorie",
+        "nameLabel": "Nom de la catégorie",
+        "namePlaceholder": "Nommez votre catégorie",
+        "create": "Créer la catégorie",
+        "save": "Enregistrer",
+        "edit": "Modifier",
+        "archive": "Archiver",
+        "menuLabel": "Gérer {category}",
+        "empty": "Aucun rituel pour l'instant.",
+        "archiveConfirmTitle": "Archiver la catégorie ?",
+        "archiveConfirmBody": "Elle n'apparaîtra plus à la création d'un rituel, et ses rituels passent dans « Autre ».",
+        "archiveCancel": "La garder",
+        "archiveConfirm": "Archiver",
+        "errors": {
+          "nameRequired": "Veuillez saisir un nom.",
+          "nameTooLong": "Limitez-vous à 50 caractères.",
+          "notFound": "Cette catégorie n'existe plus.",
+          "validationFailed": "Vérifiez le nom et réessayez.",
+          "unknown": "Une erreur est survenue. Réessayez."
+        }
+      }
+    },
+    "create": {
+      "title": "Définir un rituel"
+    },
+    "edit": {
+      "title": "Modifier le rituel"
+    },
+    "detail": {
+      "back": "Retour aux rituels",
+      "momentum": "Momentum",
+      "logged": "Enregistrés",
+      "started": "Démarré",
+      "logAria": "Enregistrer {name}",
+      "log": {
+        "logAgain": "Enregistrer à nouveau",
+        "undo": "Annuler le dernier",
+        "adjust": "Ajuster les logs du jour",
+        "markDone": "Marquer comme fait",
+        "undoDone": "Annuler"
+      },
+      "arc": {
+        "label": "L'Arc",
+        "labelWeeks": "L'Arc · {weeks, plural, one {# semaine} other {# semaines}}",
+        "chartLabel": "Décompte hebdomadaire sur {weeks, plural, one {# semaine} other {# semaines}}",
+        "targetLabel": "Objectif {n}×",
+        "weekOf": "Semaine du {date}",
+        "meta": "{n} sur {target}",
+        "metaCount": "{n} enregistrés",
+        "selectWeek": "Afficher la semaine du {date}",
+        "emptyTitle": "L'Arc se dessine avec le temps",
+        "emptyBody": "Enregistre ce rituel et ton rythme au fil des semaines apparaîtra ici."
+      },
+      "oneTime": {
+        "status": {
+          "upcoming": "À venir",
+          "done": "Fait",
+          "overdue": "Échéance passée"
+        },
+        "dueOn": "Prévu le {date}",
+        "loggedOn": "Loggé le {date}",
+        "early": "{n, plural, one {# jour en avance} other {# jours en avance}}",
+        "late": "{n, plural, one {# jour en retard} other {# jours en retard}}",
+        "onTime": "Le jour même",
+        "note": "Toujours d'actualité ? Loggue-le ou reprogramme la date."
+      }
+    },
+    "actions": {
+      "openLabel": "Ouvrir les actions du rituel",
+      "edit": "Modifier le rituel",
+      "archive": "Archiver",
+      "archiving": "Archivage...",
+      "archiveConfirmTitle": "Archiver ce rituel ?",
+      "archiveConfirmBody": "Il sortira de votre liste active. L'historique est conservé.",
+      "archiveConfirm": "Archiver",
+      "archiveCancel": "Le garder"
+    },
+    "form": {
+      "fields": {
+        "name": "Nom",
+        "type": "Type",
+        "cadence": "Cadence",
+        "target": "Objectif",
+        "date": "Date",
+        "category": "Catégorie",
+        "note": "Note",
+        "time": "Heure"
+      },
+      "placeholders": {
+        "name": "Nommez votre rituel",
+        "note": "De quoi parle ce rituel ?"
+      },
+      "type": {
+        "recurring": "Récurrent",
+        "oneTime": "Ponctuel",
+        "open": "Libre"
+      },
+      "cadence": {
+        "daily": "Quotidien",
+        "weekly": "Hebdo",
+        "monthly": "Mensuel"
+      },
+      "target": {
+        "unit": {
+          "week": "× par semaine",
+          "month": "× par mois"
+        }
+      },
+      "icon": {
+        "toggle": "Choisir une icône",
+        "clear": "Retirer l'icône"
+      },
+      "days": {
+        "toggle": "Choisir des jours précis",
+        "mon": "L",
+        "tue": "M",
+        "wed": "M",
+        "thu": "J",
+        "fri": "V",
+        "sat": "S",
+        "sun": "D"
+      },
+      "time": {
+        "toggle": "Définir une heure"
+      },
+      "note": {
+        "toggle": "Ajouter une note"
+      },
+      "actions": {
+        "create": "Créer le rituel",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "close": "Fermer"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis",
+        "nameTooLong": "Le nom est trop long",
+        "dateInvalid": "Choisissez une date valide",
+        "timeInvalid": "Choisissez une heure valide",
+        "validationFailed": "Certains champs nécessitent une correction",
+        "unauthorized": "Veuillez vous reconnecter",
+        "notFound": "Ce rituel est introuvable",
+        "unknown": "Une erreur est survenue. Réessayez."
+      }
+    },
+    "ai": {
+      "openLabel": "Parler à l'IA Strive"
+    }
+  },
+  "rhythm": {
+    "today": "Aujourd'hui",
+    "coach": {
+      "summary": "{x} sur {y} loggés",
+      "allDone": "Vous avez tout fait aujourd'hui"
+    },
+    "doneToday": "Fait aujourd'hui",
+    "addRitual": "Ajouter un rituel",
+    "empty": {
+      "title": "Votre rythme commence ici.",
+      "body": "Définissez votre premier rituel pour le suivre dès aujourd'hui."
+    }
+  },
+  "error": {
+    "title": "Une erreur est survenue.",
+    "body": "Une erreur inattendue a interrompu cette page. Vous pouvez réessayer.",
+    "retry": "Réessayer"
   }
 }

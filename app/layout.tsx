@@ -5,6 +5,7 @@ import { getLocale } from "next-intl/server";
 
 import { DynamicThemeColor } from "@/components/providers/dynamic-theme-color";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { appleSplashScreens } from "@/lib/apple-splash-screens";
 
 import "./globals.css";
 
@@ -31,6 +32,19 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Strive",
   description: "Consistency over intensity.",
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Strive",
+    statusBarStyle: "default",
+    startupImage: appleSplashScreens,
+  },
+  // Next emits the standard `mobile-web-app-capable` but not Apple's legacy
+  // tag, which iOS still needs to honor apple-touch-startup-image (the launch
+  // screen) even when the manifest already puts the PWA in standalone mode.
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
   icons: {
     icon: [
       {

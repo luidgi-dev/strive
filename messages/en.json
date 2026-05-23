@@ -232,6 +232,221 @@
     "flow": {
       "description": "Your daily momentum, visualized."
     }
+  },
+  "rituals": {
+    "title": "Rituals",
+    "defineCta": "Define a ritual",
+    "defineFirst": "Define your first ritual",
+    "newCategory": "New category",
+    "archived": {
+      "title": "Archived rituals",
+      "link": "{count, plural, one {# archived ritual} other {# archived rituals}}",
+      "empty": "No archived rituals.",
+      "archivedOn": "Archived {date}",
+      "restore": "Restore",
+      "restoring": "Restoring…",
+      "retry": "Retry",
+      "back": "Back to rituals"
+    },
+    "empty": {
+      "title": "Your rituals will live here.",
+      "body": "Define one to start building rhythm."
+    },
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly · {n}×",
+      "monthly": "Monthly · {n}×"
+    },
+    "type": {
+      "oneTime": "One-time",
+      "open": "Open"
+    },
+    "status": {
+      "strong": "Strong",
+      "steady": "Steady",
+      "resting": "Resting"
+    },
+    "category": {
+      "other": "Other",
+      "new": "+ New",
+      "collapse": "Hide {category} rituals",
+      "expand": "Show {category} rituals",
+      "system": {
+        "movement": "Movement",
+        "nutrition": "Nutrition",
+        "balance": "Balance",
+        "learning": "Learning",
+        "creativity": "Creativity",
+        "focus": "Focus"
+      },
+      "manage": {
+        "createTitle": "New category",
+        "editTitle": "Edit category",
+        "nameLabel": "Category name",
+        "namePlaceholder": "Name your category",
+        "create": "Create category",
+        "save": "Save",
+        "edit": "Edit",
+        "archive": "Archive",
+        "menuLabel": "Manage {category}",
+        "empty": "No rituals yet.",
+        "archiveConfirmTitle": "Archive category?",
+        "archiveConfirmBody": "It will no longer appear when creating a ritual, and its rituals move to Other.",
+        "archiveCancel": "Keep it",
+        "archiveConfirm": "Archive",
+        "errors": {
+          "nameRequired": "Please enter a name.",
+          "nameTooLong": "Keep it under 50 characters.",
+          "notFound": "This category no longer exists.",
+          "validationFailed": "Please check the name and try again.",
+          "unknown": "Something went wrong. Try again."
+        }
+      }
+    },
+    "create": {
+      "title": "Define a ritual"
+    },
+    "edit": {
+      "title": "Edit ritual"
+    },
+    "detail": {
+      "back": "Back to rituals",
+      "momentum": "Momentum",
+      "logged": "Logged",
+      "started": "Started",
+      "logAria": "Log {name}",
+      "log": {
+        "logAgain": "Log again",
+        "undo": "Undo last log",
+        "adjust": "Adjust today's logs",
+        "markDone": "Mark as done",
+        "undoDone": "Undo"
+      },
+      "arc": {
+        "label": "The Arc",
+        "labelWeeks": "The Arc · {weeks, plural, one {# week} other {# weeks}}",
+        "chartLabel": "Weekly count over {weeks, plural, one {# week} other {# weeks}}",
+        "targetLabel": "Target {n}×",
+        "weekOf": "Week of {date}",
+        "meta": "{n} of {target}",
+        "metaCount": "{n} logged",
+        "selectWeek": "Show week of {date}",
+        "emptyTitle": "The Arc takes shape with time",
+        "emptyBody": "Log this ritual and your rhythm over the weeks will appear here."
+      },
+      "oneTime": {
+        "status": {
+          "upcoming": "Upcoming",
+          "done": "Done",
+          "overdue": "Past due"
+        },
+        "dueOn": "Due {date}",
+        "loggedOn": "Logged {date}",
+        "early": "{n, plural, one {# day early} other {# days early}}",
+        "late": "{n, plural, one {# day late} other {# days late}}",
+        "onTime": "On the day",
+        "note": "Still relevant? Log it or reschedule the date."
+      }
+    },
+    "actions": {
+      "openLabel": "Open ritual actions",
+      "edit": "Edit ritual",
+      "archive": "Archive",
+      "archiving": "Archiving...",
+      "archiveConfirmTitle": "Archive this ritual?",
+      "archiveConfirmBody": "It will move out of your active list. History is kept.",
+      "archiveConfirm": "Archive",
+      "archiveCancel": "Keep it"
+    },
+    "form": {
+      "fields": {
+        "name": "Name",
+        "type": "Type",
+        "cadence": "Cadence",
+        "target": "Target",
+        "date": "Date",
+        "category": "Category",
+        "note": "Note",
+        "time": "Time"
+      },
+      "placeholders": {
+        "name": "Name your ritual",
+        "note": "What is this ritual about?"
+      },
+      "type": {
+        "recurring": "Recurring",
+        "oneTime": "One-time",
+        "open": "Open"
+      },
+      "cadence": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "target": {
+        "unit": {
+          "week": "× per week",
+          "month": "× per month"
+        }
+      },
+      "icon": {
+        "toggle": "Pick an icon",
+        "clear": "Remove icon"
+      },
+      "days": {
+        "toggle": "Pick specific days",
+        "mon": "M",
+        "tue": "T",
+        "wed": "W",
+        "thu": "T",
+        "fri": "F",
+        "sat": "S",
+        "sun": "S"
+      },
+      "time": {
+        "toggle": "Set a time"
+      },
+      "note": {
+        "toggle": "Add a note"
+      },
+      "actions": {
+        "create": "Create ritual",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "close": "Close"
+      },
+      "errors": {
+        "nameRequired": "Name is required",
+        "nameTooLong": "Name is too long",
+        "dateInvalid": "Pick a valid date",
+        "timeInvalid": "Pick a valid time",
+        "validationFailed": "Some fields need attention",
+        "unauthorized": "Please sign in again",
+        "notFound": "This ritual could not be found",
+        "unknown": "Something went wrong. Try again."
+      }
+    },
+    "ai": {
+      "openLabel": "Talk to Strive AI"
+    }
+  },
+  "rhythm": {
+    "today": "Today",
+    "coach": {
+      "summary": "{x} of {y} logged",
+      "allDone": "You're done for today"
+    },
+    "doneToday": "Done today",
+    "addRitual": "Add a ritual",
+    "empty": {
+      "title": "Your rhythm starts here.",
+      "body": "Define your first ritual to begin tracking it today."
+    }
+  },
+  "error": {
+    "title": "Something went wrong.",
+    "body": "An unexpected error interrupted this page. You can try again.",
+    "retry": "Try again"
   }
 }
 
