@@ -429,5 +429,18 @@
     "ai": {
       "openLabel": "Parler à l'IA Strive"
     }
+  },
+  "rhythm": {
+    "today": "Aujourd'hui",
+    "coach": {
+      "summary": "{x} sur {y} loggés",
+      "allDone": "Vous avez tout fait aujourd'hui"
+    },
+    "doneToday": "Fait aujourd'hui",
+    "addRitual": "Ajouter un rituel",
+    "empty": {
+      "title": "Votre rythme commence ici.",
+      "body": "Définissez votre premier rituel pour le suivre dès aujourd'hui."
+    }
   }
 }
