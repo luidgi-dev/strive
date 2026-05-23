@@ -373,6 +373,44 @@
   .add-link svg { width: 13px; height: 13px; }
   .add-link:hover { color: var(--foreground); border-color: var(--border); }
 
+  /* Done today — collapsible group of rituals already cleared for the day.
+     Collapsed by default in-app; shown open here so the design reads at a glance. */
+  .done-section { margin-top: 8px; }
+  .done-section > summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding-left: 4px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .done-section > summary::-webkit-details-marker { display: none; }
+  .done-chevron {
+    width: 12px;
+    height: 12px;
+    transform: rotate(-90deg);
+    transition: transform 0.2s ease;
+  }
+  .done-section[open] .done-chevron { transform: rotate(0deg); }
+  .done-count {
+    font-weight: 500;
+    letter-spacing: normal;
+    color: color-mix(in oklch, var(--muted-foreground) 70%, transparent);
+  }
+  .done-section[open] .done-count { display: none; }
+  .done-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
   /* Floating action button — Strive AI (foreground/background pair, inverts per theme) */
   .fab {
     position: absolute;
@@ -464,7 +502,7 @@
           <h2 class="day-title">Today</h2>
           <span class="day-date">Sat, May 16</span>
         </div>
-        <span class="day-coach"><span class="status-dot on-track"></span>2 of 3 logged</span>
+        <span class="day-coach"><span class="status-dot"></span>2 of 3 logged</span>
       </div>
 
       <!-- Card — Evening journal: WEEKLY 5×, not logged today, steady. (Sorted first: action needed.) -->
@@ -494,79 +532,91 @@
         </div>
       </article>
 
-      <!-- Card — Morning meditation: DAILY, logged 1× today, week on track -->
-      <article class="ritual-card logged">
-        <div class="ritual-top">
-          <div class="ritual-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
-              <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
-              <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
-            </svg>
-          </div>
-          <div class="ritual-info">
-            <span class="ritual-name">Morning meditation</span>
-            <span class="ritual-meta">
-              <span class="meta-period">Daily</span>
-              <span class="status-dot on-track"></span>
-              <span class="meta-status on-track">On track</span>
-            </span>
-          </div>
-          <span class="ritual-score">6<span class="denom">/7</span></span>
-          <div class="stepper" role="group" aria-label="Adjust today's logs">
-            <button type="button" aria-label="Undo last log">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
-            </button>
-            <span class="count">1</span>
-            <button type="button" aria-label="Log again">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill momentum" style="width: 86%;"></div>
-        </div>
-      </article>
-
-      <!-- Card — Long run: MONTHLY 3×, logged 1× today -->
-      <article class="ritual-card logged">
-        <div class="ritual-top">
-          <div class="ritual-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 2h4"/>
-              <path d="m12 14 3-3"/>
-              <circle cx="12" cy="14" r="8"/>
-            </svg>
-          </div>
-          <div class="ritual-info">
-            <span class="ritual-name">Long run</span>
-            <span class="ritual-meta">
-              <span class="meta-period">Monthly</span>
-              <span class="status-dot on-track"></span>
-              <span class="meta-status on-track">On track</span>
-            </span>
-          </div>
-          <span class="ritual-score">2<span class="denom">/3</span></span>
-          <div class="stepper" role="group" aria-label="Adjust today's logs">
-            <button type="button" aria-label="Undo last log">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
-            </button>
-            <span class="count">1</span>
-            <button type="button" aria-label="Log again">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill momentum" style="width: 67%;"></div>
-        </div>
-      </article>
-
       <!-- Discreet add ritual -->
       <button class="add-link" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
         Add a ritual
       </button>
+
+      <!-- Done today — rituals already cleared for the day. Collapsed by default
+           in-app; shown open here so the grouping reads at a glance. Daily and
+           recurring drop in once their daily quota is met; open rituals never do. -->
+      <details class="done-section" open>
+        <summary>
+          <span>Done today</span>
+          <svg class="done-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          <span class="done-count">2</span>
+        </summary>
+        <div class="done-list">
+          <!-- Card — Morning meditation: DAILY, logged 1× today, week on track -->
+          <article class="ritual-card logged">
+            <div class="ritual-top">
+              <div class="ritual-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
+                  <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+                  <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+                </svg>
+              </div>
+              <div class="ritual-info">
+                <span class="ritual-name">Morning meditation</span>
+                <span class="ritual-meta">
+                  <span class="meta-period">Daily</span>
+                  <span class="status-dot on-track"></span>
+                  <span class="meta-status on-track">On track</span>
+                </span>
+              </div>
+              <span class="ritual-score">6<span class="denom">/7</span></span>
+              <div class="stepper" role="group" aria-label="Adjust today's logs">
+                <button type="button" aria-label="Undo last log">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                </button>
+                <span class="count">1</span>
+                <button type="button" aria-label="Log again">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill momentum" style="width: 86%;"></div>
+            </div>
+          </article>
+
+          <!-- Card — Long run: MONTHLY 3×, logged 1× today -->
+          <article class="ritual-card logged">
+            <div class="ritual-top">
+              <div class="ritual-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 2h4"/>
+                  <path d="m12 14 3-3"/>
+                  <circle cx="12" cy="14" r="8"/>
+                </svg>
+              </div>
+              <div class="ritual-info">
+                <span class="ritual-name">Long run</span>
+                <span class="ritual-meta">
+                  <span class="meta-period">Monthly</span>
+                  <span class="status-dot on-track"></span>
+                  <span class="meta-status on-track">On track</span>
+                </span>
+              </div>
+              <span class="ritual-score">2<span class="denom">/3</span></span>
+              <div class="stepper" role="group" aria-label="Adjust today's logs">
+                <button type="button" aria-label="Undo last log">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                </button>
+                <span class="count">1</span>
+                <button type="button" aria-label="Log again">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill momentum" style="width: 67%;"></div>
+            </div>
+          </article>
+        </div>
+      </details>
     </main>
 
     <!-- FAB: Strive AI -->
