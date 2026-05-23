@@ -10,6 +10,7 @@ import { RitualLogProvider } from "@/components/rituals/ritual-log-provider";
 import { RitualMeta } from "@/components/rituals/ritual-meta";
 import { TheArc } from "@/components/rituals/the-arc";
 import { TheArcLive } from "@/components/rituals/the-arc-live";
+import { todayInTimeZone } from "@/lib/date";
 import { Link } from "@/lib/i18n/navigation";
 import {
   deriveMomentumStatus,
@@ -27,19 +28,6 @@ import { createClient } from "@/lib/supabase/server";
 type Props = { params: Promise<{ locale: string; id: string }> };
 
 const ARC_LOOKBACK_DAYS = 90;
-
-function todayInTimeZone(timeZone: string): string {
-  try {
-    return new Intl.DateTimeFormat("en-CA", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-  } catch {
-    return new Date().toISOString().slice(0, 10);
-  }
-}
 
 function isoDaysAgo(days: number): string {
   return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
