@@ -87,6 +87,13 @@ jobs:
             echo "$DIFF"
             echo "${DELIM}"
           } >> "$GITHUB_OUTPUT"
+          # Flag whether there is any reviewable code change, so we can skip the
+          # model call (and avoid empty/filler reviews) when there is none.
+          if [ -n "$(printf '%s' "$DIFF" | tr -d '[:space:]')" ]; then
+            echo "has_diff=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_diff=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Load system prompt
         id: prompt
@@ -98,6 +105,11 @@ jobs:
 
       - name: Run AI review
         id: review
+        # Skip the model call entirely when the PR has no reviewable code change.
+        if: steps.diff.outputs.has_diff == 'true'
+        # A model hiccup (rate limit, content filter, transient error) must not fail
+        # the check or block the PR — handle it gracefully in the next step.
+        continue-on-error: true
         uses: actions/ai-inference@v1
         with:
           # Instruction-following model (GitHub Models). gpt-4o-mini balances quality
@@ -122,16 +134,46 @@ jobs:
           temperature: 0
 
       - name: Post review comment
+        if: steps.diff.outputs.has_diff == 'true'
         uses: actions/github-script@v7
         env:
           REVIEW_DATA: ${{ steps.review.outputs.response }}
         with:
           script: |
-            const body = process.env.REVIEW_DATA;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## Strive PR Agent Review\n\n${body}`
-            })
+            // Hidden marker lets us update a single comment across pushes instead
+            // of stacking a new one on every `synchronize`.
+            const marker = "<!-- strive-pr-agent -->";
+            const review = (process.env.REVIEW_DATA || "").trim();
+            const content = review
+              ? review
+              : "_The review could not be generated for this run (model unavailable or rate-limited). Push again to retry._";
+            const body = `## Strive PR Agent Review\n${marker}\n\n${content}`;
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.body && c.body.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }

@@ -120,20 +120,30 @@ jobs:
               )
               ;;
           esac
-          echo "content<<EOF" >> $GITHUB_OUTPUT
-          echo "$SNAPSHOT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          # Random delimiter: a snapshot cats whole files, one of which could
+          # contain a literal 'EOF' line and break the output otherwise.
+          DELIM="SNAPSHOT_EOF_$(date +%s)_${RANDOM}"
+          {
+            echo "content<<${DELIM}"
+            echo "$SNAPSHOT"
+            echo "${DELIM}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Load system prompt
         id: prompt
         run: |
           PROMPT=$(cat .github/prompts/strive-project-reviewer.md)
-          echo "content<<EOF" >> $GITHUB_OUTPUT
-          echo "$PROMPT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          DELIM="PROMPT_EOF_$(date +%s)_${RANDOM}"
+          {
+            echo "content<<${DELIM}"
+            echo "$PROMPT"
+            echo "${DELIM}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Run audit
         id: audit
+        # A model error must not fail the run; the next step skips on empty output.
+        continue-on-error: true
         uses: actions/ai-inference@v1
         with:
           model: openai/gpt-4o
@@ -149,8 +159,11 @@ jobs:
             ${{ steps.snapshot.outputs.content }}
           token: ${{ secrets.GITHUB_TOKEN }}
           max-tokens: 4000
+          temperature: 0
 
       - name: Create audit issue
+        # Don't open an empty issue if the model produced nothing.
+        if: steps.audit.outputs.response != ''
         uses: actions/github-script@v7
         env:
           AUDIT_OUTPUT: ${{ steps.audit.outputs.response }}
