@@ -277,6 +277,57 @@ export async function getLatestCompletedLog(
   return data?.logged_at ?? null;
 }
 
+export type CompletedLogRow = { ritual_id: string; logged_at: string };
+
+/**
+ * Completed logs since `weekStart` (Monday), for the current user (RLS-scoped).
+ * One query feeds the Rhythm view both today's per-ritual count (quick-log
+ * baseline + Done-today split) and the distinct days logged this week (the
+ * daily ritual's X/7 momentum).
+ */
+export async function getWeekCompletedLogs(
+  client: SupabaseClient<Database>,
+  weekStart: string,
+): Promise<CompletedLogRow[]> {
+  const { data, error } = await client
+    .from("ritual_logs")
+    .select("ritual_id, logged_at")
+    .eq("status_id", "completed")
+    .gte("logged_at", weekStart);
+
+  if (error) throw error;
+
+  return (data ?? []).filter(
+    (row): row is CompletedLogRow => row.ritual_id != null && row.logged_at != null,
+  );
+}
+
+/**
+ * Which of the given rituals have at least one completed log (any date). Used
+ * to tell whether a one-time ritual is already done. Returns an empty set
+ * without a round-trip when the input is empty.
+ */
+export async function getCompletedRitualIds(
+  client: SupabaseClient<Database>,
+  ritualIds: string[],
+): Promise<Set<string>> {
+  if (ritualIds.length === 0) return new Set();
+
+  const { data, error } = await client
+    .from("ritual_logs")
+    .select("ritual_id")
+    .eq("status_id", "completed")
+    .in("ritual_id", ritualIds);
+
+  if (error) throw error;
+
+  const done = new Set<string>();
+  for (const row of data ?? []) {
+    if (row.ritual_id) done.add(row.ritual_id);
+  }
+  return done;
+}
+
 export function deriveMomentumStatus(
   ritualType: string,
   completionRate: number | null,
@@ -285,6 +336,22 @@ export function deriveMomentumStatus(
   if (completionRate === null) return "resting";
   if (completionRate >= 80) return "strong";
   if (completionRate >= 40) return "steady";
+  return "resting";
+}
+
+/**
+ * Momentum for a daily ritual, paced against the week so far: days done vs days
+ * elapsed (Mon = 1 … today). This avoids the early-week trap of `daysDone / 7`,
+ * where a perfect Tuesday (2/2) would otherwise read as 2/7 = "behind".
+ */
+export function deriveDailyMomentum(
+  daysDone: number,
+  daysElapsed: number,
+): MomentumStatus {
+  if (daysElapsed <= 0) return "resting";
+  const pace = (daysDone / daysElapsed) * 100;
+  if (pace >= 80) return "strong";
+  if (pace >= 40) return "steady";
   return "resting";
 }
 
