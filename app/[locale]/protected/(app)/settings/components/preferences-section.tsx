@@ -60,14 +60,14 @@ export function PreferencesSection() {
           <SegmentedButton
             active={locale === "en"}
             onClick={() => switchLocale("en")}
-            aria-label="English"
+            aria-label={tPref("languageEnglish")}
           >
             EN
           </SegmentedButton>
           <SegmentedButton
             active={locale === "fr"}
             onClick={() => switchLocale("fr")}
-            aria-label="Français"
+            aria-label={tPref("languageFrench")}
           >
             FR
           </SegmentedButton>
