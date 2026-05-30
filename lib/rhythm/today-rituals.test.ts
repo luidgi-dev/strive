@@ -100,7 +100,7 @@ describe("selectTodayRituals — daily quota for high targets", () => {
     expect(ids(res.done)).toEqual(["w5"]);
   });
 
-  it("is done when the period target is already met, even with no log today", () => {
+  it("drops off Rhythm when the period target is met and nothing logged today", () => {
     const weekly = makeRitual({
       id: "wt",
       frequency_unit: "week",
@@ -109,8 +109,23 @@ describe("selectTodayRituals — daily quota for high targets", () => {
     const res = run([weekly], {
       progress: new Map([["wt", { completionRate: 100, logsThisPeriod: 3 }]]),
     });
-    expect(ids(res.done)).toEqual(["wt"]);
-    expect(res.done[0].initialLogCount).toBe(0);
+    expect(res.active).toHaveLength(0);
+    expect(res.done).toHaveLength(0);
+  });
+
+  it("still shows as done on the day the period target is reached by logging", () => {
+    const weekly = makeRitual({
+      id: "wt2",
+      frequency_unit: "week",
+      frequency_value: 3,
+    });
+    // Third log of the period happens today (quota 1) -> done today, not hidden.
+    const res = run([weekly], {
+      progress: new Map([["wt2", { completionRate: 100, logsThisPeriod: 3 }]]),
+      weekLogs: [{ ritual_id: "wt2", logged_at: TODAY }],
+    });
+    expect(ids(res.done)).toEqual(["wt2"]);
+    expect(res.done[0].initialLogCount).toBe(1);
   });
 });
 
