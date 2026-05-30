@@ -47,6 +47,8 @@
       "themeLight": "Clair",
       "themeDark": "Sombre",
       "themeSystem": "Système",
+      "languageEnglish": "English",
+      "languageFrench": "Français",
       "smartReminders": "Rappels intelligents",
       "comingSoon": "Bientôt"
     },
@@ -384,6 +386,8 @@
         "monthly": "Mensuel"
       },
       "target": {
+        "decrease": "Diminuer",
+        "increase": "Augmenter",
         "unit": {
           "week": "× par semaine",
           "month": "× par mois"
