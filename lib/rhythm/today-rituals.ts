@@ -140,12 +140,18 @@ export function selectTodayRituals({
       satisfied = false;
       countsTowardDay = false;
     } else {
-      // Recurring: done for today once today's logs reach the daily quota, or
-      // the whole period target is already met.
-      initialLogCount = loggedToday;
+      // Recurring: clears to "Done today" once today's logs reach the daily
+      // quota. If the whole period target is already met and nothing qualifying
+      // was logged today, the ritual leaves Rhythm entirely — a met week/month
+      // shouldn't linger as "Done today" on the remaining days. It stays
+      // loggable from the rituals list. The day the target is reached by
+      // logging, loggedEnoughToday keeps it visible as done for that day.
+      const loggedEnoughToday = loggedToday >= dailyQuota(ritual, today);
       const target = ritual.frequency_value ?? 0;
       const targetMet = target > 0 && (progress?.logsThisPeriod ?? 0) >= target;
-      satisfied = loggedToday >= dailyQuota(ritual, today) || targetMet;
+      if (targetMet && !loggedEnoughToday) continue;
+      initialLogCount = loggedToday;
+      satisfied = loggedEnoughToday;
     }
 
     (satisfied ? done : active).push({

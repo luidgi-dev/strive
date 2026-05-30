@@ -7,6 +7,7 @@ import type {
   RitualProgressEntry,
   RitualWithCategory,
 } from "@/lib/data/rituals";
+import { Link } from "@/lib/i18n/navigation";
 import { deriveRhythmCardView } from "@/lib/rhythm/today-rituals";
 import { MOMENTUM_TOKENS, ritualPeriodLabel } from "@/lib/rituals/presentation";
 import { cn } from "@/lib/utils";
@@ -39,42 +40,48 @@ export async function RhythmCard({
   return (
     <article
       className={cn(
-        "flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 transition-colors",
+        "flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-foreground/20",
         // Logged today: subtle off-white outline (same cue as elsewhere).
         loggedToday && "border-foreground/20",
       )}
     >
       <div className="flex items-center gap-3">
-        <span
-          aria-hidden
-          className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent text-lg text-muted-foreground"
+        {/* Tapping the ritual opens its detail / The Arc view, like Rituals. */}
+        <Link
+          href={`/protected/rituals/${ritual.id}`}
+          className="group flex min-h-[44px] min-w-0 flex-1 items-center gap-3 rounded-lg text-left transition-opacity hover:opacity-80"
         >
-          {ritual.icon ?? "•"}
-        </span>
-
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="font-heading text-[15px] font-semibold leading-tight tracking-tight text-foreground">
-            {ritual.name}
+          <span
+            aria-hidden
+            className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent text-lg text-muted-foreground"
+          >
+            {ritual.icon ?? "•"}
           </span>
-          <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <span className="font-medium">{meta}</span>
-            {status ? (
-              <>
-                <span aria-hidden>·</span>
-                <MomentumPill status={status} />
-              </>
-            ) : null}
-          </span>
-        </div>
 
-        {showProgress ? (
-          <span className="shrink-0 font-heading text-2xl font-bold leading-none tracking-tight text-foreground">
-            {numerator}
-            <span className="font-sans text-sm font-medium text-muted-foreground">
-              /{denominator}
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="font-heading text-[15px] font-semibold leading-tight tracking-tight text-foreground">
+              {ritual.name}
+            </span>
+            <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <span className="font-medium">{meta}</span>
+              {status ? (
+                <>
+                  <span aria-hidden>·</span>
+                  <MomentumPill status={status} />
+                </>
+              ) : null}
             </span>
           </span>
-        ) : null}
+
+          {showProgress ? (
+            <span className="shrink-0 font-heading text-2xl font-bold leading-none tracking-tight text-foreground">
+              {numerator}
+              <span className="font-sans text-sm font-medium text-muted-foreground">
+                /{denominator}
+              </span>
+            </span>
+          ) : null}
+        </Link>
 
         <RitualLogProvider
           ritualId={ritual.id}
