@@ -49,7 +49,7 @@ export async function RhythmCard({
         {/* Tapping the ritual opens its detail / The Arc view, like Rituals. */}
         <Link
           href={`/protected/rituals/${ritual.id}`}
-          className="group flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left transition-opacity hover:opacity-80"
+          className="group flex min-h-[44px] min-w-0 flex-1 items-center gap-3 rounded-lg text-left transition-opacity hover:opacity-80"
         >
           <span
             aria-hidden
