@@ -287,6 +287,8 @@ export function RitualForm({
                       min={1}
                       max={99}
                       ariaLabel={t("fields.target")}
+                      decreaseLabel={t("target.decrease")}
+                      increaseLabel={t("target.increase")}
                     />
                   )}
                 />
