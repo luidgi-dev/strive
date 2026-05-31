@@ -20,6 +20,7 @@ The full product specification lives in `[docs/PRODUCT_SPEC.md](docs/PRODUCT_SPE
 - **next-intl** for routing-aware i18n (`en`, `fr`)
 - **Tailwind CSS v4** + shadcn/Base UI primitives
 - **next-themes** for light/dark theming
+- **Vercel AI SDK** (`ai` + `@ai-sdk/google`) with Google **Gemini** (`gemini-2.5-flash`) for the app's AI features
 - **Vitest** for unit tests (pure logic: dates, momentum, scheduling)
 
 ## Repository structure
@@ -42,12 +43,13 @@ Root files like `proxy.ts`, `i18n.ts`, `next.config.ts`, `tsconfig.json` are bui
 
 ## Quick start
 
-Prerequisites: Node.js 20+, npm.
+Prerequisites: Node.js 24+ (see `.nvmrc`), npm.
 
 1. Create a `.env.local` at the repo root with:
   ```env
    NEXT_PUBLIC_SUPABASE_URL=...
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+   GOOGLE_GENERATIVE_AI_API_KEY=...   # AI features (Gemini); optional STRIVE_AI_MODEL overrides the model
   ```
 2. Install and run:
   ```bash
