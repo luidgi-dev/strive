@@ -21,9 +21,9 @@ import { createClient } from "@/lib/supabase/server";
  * with a locale prefix; the client still posts to `/api/chat`.
  */
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
-
-  // Authenticate server-side; proxy.ts has already refreshed the session cookie.
+  // Authenticate first: reject anonymous requests before doing any work, and
+  // make it unambiguous that the user id comes only from the verified session
+  // (proxy.ts has already refreshed the session cookie).
   const supabase = await createClient();
   const {
     data: { user },
@@ -32,6 +32,10 @@ export async function POST(req: Request) {
   if (!user) {
     return new Response("Unauthorized", { status: 401 });
   }
+
+  // Only the conversation history is read from the request body; the user id is
+  // never derived from it — tools are bound to the verified `user.id` below.
+  const { messages }: { messages: UIMessage[] } = await req.json();
 
   const result = streamText({
     model: striveAIModel,
