@@ -431,7 +431,43 @@
       }
     },
     "ai": {
-      "openLabel": "Parler à l'IA Strive"
+      "openLabel": "Parler à l'IA Strive",
+      "title": "Mon Strive",
+      "placeholder": "Qu'as-tu fait aujourd'hui ?",
+      "closeLabel": "Fermer",
+      "sendLabel": "Envoyer",
+      "recordLabel": "Enregistrer un message vocal",
+      "recording": "Enregistrement",
+      "stopLabel": "Envoyer le message vocal",
+      "cancelLabel": "Annuler",
+      "micDenied": "L'accès au micro est bloqué. Active-le dans les réglages de ton navigateur.",
+      "voiceMessage": "Message vocal",
+      "voicePlayLabel": "Lire le message vocal",
+      "voicePauseLabel": "Mettre en pause le message vocal",
+      "thinkingLabel": "Strive réfléchit",
+      "errorMessage": "Un problème est survenu de mon côté. Réessaie dans un instant.",
+      "suggestions": {
+        "momentum": "Où en est mon momentum cette semaine ?",
+        "log": "Enregistre ma course",
+        "list": "Quels sont mes rituels ?"
+      },
+      "cards": {
+        "momentumTitle": "Momentum",
+        "ritualsTitle": "Tes rituels",
+        "logged": "Enregistré",
+        "undo": "Annuler",
+        "undoing": "Annulation…",
+        "undone": "Retiré",
+        "pickRitual": "Quel rituel ?",
+        "period": {
+          "daily": "Quotidien",
+          "weekly": "Hebdo",
+          "monthly": "Mensuel",
+          "one_time": "Ponctuel",
+          "open": "Libre"
+        }
+      },
+      "greeting": "Je suis ton IA Strive. Je t'aide à enregistrer tes rituels, suivre ton momentum et garder ton rythme. Sur quoi puis-je t'aider ?"
     }
   },
   "rhythm": {

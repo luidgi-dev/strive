@@ -20,6 +20,8 @@ Shared utilities and client libraries for the Strive web app.
   - `types.ts` — shared types for the AI layer (`StriveSupabaseClient`, `StriveToolContext`).
 
   Consumed by the chat route at `app/[locale]/api/chat/route.ts` (POST), which authenticates the user, then `streamText`s the reply via `toUIMessageStreamResponse()`. The route lives under `[locale]/` because `proxy.ts` rewrites every non-static path with a locale prefix.
+
+  The user-facing surface is `components/chat/` (a floating glass panel opened by the FAB on Rhythm), which calls this route through the AI SDK v6 `useChat` hook (`@ai-sdk/react`). See `components/chat/` for the UI pieces.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
 - `date.ts` — Date helpers: `todayInTimeZone`, `isoWeekday`, `startOfWeek`, `daysInMonth`
 - `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `deriveMomentumStatus`, `deriveDailyMomentum`, plus `insertRitualLog`/`insertRitual` write helpers used by the AI tools — tagged `logged_via: "ai"`)

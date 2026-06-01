@@ -1,13 +1,17 @@
 import { tool, type ToolSet } from "ai";
 import { z } from "zod";
 
+import { startOfWeek } from "@/lib/date";
 import {
-  deriveMomentumStatus,
+  buildMomentumView,
+  weekDayCountsByRitual,
+} from "@/lib/data/momentum";
+import {
   getRitualProgress,
   getRitualsForActiveUser,
+  getWeekCompletedLogs,
   insertRitual,
   insertRitualLog,
-  type MomentumStatus,
 } from "@/lib/data/rituals";
 import {
   FREQUENCY_UNITS,
@@ -16,7 +20,6 @@ import {
   type RitualFormValues,
 } from "@/lib/data/rituals-schema";
 import { ensureProfile, getUserToday } from "@/lib/profile";
-import { isRitualFresh } from "@/lib/rituals/presentation";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -41,37 +44,6 @@ function describePeriod(
         ? "monthly"
         : "weekly";
   return { period: frequencyUnit, period_label };
-}
-
-/**
- * Momentum status mirroring the Rhythm card: suppressed (null) for a brand-new
- * ritual with no logs yet, otherwise derived from the completion rate (null for
- * non-recurring rituals).
- */
-function deriveStatus(
-  ritualType: string,
-  completionRate: number | null,
-  logsThisPeriod: number | null,
-  createdAt: string,
-): MomentumStatus | null {
-  if ((logsThisPeriod ?? 0) === 0 && isRitualFresh(createdAt)) return null;
-  return deriveMomentumStatus(ritualType, completionRate);
-}
-
-/**
- * Whether the user is keeping pace this period. Only meaningful for recurring
- * rituals: the `ritual_progress` view counts `logs_this_period` against today
- * for non-recurring rituals, so a one_time done earlier would wrongly read as
- * off-track. Returns null for open/one_time (and for fresh, status-suppressed
- * recurring rituals).
- */
-function deriveOnTrack(
-  ritualType: string,
-  status: MomentumStatus | null,
-): boolean | null {
-  if (ritualType !== "recurring") return null;
-  if (status === null) return null;
-  return status !== "resting";
 }
 
 type ResolvedRitual = {
@@ -153,18 +125,41 @@ export function striveTools(
   return {
     list_rituals: tool({
       description:
-        "List the user's active rituals. Also useful to discover ritual names before logging or asking about momentum.",
-      inputSchema: z.object({}),
-      execute: async () => {
-        const { rituals, progressByRitualId } =
-          await getRitualsForActiveUser(supabase);
+        "List the user's active rituals, optionally filtered to one category. Also useful to discover ritual names before logging or asking about momentum.",
+      inputSchema: z.object({
+        category_name: z
+          .string()
+          .optional()
+          .describe(
+            "Optional category to filter by (e.g. 'Movement'), matched case-insensitively. Omit to list every ritual.",
+          ),
+      }),
+      execute: async ({ category_name }) => {
+        const today = await getUserToday(supabase);
+        const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
+          getRitualsForActiveUser(supabase),
+          getWeekCompletedLogs(supabase, startOfWeek(today)),
+        ]);
+        const weekDays = weekDayCountsByRitual(weekLogs);
+
+        const filter = category_name?.trim().toLowerCase();
+        const scoped = filter
+          ? rituals.filter((r) => r.category?.name.toLowerCase() === filter)
+          : rituals;
+
         return {
-          count: rituals.length,
-          rituals: rituals.map((r) => {
-            const progress = progressByRitualId.get(r.id);
+          count: scoped.length,
+          category: category_name?.trim() ?? null,
+          rituals: scoped.map((r) => {
             const { period, period_label } = describePeriod(
               r.ritual_type,
               r.frequency_unit,
+            );
+            const view = buildMomentumView(
+              r,
+              progressByRitualId.get(r.id),
+              weekDays.get(r.id) ?? 0,
+              today,
             );
             return {
               id: r.id,
@@ -175,12 +170,7 @@ export function striveTools(
               period,
               period_label,
               category: r.category?.name ?? null,
-              momentum_status: deriveStatus(
-                r.ritual_type,
-                progress?.completionRate ?? null,
-                progress?.logsThisPeriod ?? null,
-                r.created_at,
-              ),
+              momentum_status: view.momentum_status,
             };
           }),
         };
@@ -199,8 +189,12 @@ export function striveTools(
           ),
       }),
       execute: async ({ ritual_name }) => {
-        const { rituals, progressByRitualId } =
-          await getRitualsForActiveUser(supabase);
+        const today = await getUserToday(supabase);
+        const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
+          getRitualsForActiveUser(supabase),
+          getWeekCompletedLogs(supabase, startOfWeek(today)),
+        ]);
+        const weekDays = weekDayCountsByRitual(weekLogs);
 
         let scoped = rituals;
         if (ritual_name) {
@@ -216,23 +210,20 @@ export function striveTools(
         return {
           status: "ok" as const,
           rituals: scoped.map((r) => {
-            const progress = progressByRitualId.get(r.id);
-            const logs_this_period = progress?.logsThisPeriod ?? null;
-            const { period } = describePeriod(r.ritual_type, r.frequency_unit);
-            const momentum_status = deriveStatus(
-              r.ritual_type,
-              progress?.completionRate ?? null,
-              logs_this_period,
-              r.created_at,
+            const view = buildMomentumView(
+              r,
+              progressByRitualId.get(r.id),
+              weekDays.get(r.id) ?? 0,
+              today,
             );
             return {
               name: r.name,
               ritual_type: r.ritual_type,
-              logs_this_period,
-              target: progress?.target ?? null,
-              period,
-              momentum_status,
-              on_track: deriveOnTrack(r.ritual_type, momentum_status),
+              logs_this_period: view.logs_this_period,
+              target: view.target,
+              period: view.period,
+              momentum_status: view.momentum_status,
+              on_track: view.on_track,
             };
           }),
         };
@@ -264,35 +255,46 @@ export function striveTools(
         if (resolution.status !== "ok") return resolution;
         const ritual = resolution.ritual;
 
-        const date = logged_at ?? (await getUserToday(supabase));
+        const today = await getUserToday(supabase);
+        const date = logged_at ?? today;
 
         await ensureProfile(supabase, { id: userId });
-        await insertRitualLog(supabase, {
+        const { id: log_id } = await insertRitualLog(supabase, {
           ritualId: ritual.id,
           userId,
           loggedAt: date,
           note,
         });
 
-        const progress = await getRitualProgress(supabase, ritual.id);
-        const logs_this_period = progress?.logsThisPeriod ?? null;
-        const { period } = describePeriod(ritual.ritual_type, ritual.frequency_unit);
+        // Re-read momentum the same way the Rhythm cards present it, so the
+        // confirmation matches what the user sees (daily rituals framed as X/7).
+        const [progress, weekLogs] = await Promise.all([
+          getRitualProgress(supabase, ritual.id),
+          getWeekCompletedLogs(supabase, startOfWeek(today)),
+        ]);
+        const weekDaysCount = new Set(
+          weekLogs
+            .filter((log) => log.ritual_id === ritual.id)
+            .map((log) => log.logged_at),
+        ).size;
+        const view = buildMomentumView(
+          ritual,
+          progress ?? undefined,
+          weekDaysCount,
+          today,
+        );
 
         return {
           status: "ok" as const,
           logged: true,
+          log_id,
           ritual_name: ritual.name,
           date,
           momentum: {
-            logs_this_period,
-            target: progress?.target ?? null,
-            period,
-            status: deriveStatus(
-              ritual.ritual_type,
-              progress?.completionRate ?? null,
-              logs_this_period,
-              ritual.created_at,
-            ),
+            logs_this_period: view.logs_this_period,
+            target: view.target,
+            period: view.period,
+            status: view.momentum_status,
           },
         };
       },
