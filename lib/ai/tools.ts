@@ -1,18 +1,17 @@
 import { tool, type ToolSet } from "ai";
 import { z } from "zod";
 
-import { isoWeekday, startOfWeek } from "@/lib/date";
+import { startOfWeek } from "@/lib/date";
 import {
-  type CompletedLogRow,
-  deriveDailyMomentum,
-  deriveMomentumStatus,
+  buildMomentumView,
+  weekDayCountsByRitual,
+} from "@/lib/data/momentum";
+import {
   getRitualProgress,
   getRitualsForActiveUser,
   getWeekCompletedLogs,
   insertRitual,
   insertRitualLog,
-  type MomentumStatus,
-  type RitualProgressEntry,
 } from "@/lib/data/rituals";
 import {
   FREQUENCY_UNITS,
@@ -21,7 +20,6 @@ import {
   type RitualFormValues,
 } from "@/lib/data/rituals-schema";
 import { ensureProfile, getUserToday } from "@/lib/profile";
-import { isRitualFresh } from "@/lib/rituals/presentation";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -46,94 +44,6 @@ function describePeriod(
         ? "monthly"
         : "weekly";
   return { period: frequencyUnit, period_label };
-}
-
-// A week is seven days; daily rituals are framed against this weekly target
-// (mirrors DAILY_WEEK_TARGET in lib/rhythm/today-rituals.ts).
-const DAILY_WEEK_TARGET = 7;
-
-type MomentumFields = {
-  ritual_type: string;
-  frequency_unit: string | null;
-  frequency_value: number | null;
-  created_at: string;
-};
-
-type MomentumView = {
-  logs_this_period: number | null;
-  target: number | null;
-  period: "week" | "month" | null;
-  momentum_status: MomentumStatus | null;
-  on_track: boolean | null;
-};
-
-/** Distinct days logged this week per ritual id (drives a daily ritual's X/7). */
-function weekDayCountsByRitual(
-  weekLogs: CompletedLogRow[],
-): Map<string, number> {
-  const days = new Map<string, Set<string>>();
-  for (const log of weekLogs) {
-    const set = days.get(log.ritual_id) ?? new Set<string>();
-    set.add(log.logged_at);
-    days.set(log.ritual_id, set);
-  }
-  const counts = new Map<string, number>();
-  for (const [id, set] of days) counts.set(id, set.size);
-  return counts;
-}
-
-/**
- * Per-ritual momentum exactly as the Rhythm cards present it (mirrors
- * `deriveRhythmCardView`): daily rituals are framed weekly (X/7, pace-based
- * momentum over elapsed weekdays), weekly/monthly use their period target, and
- * one_time/open carry no target. Fresh rituals with nothing logged suppress
- * momentum so the chat and the cards agree.
- */
-function buildMomentumView(
-  fields: MomentumFields,
-  progress: RitualProgressEntry | undefined,
-  weekDaysCount: number,
-  today: string,
-): MomentumView {
-  const isFresh = isRitualFresh(fields.created_at);
-  const isDaily =
-    fields.ritual_type === "recurring" && fields.frequency_unit === "day";
-  const isPeriodic =
-    fields.ritual_type === "recurring" &&
-    (fields.frequency_unit === "week" || fields.frequency_unit === "month") &&
-    (fields.frequency_value ?? 0) > 0;
-
-  let logs_this_period: number | null = null;
-  let target: number | null = null;
-  let period: "week" | "month" | null = null;
-  let momentum_status: MomentumStatus | null = null;
-
-  if (isDaily) {
-    logs_this_period = weekDaysCount;
-    target = DAILY_WEEK_TARGET;
-    period = "week";
-    momentum_status =
-      weekDaysCount === 0 && isFresh
-        ? null
-        : deriveDailyMomentum(weekDaysCount, isoWeekday(today));
-  } else if (isPeriodic) {
-    const logs = progress?.logsThisPeriod ?? 0;
-    logs_this_period = logs;
-    target = fields.frequency_value;
-    period = fields.frequency_unit === "month" ? "month" : "week";
-    momentum_status =
-      logs === 0 && isFresh
-        ? null
-        : deriveMomentumStatus(fields.ritual_type, progress?.completionRate ?? null);
-  }
-  // one_time / open: no target, no momentum (everything stays null).
-
-  const on_track =
-    fields.ritual_type === "recurring" && momentum_status !== null
-      ? momentum_status !== "resting"
-      : null;
-
-  return { logs_this_period, target, period, momentum_status, on_track };
 }
 
 type ResolvedRitual = {
@@ -215,18 +125,32 @@ export function striveTools(
   return {
     list_rituals: tool({
       description:
-        "List the user's active rituals. Also useful to discover ritual names before logging or asking about momentum.",
-      inputSchema: z.object({}),
-      execute: async () => {
+        "List the user's active rituals, optionally filtered to one category. Also useful to discover ritual names before logging or asking about momentum.",
+      inputSchema: z.object({
+        category_name: z
+          .string()
+          .optional()
+          .describe(
+            "Optional category to filter by (e.g. 'Movement'), matched case-insensitively. Omit to list every ritual.",
+          ),
+      }),
+      execute: async ({ category_name }) => {
         const today = await getUserToday(supabase);
         const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
           getRitualsForActiveUser(supabase),
           getWeekCompletedLogs(supabase, startOfWeek(today)),
         ]);
         const weekDays = weekDayCountsByRitual(weekLogs);
+
+        const filter = category_name?.trim().toLowerCase();
+        const scoped = filter
+          ? rituals.filter((r) => r.category?.name.toLowerCase() === filter)
+          : rituals;
+
         return {
-          count: rituals.length,
-          rituals: rituals.map((r) => {
+          count: scoped.length,
+          category: category_name?.trim() ?? null,
+          rituals: scoped.map((r) => {
             const { period, period_label } = describePeriod(
               r.ritual_type,
               r.frequency_unit,
@@ -335,7 +259,7 @@ export function striveTools(
         const date = logged_at ?? today;
 
         await ensureProfile(supabase, { id: userId });
-        await insertRitualLog(supabase, {
+        const { id: log_id } = await insertRitualLog(supabase, {
           ritualId: ritual.id,
           userId,
           loggedAt: date,
@@ -363,6 +287,7 @@ export function striveTools(
         return {
           status: "ok" as const,
           logged: true,
+          log_id,
           ritual_name: ritual.name,
           date,
           momentum: {
