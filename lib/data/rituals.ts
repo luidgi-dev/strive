@@ -420,15 +420,36 @@ export function groupRitualsByCategory(
 export async function insertRitualLog(
   client: SupabaseClient<Database>,
   args: { ritualId: string; userId: string; loggedAt: string; note?: string | null },
+): Promise<{ id: string }> {
+  const { data, error } = await client
+    .from("ritual_logs")
+    .insert({
+      ritual_id: args.ritualId,
+      user_id: args.userId,
+      status_id: "completed",
+      logged_at: args.loggedAt,
+      logged_via: "ai",
+      note: args.note ?? null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return { id: data.id };
+}
+
+/**
+ * Delete a single ritual log by id, scoped to the owner. Used by the chat's
+ * "undo" card after an AI log. Safe to call with a log that no longer exists.
+ */
+export async function deleteRitualLog(
+  client: SupabaseClient<Database>,
+  args: { logId: string; userId: string },
 ): Promise<void> {
-  const { error } = await client.from("ritual_logs").insert({
-    ritual_id: args.ritualId,
-    user_id: args.userId,
-    status_id: "completed",
-    logged_at: args.loggedAt,
-    logged_via: "ai",
-    note: args.note ?? null,
-  });
+  const { error } = await client
+    .from("ritual_logs")
+    .delete()
+    .eq("id", args.logId)
+    .eq("user_id", args.userId);
   if (error) throw error;
 }
 
