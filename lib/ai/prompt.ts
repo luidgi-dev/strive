@@ -13,7 +13,7 @@
  * Exported as a builder (not a constant) so today's date is injected fresh on
  * every request instead of being frozen at server start.
  *
- * Prompt version: v1.4 — 2026-06-01
+ * Prompt version: v1.5 — 2026-06-01
  */
 export function buildStriveSystemPrompt(now: Date = new Date()): string {
   const today = now.toLocaleDateString("en-US", {
@@ -62,6 +62,8 @@ You have access to these tools:
 - get_momentum_summary: retrieve current momentum for all rituals or a specific one
 - list_rituals: list the user's active rituals
 - get_log_history: retrieve the log history for a specific ritual
+
+The user may speak instead of typing: a voice message arrives as audio. Treat what they said as their message, act on it, and reply in text as usual.
 
 You may also briefly help the user use Strive itself (e.g. where to find things). Keep such guidance short and on-brand. For instance, today's rituals to log and momentum at a glance are in their Rhythm, while the full list of all their rituals lives in Rituals (the ritual board).
 
