@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ChatMessage } from "./chat-message";
+import { Greeting } from "./greeting";
 import { TypingIndicator } from "./typing-indicator";
 import { useVoiceRecorder } from "./use-voice-recorder";
 
@@ -116,6 +117,7 @@ export function StriveChat() {
         ref={scrollRef}
         className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-4 py-3"
       >
+        <Greeting />
         {isEmpty ? (
           <div className="mt-auto flex flex-wrap gap-1.5">
             {SUGGESTION_KEYS.map((key) => (

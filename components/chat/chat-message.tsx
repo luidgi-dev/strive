@@ -1,41 +1,52 @@
-import type { UIMessage } from "ai";
+import { isToolUIPart, type UIMessage } from "ai";
 
-import { cn } from "@/lib/utils";
-
+import { ToolCard } from "./cards/tool-card";
 import { VoiceMessage } from "./voice-message";
 
 /**
- * A single chat bubble. User messages sit right with a subtle fill; agent
- * messages sit left in the accent surface (no avatar, per the minimal design).
- * A user voice message renders as a playable bubble; otherwise we render text.
- * Tool/step parts are ignored for now (until the interactive-card follow-up).
+ * A single chat message. User messages sit right (a voice message renders as a
+ * playable bubble, otherwise text). Assistant messages render any tool calls as
+ * cards, followed by the model's short accompanying text (left, minimal, no
+ * avatar). Step parts are ignored.
  */
 export function ChatMessage({ message }: { message: UIMessage }) {
-  const isUser = message.role === "user";
-
-  const audioPart = message.parts.find(
-    (part) => part.type === "file" && part.mediaType.startsWith("audio/"),
-  );
-  if (audioPart?.type === "file") {
-    return <VoiceMessage url={audioPart.url} />;
+  if (message.role === "user") {
+    const audioPart = message.parts.find(
+      (part) => part.type === "file" && part.mediaType.startsWith("audio/"),
+    );
+    if (audioPart?.type === "file") {
+      return <VoiceMessage url={audioPart.url} />;
+    }
+    const text = textOf(message);
+    if (!text) return null;
+    return (
+      <div className="max-w-[84%] self-end whitespace-pre-wrap break-words rounded-[18px_18px_4px_18px] bg-foreground/10 px-3 py-2 text-sm leading-snug text-foreground">
+        {text}
+      </div>
+    );
   }
 
-  const text = message.parts
-    .map((part) => (part.type === "text" ? part.text : ""))
-    .join("");
-
-  if (!text) return null;
+  const toolParts = message.parts.filter(isToolUIPart);
+  const text = textOf(message);
+  if (toolParts.length === 0 && !text) return null;
 
   return (
-    <div
-      className={cn(
-        "max-w-[84%] whitespace-pre-wrap break-words px-3 py-2 text-sm leading-snug text-foreground",
-        isUser
-          ? "self-end rounded-[18px_18px_4px_18px] bg-foreground/10"
-          : "self-start rounded-[18px_18px_18px_4px] bg-accent",
-      )}
-    >
-      {text}
-    </div>
+    <>
+      {toolParts.map((part, index) => (
+        <ToolCard key={part.toolCallId ?? index} part={part} />
+      ))}
+      {text ? (
+        <div className="max-w-[84%] self-start whitespace-pre-wrap break-words rounded-[18px_18px_18px_4px] bg-accent px-3 py-2 text-sm leading-snug text-foreground">
+          {text}
+        </div>
+      ) : null}
+    </>
   );
+}
+
+function textOf(message: UIMessage): string {
+  return message.parts
+    .map((part) => (part.type === "text" ? part.text : ""))
+    .join("")
+    .trim();
 }
