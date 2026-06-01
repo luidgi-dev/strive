@@ -16,13 +16,13 @@ Shared utilities and client libraries for the Strive web app.
 - `ai/` — Vercel AI SDK setup
   - `client.ts` — Shared, typed Gemini model singleton (`striveAIModel`, default `gemini-2.5-flash`). Reads `GOOGLE_GENERATIVE_AI_API_KEY`; the model id is overridable via `STRIVE_AI_MODEL`. Reuse this instead of re-instantiating a provider per call.
   - `prompt.ts` — `buildStriveSystemPrompt(now?)`: builds the agent's system prompt (identity, terminology, capabilities, per-tool response format, guardrails), injecting today's date at call time. Versioned; mirrors `docs/UX_WRITING.md`.
-  - `tools.ts` — `striveTools(supabase, userId)` factory returning the agent's tool set, bound to the verified user (empty until LUI-37).
+  - `tools.ts` — `striveTools(supabase, userId)` factory returning the agent's 5 tools (`list_rituals`, `get_momentum_summary`, `log_ritual`, `create_ritual`, `get_log_history`), each bound to the verified user. Tools resolve rituals by name (case-insensitive, structured not-found/ambiguous results), return rich momentum context, and reuse the `lib/data/rituals.ts` read/write helpers.
   - `types.ts` — shared types for the AI layer (`StriveSupabaseClient`, `StriveToolContext`).
 
   Consumed by the chat route at `app/[locale]/api/chat/route.ts` (POST), which authenticates the user, then `streamText`s the reply via `toUIMessageStreamResponse()`. The route lives under `[locale]/` because `proxy.ts` rewrites every non-static path with a locale prefix.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
 - `date.ts` — Date helpers: `todayInTimeZone`, `isoWeekday`, `startOfWeek`, `daysInMonth`
-- `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `deriveMomentumStatus`, `deriveDailyMomentum`)
+- `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `deriveMomentumStatus`, `deriveDailyMomentum`, plus `insertRitualLog`/`insertRitual` write helpers used by the AI tools — tagged `logged_via: "ai"`)
 - `rituals/` — Ritual presentation logic: `presentation.ts` (period label, momentum tokens, freshness), `category-label.ts`, `arc.ts`
 - `rhythm/` — `today-rituals.ts`: pure `selectTodayRituals` deciding what shows on the Rhythm home today (scope, daily quota, Done-today split)
 

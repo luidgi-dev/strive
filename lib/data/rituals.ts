@@ -1,6 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { Database, Tables } from "@/lib/supabase/database.types";
+import type { RitualFormValues } from "@/lib/data/rituals-schema";
+import type {
+  Database,
+  Tables,
+  TablesInsert,
+} from "@/lib/supabase/database.types";
 
 export type RitualType = "recurring" | "one_time" | "open";
 export type FrequencyUnit = "day" | "week" | "month";
@@ -66,6 +71,8 @@ export type RitualLogHistoryEntry = Pick<
 export type RitualProgressEntry = {
   completionRate: number | null;
   logsThisPeriod: number | null;
+  /** Expected logs for the current period (null for open rituals / no target). */
+  target: number | null;
 };
 
 export type RitualsData = {
@@ -106,7 +113,7 @@ export async function getRitualsForActiveUser(
     // Only active categories resolve; a ritual still pointing at an archived
     // category (e.g. a failed detach) gracefully falls back to "Other".
     client.from("ritual_categories").select(CATEGORY_COLUMNS).eq("is_active", true),
-    client.from("ritual_progress").select("ritual_id, completion_rate, logs_this_period"),
+    client.from("ritual_progress").select("ritual_id, completion_rate, logs_this_period, target"),
   ]);
 
   if (ritualsRes.error) throw ritualsRes.error;
@@ -126,6 +133,7 @@ export async function getRitualsForActiveUser(
     progressByRitualId.set(p.ritual_id, {
       completionRate: p.completion_rate,
       logsThisPeriod: p.logs_this_period,
+      target: p.target,
     });
   }
 
@@ -232,7 +240,7 @@ export async function getRitualProgress(
 ): Promise<RitualProgressEntry | null> {
   const { data, error } = await client
     .from("ritual_progress")
-    .select("completion_rate, logs_this_period")
+    .select("completion_rate, logs_this_period, target")
     .eq("ritual_id", ritualId)
     .maybeSingle();
 
@@ -241,6 +249,7 @@ export async function getRitualProgress(
   return {
     completionRate: data.completion_rate,
     logsThisPeriod: data.logs_this_period,
+    target: data.target,
   };
 }
 
@@ -391,4 +400,83 @@ export function groupRitualsByCategory(
     return a.category.name.localeCompare(b.category.name);
   });
   return groups;
+}
+
+// ---------------------------------------------------------------------------
+// Writes
+//
+// Pure insert helpers (no auth concern — the caller passes a verified userId).
+// They mirror the inserts the UI server actions perform, so logging/creating a
+// ritual through the AI agent stays consistent with the app. The matching
+// server actions live in app/.../rituals/actions.ts and are intentionally not
+// reused here to keep lib/ free of any app-layer dependency.
+// ---------------------------------------------------------------------------
+
+/**
+ * Insert a "completed" log for a ritual. Tagged `logged_via: "ai"` so logs made
+ * by the agent are distinguishable from manual ones. No uniqueness check —
+ * duplicate logs on the same day are allowed, matching the app.
+ */
+export async function insertRitualLog(
+  client: SupabaseClient<Database>,
+  args: { ritualId: string; userId: string; loggedAt: string; note?: string | null },
+): Promise<void> {
+  const { error } = await client.from("ritual_logs").insert({
+    ritual_id: args.ritualId,
+    user_id: args.userId,
+    status_id: "completed",
+    logged_at: args.loggedAt,
+    logged_via: "ai",
+    note: args.note ?? null,
+  });
+  if (error) throw error;
+}
+
+/**
+ * Insert a new ritual from validated form values. Mirrors the column mapping of
+ * the `createRitual` server action (recurring → frequency fields, one_time →
+ * due_date, open → base only). Returns the new ritual id.
+ */
+export async function insertRitual(
+  client: SupabaseClient<Database>,
+  values: RitualFormValues,
+  userId: string,
+): Promise<{ id: string }> {
+  const base: TablesInsert<"rituals"> = {
+    user_id: userId,
+    name: values.name,
+    icon: values.icon ?? null,
+    description: values.description ?? null,
+    category_id: values.category_id ?? null,
+    ritual_type: values.ritual_type,
+  };
+
+  let insert: TablesInsert<"rituals"> = base;
+  if (values.ritual_type === "recurring") {
+    insert = {
+      ...base,
+      frequency_unit: values.frequency_unit,
+      frequency_value: values.frequency_value,
+      scheduled_days:
+        values.scheduled_days && values.scheduled_days.length > 0
+          ? values.scheduled_days
+          : null,
+      scheduled_time: values.scheduled_time ?? null,
+    };
+  } else if (values.ritual_type === "one_time") {
+    insert = {
+      ...base,
+      due_date: values.due_date,
+      scheduled_time: values.scheduled_time ?? null,
+    };
+  }
+
+  const { data, error } = await client
+    .from("rituals")
+    .insert(insert)
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  return { id: data.id };
 }
