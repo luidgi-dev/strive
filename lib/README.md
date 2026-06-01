@@ -15,6 +15,11 @@ Shared utilities and client libraries for the Strive web app.
   - `navigation.ts` — `createNavigation(routing)` re-exports: `Link`, `redirect`, `usePathname`, `useRouter`, `getPathname`. Use these instead of `next/link` / `next/navigation` for any internal route that needs to preserve the current locale.
 - `ai/` — Vercel AI SDK setup
   - `client.ts` — Shared, typed Gemini model singleton (`striveAIModel`, default `gemini-2.5-flash`). Reads `GOOGLE_GENERATIVE_AI_API_KEY`; the model id is overridable via `STRIVE_AI_MODEL`. Reuse this instead of re-instantiating a provider per call.
+  - `prompt.ts` — `buildStriveSystemPrompt(now?)`: builds the agent's system prompt (identity, terminology, capabilities, per-tool response format, guardrails), injecting today's date at call time. Versioned; mirrors `docs/UX_WRITING.md`.
+  - `tools.ts` — `striveTools(supabase, userId)` factory returning the agent's tool set, bound to the verified user (empty until LUI-37).
+  - `types.ts` — shared types for the AI layer (`StriveSupabaseClient`, `StriveToolContext`).
+
+  Consumed by the chat route at `app/[locale]/api/chat/route.ts` (POST), which authenticates the user, then `streamText`s the reply via `toUIMessageStreamResponse()`. The route lives under `[locale]/` because `proxy.ts` rewrites every non-static path with a locale prefix.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
 - `date.ts` — Date helpers: `todayInTimeZone`, `isoWeekday`, `startOfWeek`, `daysInMonth`
 - `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `deriveMomentumStatus`, `deriveDailyMomentum`)
