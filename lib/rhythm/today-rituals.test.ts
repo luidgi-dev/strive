@@ -107,7 +107,7 @@ describe("selectTodayRituals — daily quota for high targets", () => {
       frequency_value: 3,
     });
     const res = run([weekly], {
-      progress: new Map([["wt", { completionRate: 100, logsThisPeriod: 3 }]]),
+      progress: new Map([["wt", { completionRate: 100, logsThisPeriod: 3, target: 3 }]]),
     });
     expect(res.active).toHaveLength(0);
     expect(res.done).toHaveLength(0);
@@ -121,7 +121,7 @@ describe("selectTodayRituals — daily quota for high targets", () => {
     });
     // Third log of the period happens today (quota 1) -> done today, not hidden.
     const res = run([weekly], {
-      progress: new Map([["wt2", { completionRate: 100, logsThisPeriod: 3 }]]),
+      progress: new Map([["wt2", { completionRate: 100, logsThisPeriod: 3, target: 3 }]]),
       weekLogs: [{ ritual_id: "wt2", logged_at: TODAY }],
     });
     expect(ids(res.done)).toEqual(["wt2"]);
@@ -219,7 +219,7 @@ describe("deriveRhythmCardView", () => {
       created_at: OLD,
     });
     const view = deriveRhythmCardView(
-      { ritual, progress: { completionRate: 60, logsThisPeriod: 3 }, weekDaysCount: 0 },
+      { ritual, progress: { completionRate: 60, logsThisPeriod: 3, target: 5 }, weekDaysCount: 0 },
       TODAY,
     );
     expect(view).toMatchObject({
