@@ -450,7 +450,24 @@
         "momentum": "How am I doing this week?",
         "log": "Log my run",
         "list": "What rituals do I have?"
-      }
+      },
+      "cards": {
+        "momentumTitle": "Momentum",
+        "ritualsTitle": "Your rituals",
+        "logged": "Logged",
+        "undo": "Undo",
+        "undoing": "Undoing…",
+        "undone": "Removed",
+        "pickRitual": "Which ritual?",
+        "period": {
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "monthly": "Monthly",
+          "one_time": "One-time",
+          "open": "Open"
+        }
+      },
+      "greeting": "I'm your Strive AI. I help you log rituals, track your momentum, and keep your rhythm. What can I help with?"
     }
   },
   "rhythm": {

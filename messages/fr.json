@@ -450,7 +450,24 @@
         "momentum": "Où en est mon momentum cette semaine ?",
         "log": "Enregistre ma course",
         "list": "Quels sont mes rituels ?"
-      }
+      },
+      "cards": {
+        "momentumTitle": "Momentum",
+        "ritualsTitle": "Tes rituels",
+        "logged": "Enregistré",
+        "undo": "Annuler",
+        "undoing": "Annulation…",
+        "undone": "Retiré",
+        "pickRitual": "Quel rituel ?",
+        "period": {
+          "daily": "Quotidien",
+          "weekly": "Hebdo",
+          "monthly": "Mensuel",
+          "one_time": "Ponctuel",
+          "open": "Libre"
+        }
+      },
+      "greeting": "Je suis ton IA Strive. Je t'aide à enregistrer tes rituels, suivre ton momentum et garder ton rythme. Sur quoi puis-je t'aider ?"
     }
   },
   "rhythm": {
