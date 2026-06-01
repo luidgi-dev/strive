@@ -431,7 +431,20 @@
       }
     },
     "ai": {
-      "openLabel": "Parler à l'IA Strive"
+      "openLabel": "Parler à l'IA Strive",
+      "title": "Mon Strive",
+      "placeholder": "Qu'as-tu fait aujourd'hui ?",
+      "closeLabel": "Fermer",
+      "sendLabel": "Envoyer",
+      "micLabel": "Message vocal",
+      "micListening": "Écoute…",
+      "thinkingLabel": "Strive réfléchit",
+      "errorMessage": "Un problème est survenu de mon côté. Réessaie dans un instant.",
+      "suggestions": {
+        "momentum": "Où en est mon momentum cette semaine ?",
+        "log": "Enregistre ma course",
+        "list": "Quels sont mes rituels ?"
+      }
     }
   },
   "rhythm": {

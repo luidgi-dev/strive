@@ -431,7 +431,20 @@
       }
     },
     "ai": {
-      "openLabel": "Talk to Strive AI"
+      "openLabel": "Talk to Strive AI",
+      "title": "My Strive",
+      "placeholder": "What did you do today?",
+      "closeLabel": "Close",
+      "sendLabel": "Send",
+      "micLabel": "Voice message",
+      "micListening": "Listening…",
+      "thinkingLabel": "Strive is thinking",
+      "errorMessage": "Something went wrong on my end. Try again in a moment.",
+      "suggestions": {
+        "momentum": "How am I doing this week?",
+        "log": "Log my run",
+        "list": "What rituals do I have?"
+      }
     }
   },
   "rhythm": {
