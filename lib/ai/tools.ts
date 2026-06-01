@@ -7,7 +7,6 @@ import {
   getRitualsForActiveUser,
   insertRitual,
   insertRitualLog,
-  type FrequencyUnit,
   type MomentumStatus,
 } from "@/lib/data/rituals";
 import {
@@ -32,13 +31,16 @@ type PeriodLabel = "daily" | "weekly" | "monthly" | "one_time" | "open";
 function describePeriod(
   ritualType: string,
   frequencyUnit: string | null,
-): { period: FrequencyUnit | null; period_label: PeriodLabel } {
+): { period: string | null; period_label: PeriodLabel } {
   if (ritualType === "one_time") return { period: null, period_label: "one_time" };
   if (ritualType === "open") return { period: null, period_label: "open" };
-  const period = (frequencyUnit as FrequencyUnit | null) ?? null;
   const period_label: PeriodLabel =
-    period === "day" ? "daily" : period === "month" ? "monthly" : "weekly";
-  return { period, period_label };
+    frequencyUnit === "day"
+      ? "daily"
+      : frequencyUnit === "month"
+        ? "monthly"
+        : "weekly";
+  return { period: frequencyUnit, period_label };
 }
 
 /**
@@ -56,14 +58,18 @@ function deriveStatus(
   return deriveMomentumStatus(ritualType, completionRate);
 }
 
-/** Whether the user is keeping pace. Null when there's no target (open) or it's unknown. */
+/**
+ * Whether the user is keeping pace this period. Only meaningful for recurring
+ * rituals: the `ritual_progress` view counts `logs_this_period` against today
+ * for non-recurring rituals, so a one_time done earlier would wrongly read as
+ * off-track. Returns null for open/one_time (and for fresh, status-suppressed
+ * recurring rituals).
+ */
 function deriveOnTrack(
   ritualType: string,
   status: MomentumStatus | null,
-  logsThisPeriod: number | null,
 ): boolean | null {
-  if (ritualType === "open") return null;
-  if (ritualType === "one_time") return (logsThisPeriod ?? 0) > 0;
+  if (ritualType !== "recurring") return null;
   if (status === null) return null;
   return status !== "resting";
 }
@@ -226,7 +232,7 @@ export function striveTools(
               target: progress?.target ?? null,
               period,
               momentum_status,
-              on_track: deriveOnTrack(r.ritual_type, momentum_status, logs_this_period),
+              on_track: deriveOnTrack(r.ritual_type, momentum_status),
             };
           }),
         };
