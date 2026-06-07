@@ -347,6 +347,39 @@ export type Database = {
           },
         ]
       }
+      system_settings: {
+        Row: {
+          ai_enabled: boolean
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          ai_enabled?: boolean
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          ai_enabled?: boolean
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tier_quotas: {
+        Row: {
+          monthly_quota: number
+          tier: string
+        }
+        Insert: {
+          monthly_quota: number
+          tier: string
+        }
+        Update: {
+          monthly_quota?: number
+          tier?: string
+        }
+        Relationships: []
+      }
       user_credits: {
         Row: {
           balance: number
@@ -467,7 +500,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      consume_ai_credit: {
+        Args: never
+        Returns: {
+          balance: number
+          reset_at: string
+          status: string
+        }[]
+      }
+      refund_ai_credit: { Args: never; Returns: undefined }
+      reset_ai_credits: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
