@@ -20,6 +20,7 @@ import {
   type RitualFormValues,
 } from "@/lib/data/rituals-schema";
 import { ensureProfile, getUserToday } from "@/lib/profile";
+import { runTool } from "@/lib/ai/run-tool";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -106,28 +107,6 @@ async function resolveRitualByName(
 // ---------------------------------------------------------------------------
 // Tool factory
 // ---------------------------------------------------------------------------
-
-/** A structured failure the model already knows how to phrase (see prompt.ts). */
-type ToolError = { status: "error" };
-
-/**
- * Run a tool's body so an unexpected throw (DB/runtime error) never reaches the
- * model or the client as a raw message. The real error is logged server-side
- * only; the model gets `{ status: "error" }` and replies with the generic
- * failure copy. Expected outcomes (not_found / ambiguous / validation) are
- * returned normally from within `fn` and pass straight through.
- */
-async function runTool<T>(
-  label: string,
-  fn: () => Promise<T>,
-): Promise<T | ToolError> {
-  try {
-    return await fn();
-  } catch (error) {
-    console.error(`[ai-tool:${label}]`, error);
-    return { status: "error" };
-  }
-}
 
 /**
  * The tool set available to the Strive agent, with the Supabase client and
