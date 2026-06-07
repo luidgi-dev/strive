@@ -5,8 +5,10 @@
 -- computes logs count and completion rate for the current period
 -- period is determined by frequency_unit (day / week / month)
 -- open rituals have no target: completion_rate is null
- 
-create or replace view ritual_progress as
+-- security_invoker: the view runs with the querying user's privileges so the
+-- underlying tables' RLS is enforced (a user only ever sees their own rows).
+
+create or replace view ritual_progress with (security_invoker = on) as
 select
     r.id                                                as ritual_id,
     r.user_id,
