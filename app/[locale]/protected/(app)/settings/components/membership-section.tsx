@@ -20,7 +20,7 @@ type PaidTier = Exclude<Tier, "lite">;
 type Props = {
   tier?: Tier;
   used?: number;
-  balance?: number;
+  quota?: number;
   resetAt?: string | Date | null;
 };
 
@@ -32,7 +32,7 @@ function nextResetFallback(): Date {
 export function MembershipSection({
   tier = "lite",
   used = 0,
-  balance = 5,
+  quota = 5,
   resetAt,
 }: Props) {
   const t = useTranslations("settings.membership");
@@ -75,7 +75,7 @@ export function MembershipSection({
       <div className="flex min-h-[44px] items-center justify-between gap-3">
         <span className="text-sm">{t("credits")}</span>
         <span className="text-sm text-muted-foreground">
-          {t("creditsValue", { used, total: balance })}
+          {t("creditsValue", { used, total: quota })}
         </span>
       </div>
       <div className="h-px bg-border" aria-hidden />
