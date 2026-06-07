@@ -56,7 +56,7 @@
       "label": "Abonnement",
       "plan": "Formule",
       "credits": "Crédits",
-      "creditsValue": "{used} / {total}",
+      "creditsValue": "{remaining} / {total}",
       "resetsOn": "Renouvellement",
       "tierLite": "Lite",
       "tierPremium": "Premium",
@@ -446,6 +446,8 @@
       "voicePauseLabel": "Mettre en pause le message vocal",
       "thinkingLabel": "Strive réfléchit",
       "errorMessage": "Un problème est survenu de mon côté. Réessaie dans un instant.",
+      "creditsExhausted": "Tu as utilisé tous tes crédits IA ce mois-ci. Ils se renouvellent le {resetDate}. Passe à une formule supérieure pour continuer.",
+      "aiPaused": "Le moteur IA de Strive fait une courte pause. Ton accès standard reste ouvert. Les fonctionnalités IA reviendront sous 24h. Merci de ta patience.",
       "suggestions": {
         "momentum": "Où en est mon momentum cette semaine ?",
         "log": "Enregistre ma course",

@@ -11,6 +11,8 @@ export type Membership = {
   tier: Tier;
   balance: number;
   used: number;
+  /** Monthly credit allotment for this tier (the "total" in used/total). */
+  quota: number;
   resetAt: string | null;
 };
 
@@ -82,19 +84,31 @@ export async function getMembership(): Promise<Membership | null> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [profileResult, creditsResult] = await Promise.all([
+  const [profileResult, creditsResult, quotasResult] = await Promise.all([
     supabase.from("profiles").select("tier").eq("id", user.id).single(),
     supabase
       .from("user_credits")
       .select("balance, used, reset_at")
       .eq("user_id", user.id)
       .single(),
+    supabase.from("tier_quotas").select("tier, monthly_quota"),
   ]);
 
+  const tier = toTier(profileResult.data?.tier);
+  const balance = creditsResult.data?.balance ?? 0;
+  const used = creditsResult.data?.used ?? 0;
+
+  // Quota comes from tier_quotas (source of truth). Fall back to balance + used,
+  // which always equals the quota since consume/refund keep the sum invariant.
+  const quota =
+    quotasResult.data?.find((row) => row.tier === tier)?.monthly_quota ??
+    balance + used;
+
   return {
-    tier: toTier(profileResult.data?.tier),
-    balance: creditsResult.data?.balance ?? 5,
-    used: creditsResult.data?.used ?? 0,
+    tier,
+    balance,
+    used,
+    quota,
     resetAt: creditsResult.data?.reset_at ?? null,
   };
 }

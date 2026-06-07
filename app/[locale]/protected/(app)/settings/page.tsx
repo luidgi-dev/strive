@@ -53,8 +53,8 @@ export default async function SettingsPage({ params }: Props) {
 
         <MembershipSection
           tier={membership?.tier}
+          quota={membership?.quota}
           balance={membership?.balance}
-          used={membership?.used}
           resetAt={membership?.resetAt}
         />
 
