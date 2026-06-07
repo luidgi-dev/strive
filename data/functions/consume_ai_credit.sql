@@ -68,12 +68,15 @@ begin
         return;
     end if;
 
+    -- columns are table-qualified because the function's OUT columns (balance,
+    -- reset_at) shadow the table columns and would otherwise be ambiguous here.
     update user_credits
-        set balance = balance - 1,
-            used = used + 1,
+        set balance = user_credits.balance - 1,
+            used = user_credits.used + 1,
             updated_at = now()
-        where user_id = uid
-        returning balance, reset_at into current_balance, current_reset;
+        where user_credits.user_id = uid
+        returning user_credits.balance, user_credits.reset_at
+            into current_balance, current_reset;
 
     return query select 'ok'::text, current_balance, current_reset;
 end;
