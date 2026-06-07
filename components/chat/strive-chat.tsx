@@ -3,7 +3,7 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { ArrowUp, Mic, X } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ChatMessage } from "./chat-message";
@@ -12,6 +12,35 @@ import { TypingIndicator } from "./typing-indicator";
 import { useVoiceRecorder } from "./use-voice-recorder";
 
 const SUGGESTION_KEYS = ["momentum", "log", "list"] as const;
+
+// Block codes the chat route puts in a non-2xx JSON body ({ code, resetAt }).
+// These two keep the input locked; any other failure is a transient retry.
+const BLOCKING_CODES = new Set(["credits_exhausted", "ai_paused"]);
+
+type ChatBlock = { code: string; resetAt: string | null };
+
+/**
+ * Read the structured `{ code, resetAt }` the route returns when a request is
+ * blocked. `useChat` surfaces a non-2xx response as an Error whose message is
+ * the response body. Anything we can't parse is treated as a generic error.
+ */
+function parseChatError(error: Error | undefined): ChatBlock | null {
+  if (!error) return null;
+  try {
+    const parsed = JSON.parse(error.message) as unknown;
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      typeof (parsed as { code?: unknown }).code === "string"
+    ) {
+      const { code, resetAt } = parsed as { code: string; resetAt?: unknown };
+      return { code, resetAt: typeof resetAt === "string" ? resetAt : null };
+    }
+  } catch {
+    // Not a structured block (network error, 500 without body, etc.).
+  }
+  return { code: "error", resetAt: null };
+}
 
 /**
  * Replace audio in every message except the most recent with a short text
@@ -46,11 +75,12 @@ function stripHistoryAudio(messages: UIMessage[]): UIMessage[] {
  */
 export function StriveChat() {
   const t = useTranslations("rituals.ai");
+  const format = useFormatter();
   const [input, setInput] = useState("");
   const recorder = useVoiceRecorder();
   const [elapsed, setElapsed] = useState(0);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     transport: useMemo(
       () =>
         new DefaultChatTransport({
@@ -66,6 +96,23 @@ export function StriveChat() {
   const isStreaming = status === "submitted" || status === "streaming";
   const isEmpty = messages.length === 0;
   const isRecording = recorder.state === "recording";
+
+  // Map a blocked request to a calm, localized notice. The quota case shows the
+  // renewal date; the global pause and generic failures reuse their own copy.
+  const block = useMemo(() => parseChatError(error), [error]);
+  const isBlocked = block ? BLOCKING_CODES.has(block.code) : false;
+  const noticeText = useMemo(() => {
+    if (!block) return null;
+    if (block.code === "credits_exhausted") {
+      return t("creditsExhausted", {
+        resetDate: block.resetAt
+          ? format.dateTime(new Date(block.resetAt), { dateStyle: "long" })
+          : "",
+      });
+    }
+    if (block.code === "ai_paused") return t("aiPaused");
+    return t("errorMessage");
+  }, [block, t, format]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -86,7 +133,7 @@ export function StriveChat() {
 
   const submitText = () => {
     const trimmed = input.trim();
-    if (!trimmed || isStreaming) return;
+    if (!trimmed || isStreaming || isBlocked) return;
     sendMessage({ text: trimmed });
     setInput("");
   };
@@ -98,7 +145,7 @@ export function StriveChat() {
 
   const sendVoice = async () => {
     const clip = await recorder.stop();
-    if (!clip || isStreaming) return;
+    if (!clip || isStreaming || isBlocked) return;
     sendMessage({
       files: [
         {
@@ -146,6 +193,15 @@ export function StriveChat() {
         }}
         className="border-t border-border bg-card px-3.5 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
       >
+        {noticeText ? (
+          <div
+            role="status"
+            className="mb-2 rounded-2xl border border-border bg-accent px-3.5 py-2.5 text-xs leading-relaxed text-muted-foreground"
+          >
+            {noticeText}
+          </div>
+        ) : null}
+
         {recorder.error === "denied" ? (
           <p className="px-1 pb-2 text-xs text-muted-foreground">
             {t("micDenied")}
@@ -188,7 +244,7 @@ export function StriveChat() {
               onChange={(event) => setInput(event.target.value)}
               placeholder={t("placeholder")}
               aria-label={t("placeholder")}
-              disabled={isStreaming}
+              disabled={isStreaming || isBlocked}
               autoComplete="off"
               className="min-w-0 flex-1 rounded-full bg-accent px-4 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
             />
@@ -196,7 +252,7 @@ export function StriveChat() {
               <button
                 type="button"
                 onClick={startRecording}
-                disabled={isStreaming}
+                disabled={isStreaming || isBlocked}
                 aria-label={t("recordLabel")}
                 className="flex size-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-40"
               >
@@ -205,7 +261,7 @@ export function StriveChat() {
             ) : null}
             <button
               type="submit"
-              disabled={isStreaming || input.trim().length === 0}
+              disabled={isStreaming || isBlocked || input.trim().length === 0}
               aria-label={t("sendLabel")}
               className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-40"
             >
