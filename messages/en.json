@@ -56,7 +56,7 @@
       "label": "Membership",
       "plan": "Plan",
       "credits": "Credits",
-      "creditsValue": "{used} / {total}",
+      "creditsValue": "{remaining} / {total}",
       "resetsOn": "Resets on",
       "tierLite": "Lite",
       "tierPremium": "Premium",

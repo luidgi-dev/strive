@@ -56,7 +56,7 @@
       "label": "Abonnement",
       "plan": "Formule",
       "credits": "Crédits",
-      "creditsValue": "{used} / {total}",
+      "creditsValue": "{remaining} / {total}",
       "resetsOn": "Renouvellement",
       "tierLite": "Lite",
       "tierPremium": "Premium",
