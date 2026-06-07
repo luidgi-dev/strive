@@ -4,8 +4,10 @@
 -- full log history per ritual
 -- used for heatmap / arc visualization
 -- ordered most recent first
- 
-create or replace view ritual_log_history as
+-- security_invoker: the view runs with the querying user's privileges so the
+-- underlying tables' RLS is enforced (a user only ever sees their own rows).
+
+create or replace view ritual_log_history with (security_invoker = on) as
 select
     rl.ritual_id,
     rl.user_id,

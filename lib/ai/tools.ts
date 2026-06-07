@@ -20,6 +20,7 @@ import {
   type RitualFormValues,
 } from "@/lib/data/rituals-schema";
 import { ensureProfile, getUserToday } from "@/lib/profile";
+import { runTool } from "@/lib/ai/run-tool";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -112,11 +113,12 @@ async function resolveRitualByName(
  * verified user id already bound (server-side context).
  *
  * Conventions:
- * - Every tool acts on `userId` (never an id derived from the conversation);
- *   new queries filter by `user_id` explicitly on top of RLS.
+ * - Every tool acts on `userId` (never an id derived from the conversation), and
+ *   filters by `user_id` explicitly on top of RLS (defense-in-depth).
  * - Expected outcomes (not found / ambiguous / validation) are returned as
  *   structured `{ status }` objects so the model can clarify; genuine DB errors
- *   throw and surface via the system prompt's failure copy.
+ *   are caught by `runTool` and returned as `{ status: "error" }` — never thrown
+ *   raw to the model or surfaced to the user.
  */
 export function striveTools(
   supabase: StriveSupabaseClient,
@@ -134,47 +136,48 @@ export function striveTools(
             "Optional category to filter by (e.g. 'Movement'), matched case-insensitively. Omit to list every ritual.",
           ),
       }),
-      execute: async ({ category_name }) => {
-        const today = await getUserToday(supabase);
-        const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
-          getRitualsForActiveUser(supabase),
-          getWeekCompletedLogs(supabase, startOfWeek(today)),
-        ]);
-        const weekDays = weekDayCountsByRitual(weekLogs);
+      execute: async ({ category_name }) =>
+        runTool("list_rituals", async () => {
+          const today = await getUserToday(supabase);
+          const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
+            getRitualsForActiveUser(supabase, userId),
+            getWeekCompletedLogs(supabase, startOfWeek(today), userId),
+          ]);
+          const weekDays = weekDayCountsByRitual(weekLogs);
 
-        const filter = category_name?.trim().toLowerCase();
-        const scoped = filter
-          ? rituals.filter((r) => r.category?.name.toLowerCase() === filter)
-          : rituals;
+          const filter = category_name?.trim().toLowerCase();
+          const scoped = filter
+            ? rituals.filter((r) => r.category?.name.toLowerCase() === filter)
+            : rituals;
 
-        return {
-          count: scoped.length,
-          category: category_name?.trim() ?? null,
-          rituals: scoped.map((r) => {
-            const { period, period_label } = describePeriod(
-              r.ritual_type,
-              r.frequency_unit,
-            );
-            const view = buildMomentumView(
-              r,
-              progressByRitualId.get(r.id),
-              weekDays.get(r.id) ?? 0,
-              today,
-            );
-            return {
-              id: r.id,
-              name: r.name,
-              ritual_type: r.ritual_type,
-              frequency_value: r.frequency_value,
-              frequency_unit: r.frequency_unit,
-              period,
-              period_label,
-              category: r.category?.name ?? null,
-              momentum_status: view.momentum_status,
-            };
-          }),
-        };
-      },
+          return {
+            count: scoped.length,
+            category: category_name?.trim() ?? null,
+            rituals: scoped.map((r) => {
+              const { period, period_label } = describePeriod(
+                r.ritual_type,
+                r.frequency_unit,
+              );
+              const view = buildMomentumView(
+                r,
+                progressByRitualId.get(r.id),
+                weekDays.get(r.id) ?? 0,
+                today,
+              );
+              return {
+                id: r.id,
+                name: r.name,
+                ritual_type: r.ritual_type,
+                frequency_value: r.frequency_value,
+                frequency_unit: r.frequency_unit,
+                period,
+                period_label,
+                category: r.category?.name ?? null,
+                momentum_status: view.momentum_status,
+              };
+            }),
+          };
+        }),
     }),
 
     get_momentum_summary: tool({
@@ -188,46 +191,47 @@ export function striveTools(
             "Optional. The name of one ritual to focus on. Omit to summarise every active ritual.",
           ),
       }),
-      execute: async ({ ritual_name }) => {
-        const today = await getUserToday(supabase);
-        const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
-          getRitualsForActiveUser(supabase),
-          getWeekCompletedLogs(supabase, startOfWeek(today)),
-        ]);
-        const weekDays = weekDayCountsByRitual(weekLogs);
+      execute: async ({ ritual_name }) =>
+        runTool("get_momentum_summary", async () => {
+          const today = await getUserToday(supabase);
+          const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
+            getRitualsForActiveUser(supabase, userId),
+            getWeekCompletedLogs(supabase, startOfWeek(today), userId),
+          ]);
+          const weekDays = weekDayCountsByRitual(weekLogs);
 
-        let scoped = rituals;
-        if (ritual_name) {
-          const resolution = await resolveRitualByName(
-            supabase,
-            userId,
-            ritual_name,
-          );
-          if (resolution.status !== "ok") return resolution;
-          scoped = rituals.filter((r) => r.id === resolution.ritual.id);
-        }
-
-        return {
-          status: "ok" as const,
-          rituals: scoped.map((r) => {
-            const view = buildMomentumView(
-              r,
-              progressByRitualId.get(r.id),
-              weekDays.get(r.id) ?? 0,
-              today,
+          let scoped = rituals;
+          if (ritual_name) {
+            const resolution = await resolveRitualByName(
+              supabase,
+              userId,
+              ritual_name,
             );
-            return {
-              name: r.name,
-              ritual_type: r.ritual_type,
-              logs_this_period: view.logs_this_period,
-              target: view.target,
-              period: view.period,
-              momentum_status: view.momentum_status,
-              on_track: view.on_track,
-            };
-          }),
-        };
-      },
+            if (resolution.status !== "ok") return resolution;
+            scoped = rituals.filter((r) => r.id === resolution.ritual.id);
+          }
+
+          return {
+            status: "ok" as const,
+            rituals: scoped.map((r) => {
+              const view = buildMomentumView(
+                r,
+                progressByRitualId.get(r.id),
+                weekDays.get(r.id) ?? 0,
+                today,
+              );
+              return {
+                name: r.name,
+                ritual_type: r.ritual_type,
+                logs_this_period: view.logs_this_period,
+                target: view.target,
+                period: view.period,
+                momentum_status: view.momentum_status,
+                on_track: view.on_track,
+              };
+            }),
+          };
+        }),
     }),
 
     log_ritual: tool({
@@ -250,54 +254,55 @@ export function striveTools(
           .optional()
           .describe("Optional short note to attach to this log entry."),
       }),
-      execute: async ({ ritual_name, logged_at, note }) => {
-        const resolution = await resolveRitualByName(supabase, userId, ritual_name);
-        if (resolution.status !== "ok") return resolution;
-        const ritual = resolution.ritual;
+      execute: async ({ ritual_name, logged_at, note }) =>
+        runTool("log_ritual", async () => {
+          const resolution = await resolveRitualByName(supabase, userId, ritual_name);
+          if (resolution.status !== "ok") return resolution;
+          const ritual = resolution.ritual;
 
-        const today = await getUserToday(supabase);
-        const date = logged_at ?? today;
+          const today = await getUserToday(supabase);
+          const date = logged_at ?? today;
 
-        await ensureProfile(supabase, { id: userId });
-        const { id: log_id } = await insertRitualLog(supabase, {
-          ritualId: ritual.id,
-          userId,
-          loggedAt: date,
-          note,
-        });
+          await ensureProfile(supabase, { id: userId });
+          const { id: log_id } = await insertRitualLog(supabase, {
+            ritualId: ritual.id,
+            userId,
+            loggedAt: date,
+            note,
+          });
 
-        // Re-read momentum the same way the Rhythm cards present it, so the
-        // confirmation matches what the user sees (daily rituals framed as X/7).
-        const [progress, weekLogs] = await Promise.all([
-          getRitualProgress(supabase, ritual.id),
-          getWeekCompletedLogs(supabase, startOfWeek(today)),
-        ]);
-        const weekDaysCount = new Set(
-          weekLogs
-            .filter((log) => log.ritual_id === ritual.id)
-            .map((log) => log.logged_at),
-        ).size;
-        const view = buildMomentumView(
-          ritual,
-          progress ?? undefined,
-          weekDaysCount,
-          today,
-        );
+          // Re-read momentum the same way the Rhythm cards present it, so the
+          // confirmation matches what the user sees (daily rituals framed as X/7).
+          const [progress, weekLogs] = await Promise.all([
+            getRitualProgress(supabase, ritual.id, userId),
+            getWeekCompletedLogs(supabase, startOfWeek(today), userId),
+          ]);
+          const weekDaysCount = new Set(
+            weekLogs
+              .filter((log) => log.ritual_id === ritual.id)
+              .map((log) => log.logged_at),
+          ).size;
+          const view = buildMomentumView(
+            ritual,
+            progress ?? undefined,
+            weekDaysCount,
+            today,
+          );
 
-        return {
-          status: "ok" as const,
-          logged: true,
-          log_id,
-          ritual_name: ritual.name,
-          date,
-          momentum: {
-            logs_this_period: view.logs_this_period,
-            target: view.target,
-            period: view.period,
-            status: view.momentum_status,
-          },
-        };
-      },
+          return {
+            status: "ok" as const,
+            logged: true,
+            log_id,
+            ritual_name: ritual.name,
+            date,
+            momentum: {
+              logs_this_period: view.logs_this_period,
+              target: view.target,
+              period: view.period,
+              status: view.momentum_status,
+            },
+          };
+        }),
     }),
 
     create_ritual: tool({
@@ -339,79 +344,80 @@ export function striveTools(
         frequency_unit,
         due_date,
         category_name,
-      }) => {
-        // Resolve the category name to an existing active category (system or
-        // the user's own). Unknown → uncategorised; never auto-created.
-        let category_id: string | null = null;
-        let category: string | null = null;
-        if (category_name?.trim()) {
-          const { data, error } = await supabase
-            .from("ritual_categories")
-            .select("id, name")
-            .eq("is_active", true)
-            .ilike("name", category_name.trim());
-          if (error) throw error;
-          if (data && data.length === 1) {
-            category_id = data[0].id;
-            category = data[0].name;
+      }) =>
+        runTool("create_ritual", async () => {
+          // Resolve the category name to an existing active category (system or
+          // the user's own). Unknown → uncategorised; never auto-created.
+          let category_id: string | null = null;
+          let category: string | null = null;
+          if (category_name?.trim()) {
+            const { data, error } = await supabase
+              .from("ritual_categories")
+              .select("id, name")
+              .eq("is_active", true)
+              .ilike("name", category_name.trim());
+            if (error) throw error;
+            if (data && data.length === 1) {
+              category_id = data[0].id;
+              category = data[0].name;
+            }
           }
-        }
 
-        // Build form values, enforcing the same type-specific rules as the DB.
-        let values: RitualFormValues;
-        if (ritual_type === "recurring") {
-          if (frequency_value == null || frequency_unit == null) {
+          // Build form values, enforcing the same type-specific rules as the DB.
+          let values: RitualFormValues;
+          if (ritual_type === "recurring") {
+            if (frequency_value == null || frequency_unit == null) {
+              return {
+                status: "validation" as const,
+                message:
+                  "Recurring rituals need a frequency value and unit (e.g. 3 times per week).",
+              };
+            }
+            values = {
+              name,
+              ritual_type,
+              frequency_value,
+              frequency_unit,
+              category_id,
+            };
+          } else if (ritual_type === "one_time") {
+            if (!due_date) {
+              return {
+                status: "validation" as const,
+                message: "One-time rituals need a due date (YYYY-MM-DD).",
+              };
+            }
+            values = { name, ritual_type, due_date, category_id };
+          } else {
+            values = { name, ritual_type, category_id };
+          }
+
+          const parsed = ritualFormSchema.safeParse(values);
+          if (!parsed.success) {
             return {
               status: "validation" as const,
-              message:
-                "Recurring rituals need a frequency value and unit (e.g. 3 times per week).",
+              message: parsed.error.issues[0]?.message ?? "Invalid ritual.",
             };
           }
-          values = {
+
+          await ensureProfile(supabase, { id: userId });
+          const { id } = await insertRitual(supabase, parsed.data, userId);
+
+          const { period_label } = describePeriod(ritual_type, frequency_unit ?? null);
+          return {
+            status: "ok" as const,
+            created: true,
+            ritual_id: id,
             name,
             ritual_type,
-            frequency_value,
-            frequency_unit,
-            category_id,
+            frequency_value: frequency_value ?? null,
+            frequency_unit: frequency_unit ?? null,
+            due_date: due_date ?? null,
+            category,
+            category_matched: category_id !== null,
+            period_label,
           };
-        } else if (ritual_type === "one_time") {
-          if (!due_date) {
-            return {
-              status: "validation" as const,
-              message: "One-time rituals need a due date (YYYY-MM-DD).",
-            };
-          }
-          values = { name, ritual_type, due_date, category_id };
-        } else {
-          values = { name, ritual_type, category_id };
-        }
-
-        const parsed = ritualFormSchema.safeParse(values);
-        if (!parsed.success) {
-          return {
-            status: "validation" as const,
-            message: parsed.error.issues[0]?.message ?? "Invalid ritual.",
-          };
-        }
-
-        await ensureProfile(supabase, { id: userId });
-        const { id } = await insertRitual(supabase, parsed.data, userId);
-
-        const { period_label } = describePeriod(ritual_type, frequency_unit ?? null);
-        return {
-          status: "ok" as const,
-          created: true,
-          ritual_id: id,
-          name,
-          ritual_type,
-          frequency_value: frequency_value ?? null,
-          frequency_unit: frequency_unit ?? null,
-          due_date: due_date ?? null,
-          category,
-          category_matched: category_id !== null,
-          period_label,
-        };
-      },
+        }),
     }),
 
     get_log_history: tool({
@@ -432,35 +438,36 @@ export function striveTools(
           .optional()
           .describe("Inclusive end date, YYYY-MM-DD."),
       }),
-      execute: async ({ ritual_name, from_date, to_date }) => {
-        const resolution = await resolveRitualByName(supabase, userId, ritual_name);
-        if (resolution.status !== "ok") return resolution;
-        const ritual = resolution.ritual;
+      execute: async ({ ritual_name, from_date, to_date }) =>
+        runTool("get_log_history", async () => {
+          const resolution = await resolveRitualByName(supabase, userId, ritual_name);
+          if (resolution.status !== "ok") return resolution;
+          const ritual = resolution.ritual;
 
-        let query = supabase
-          .from("ritual_log_history")
-          .select("logged_at, status_id, note")
-          .eq("user_id", userId)
-          .eq("ritual_id", ritual.id)
-          .order("logged_at", { ascending: false });
-        if (from_date) query = query.gte("logged_at", from_date);
-        if (to_date) query = query.lte("logged_at", to_date);
+          let query = supabase
+            .from("ritual_log_history")
+            .select("logged_at, status_id, note")
+            .eq("user_id", userId)
+            .eq("ritual_id", ritual.id)
+            .order("logged_at", { ascending: false });
+          if (from_date) query = query.gte("logged_at", from_date);
+          if (to_date) query = query.lte("logged_at", to_date);
 
-        const { data, error } = await query;
-        if (error) throw error;
+          const { data, error } = await query;
+          if (error) throw error;
 
-        const logs = (data ?? []).map((r) => ({
-          date: r.logged_at,
-          status: r.status_id,
-          note: r.note,
-        }));
-        return {
-          status: "ok" as const,
-          ritual_name: ritual.name,
-          count: logs.length,
-          logs,
-        };
-      },
+          const logs = (data ?? []).map((r) => ({
+            date: r.logged_at,
+            status: r.status_id,
+            note: r.note,
+          }));
+          return {
+            status: "ok" as const,
+            ritual_name: ritual.name,
+            count: logs.length,
+            logs,
+          };
+        }),
     }),
   };
 }

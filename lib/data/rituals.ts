@@ -100,20 +100,37 @@ function indexCategoriesById(
   return map;
 }
 
+/**
+ * Pass `userId` to add an explicit `user_id` filter on top of RLS
+ * (defense-in-depth). The AI agent — a higher-risk, model-driven surface — always
+ * does this; app server components may omit it and rely on RLS (which now also
+ * scopes the views via `security_invoker`). `ritual_categories` is never filtered
+ * by user_id: system categories have a null `user_id` and must stay visible.
+ */
 export async function getRitualsForActiveUser(
   client: SupabaseClient<Database>,
+  userId?: string,
 ): Promise<RitualsData> {
+  let ritualsQuery = client
+    .from("rituals")
+    .select(RITUAL_COLUMNS)
+    .eq("is_active", true)
+    .is("archived_at", null)
+    .order("created_at", { ascending: true });
+  let progressQuery = client
+    .from("ritual_progress")
+    .select("ritual_id, completion_rate, logs_this_period, target");
+  if (userId) {
+    ritualsQuery = ritualsQuery.eq("user_id", userId);
+    progressQuery = progressQuery.eq("user_id", userId);
+  }
+
   const [ritualsRes, categoriesRes, progressRes] = await Promise.all([
-    client
-      .from("rituals")
-      .select(RITUAL_COLUMNS)
-      .eq("is_active", true)
-      .is("archived_at", null)
-      .order("created_at", { ascending: true }),
+    ritualsQuery,
     // Only active categories resolve; a ritual still pointing at an archived
     // category (e.g. a failed detach) gracefully falls back to "Other".
     client.from("ritual_categories").select(CATEGORY_COLUMNS).eq("is_active", true),
-    client.from("ritual_progress").select("ritual_id, completion_rate, logs_this_period, target"),
+    progressQuery,
   ]);
 
   if (ritualsRes.error) throw ritualsRes.error;
@@ -237,12 +254,16 @@ export async function countArchivedRituals(
 export async function getRitualProgress(
   client: SupabaseClient<Database>,
   ritualId: string,
+  userId?: string,
 ): Promise<RitualProgressEntry | null> {
-  const { data, error } = await client
+  // Pass userId to filter explicitly on top of RLS (defense-in-depth); see
+  // getRitualsForActiveUser.
+  let query = client
     .from("ritual_progress")
     .select("completion_rate, logs_this_period, target")
-    .eq("ritual_id", ritualId)
-    .maybeSingle();
+    .eq("ritual_id", ritualId);
+  if (userId) query = query.eq("user_id", userId);
+  const { data, error } = await query.maybeSingle();
 
   if (error) throw error;
   if (!data) return null;
@@ -297,12 +318,17 @@ export type CompletedLogRow = { ritual_id: string; logged_at: string };
 export async function getWeekCompletedLogs(
   client: SupabaseClient<Database>,
   weekStart: string,
+  userId?: string,
 ): Promise<CompletedLogRow[]> {
-  const { data, error } = await client
+  // Pass userId to filter explicitly on top of RLS (defense-in-depth); see
+  // getRitualsForActiveUser.
+  let query = client
     .from("ritual_logs")
     .select("ritual_id, logged_at")
     .eq("status_id", "completed")
     .gte("logged_at", weekStart);
+  if (userId) query = query.eq("user_id", userId);
+  const { data, error } = await query;
 
   if (error) throw error;
 
