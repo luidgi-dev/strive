@@ -32,11 +32,7 @@ import {
   type CalculatorResult,
   type InsightRitual,
 } from "@/lib/insights/calculators";
-import {
-  insightSystemPrompt,
-  insightUserPrompt,
-  type InsightLocale,
-} from "@/lib/insights/prompts";
+import { insightSystemPrompt, insightUserPrompt } from "@/lib/insights/prompts";
 import type { TablesInsert } from "@/lib/supabase/database.types";
 
 export type InsightCadence = "weekly" | "monthly";
@@ -77,16 +73,20 @@ const CADENCE_CONFIG: Record<
   },
 };
 
-const InsightCardSchema = z.object({
+// Each card is written in both languages in a single call, so switching the app
+// language re-localizes the page without regenerating.
+const LocalizedCardSchema = z.object({
   headline: z.string().min(1).max(120),
   body: z.string().min(1).max(400),
+});
+const InsightCardSchema = z.object({
+  en: LocalizedCardSchema,
+  fr: LocalizedCardSchema,
 });
 
 export type GenerateInsightsOptions = {
   /** Which report to generate. Defaults to "weekly". */
   cadence?: InsightCadence;
-  /** Language the cards are written in. Defaults to "en" (no per-profile pref yet). */
-  locale?: InsightLocale;
   /** Override "today" (YYYY-MM-DD) for tests; otherwise resolved from the profile timezone. */
   today?: string;
 };
@@ -153,7 +153,6 @@ export async function generateInsightsForUser(
   options: GenerateInsightsOptions = {},
 ): Promise<{ generated: number }> {
   const cadence: InsightCadence = options.cadence ?? "weekly";
-  const locale: InsightLocale = options.locale ?? "en";
   const config = CADENCE_CONFIG[cadence];
 
   // Respect the global pause without consuming credits (generation is free /
@@ -211,15 +210,19 @@ export async function generateInsightsForUser(
       const { object } = await generateObject({
         model: striveAIModel,
         schema: InsightCardSchema,
-        system: insightSystemPrompt(candidate.type, locale),
+        system: insightSystemPrompt(candidate.type),
         prompt: insightUserPrompt(candidate),
       });
-      rows.push(buildRow(userId, cadence, period, locale, candidate, object));
+      rows.push(buildRow(userId, cadence, period, candidate, object));
     } catch (error) {
       // One card failing must not abort the batch; there is no credit to refund.
       console.error("[insights] card generation failed", cadence, candidate.type, error);
     }
   }
+
+  // Total generation failure (e.g. provider outage): keep whatever is already
+  // cached for this period rather than wiping it with the delete below.
+  if (selected.length > 0 && rows.length === 0) return { generated: 0 };
 
   // Idempotent replace: clear this report's non-dismissed cards, then insert the
   // fresh batch. Other periods/cadences and dismissed cards are untouched.
@@ -244,7 +247,6 @@ function buildRow(
   userId: string,
   cadence: InsightCadence,
   period: { start: string; end: string },
-  locale: InsightLocale,
   candidate: CalculatorResult,
   card: z.infer<typeof InsightCardSchema>,
 ): TablesInsert<"insights"> {
@@ -252,12 +254,15 @@ function buildRow(
     user_id: userId,
     cadence,
     type: candidate.type,
-    headline: card.headline,
-    body: card.body,
+    // headline/body hold the English copy as the canonical fallback; both
+    // languages live in `translations` so the page can localize on read.
+    headline: card.en.headline,
+    body: card.en.body,
+    translations: { en: card.en, fr: card.fr },
     basis_label: `Last ${candidate.basisWeeks} weeks`,
     confidence: candidate.confidence,
     ritual_id: candidate.ritualId,
-    payload: { ...candidate.payload, basisWeeks: candidate.basisWeeks, locale },
+    payload: { ...candidate.payload, basisWeeks: candidate.basisWeeks },
     period_start: period.start,
     period_end: period.end,
   };
