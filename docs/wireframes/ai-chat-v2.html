@@ -1,4 +1,22 @@
 <!doctype html>
+<!--
+  Capture recipe (for the landing's screenshots-section, aspect-[7/12] + object-contain):
+  - Open with ?clean&theme=light  then  ?clean&theme=dark   (clean hides the switcher AND
+    pins the frame to a fixed 420×720 anchored top-left, matching the other wireframes' scale).
+  - Capture at window 420×720. For retina, add --force-device-scale-factor=2 (→ 840×1440).
+    420 width matches rhythm/the-arc so the bottom nav lines up across the three cards.
+    Note: a headless browser forces a ~490px min layout width, but the fixed-width frame
+    still lays out at 420 and the 420-wide window crops to it cleanly.
+  - Save as public/wireframes/ai-chat-v2-light.png and ai-chat-v2-dark.png
+    (already referenced by components/landing/screenshots-section.tsx).
+  Example:
+    CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    F="file://$PWD/docs/wireframes/ai-chat-v2.html"
+    "$CHROME" --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=420,720 \
+      --screenshot=public/wireframes/ai-chat-v2-light.png "$F?clean&theme=light"
+    "$CHROME" --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=420,720 \
+      --screenshot=public/wireframes/ai-chat-v2-dark.png  "$F?clean&theme=dark"
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -99,7 +117,7 @@
   .frame {
     position: relative;
     width: 100%;
-    max-width: 430px;
+    max-width: 420px;
     height: 100dvh;
     margin: 0 auto;
     display: flex;
@@ -140,9 +158,10 @@
     width: 32px;
     height: 32px;
     border-radius: 999px;
-    background: var(--muted);
+    overflow: hidden;
     border: 1px solid var(--border);
   }
+  .bg-avatar svg { width: 100%; height: 100%; display: block; }
   .bg-main {
     flex: 1;
     padding: 24px 20px;
@@ -189,8 +208,8 @@
     position: absolute;
     left: 12px;
     right: 12px;
-    top: 60px;
-    bottom: 76px;
+    top: 56px;
+    bottom: 128px;
     background: color-mix(in oklch, var(--card) 90%, transparent);
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
@@ -243,8 +262,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 12px 16px;
+    gap: 5px;
+    padding: 10px 16px;
     overflow-y: auto;
   }
   .bubble {
@@ -319,7 +338,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-2xl);
-    padding: 12px;
+    padding: 10px 12px;
   }
   .card-head {
     display: flex;
@@ -431,7 +450,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-2xl);
-    padding: 12px;
+    padding: 10px 12px;
   }
   .log-icon {
     width: 28px;
@@ -529,10 +548,12 @@
   .input-btn.send svg { width: 14px; height: 14px; }
 
   /* FAB (anchors the chat bubble) */
+  /* The FAB sits behind the open panel: it peeks out below it, softly blurred
+     and dimmed, the way it shows through the glass in the live app. */
   .fab {
     position: absolute;
     right: 20px;
-    bottom: calc(64px + 18px);
+    bottom: calc(64px + 14px);
     width: 52px;
     height: 52px;
     border-radius: 999px;
@@ -543,8 +564,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 8px 24px oklch(0 0 0 / 0.18), 0 2px 6px oklch(0 0 0 / 0.1);
-    z-index: 5;
+    opacity: 0.5;
+    filter: blur(1.2px);
+    z-index: 4;
   }
   .fab svg { width: 22px; height: 22px; }
 
@@ -589,6 +611,17 @@
 
   /* Hide wireframe chrome when embedded / captured */
   .embedded .wf-controls { display: none; }
+  /* In capture/embed mode the frame is a fixed 420×720 (7:12) anchored top-left,
+     so a screenshot in a large window (avoiding headless's ~490px min-width) can
+     be cropped to exactly 420×720 — matching the other wireframes' scale. */
+  .embedded .frame {
+    width: 420px;
+    max-width: 420px;
+    height: 720px;
+    margin: 0;
+    border-left: 0;
+    border-right: 0;
+  }
 </style>
 </head>
 <body>
@@ -602,7 +635,17 @@
     <div class="rhythm-backdrop" aria-hidden="true">
       <header class="bg-header">
         <span class="bg-brand">Strive</span>
-        <span class="bg-avatar"></span>
+        <span class="bg-avatar">
+          <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="1024" height="1024" fill="#272526"/>
+            <g transform="translate(0,1024) scale(0.1,-0.1)">
+              <g transform="translate(5138 5118) scale(1.2) translate(-5138 -5118)">
+                <path fill="#cab695" stroke="none" fill-rule="evenodd"
+                      d="M6717 6618 c-4 -169 -8 -212 -24 -258 -38 -104 -76 -165 -147 -236 -113 -113 -236 -164 -401 -164 -103 0 -178 19 -290 75 -99 49 -168 99 -385 280 -210 175 -277 227 -371 288 -161 104 -338 179 -457 194 -35 4 -49 9 -40 14 7 5 487 9 1067 9 l1054 0 -6 -202z M4261 6713 c-37 -23 -98 -74 -147 -126 -176 -184 -245 -420 -195 -661 56 -271 248 -512 582 -729 109 -72 311 -182 569 -312 511 -257 708 -398 839 -599 148 -228 137 -503 -29 -696 l-30 -35 21 49 c17 40 21 63 17 122 -13 195 -185 374 -513 535 -187 91 -390 161 -722 248 -251 66 -369 105 -478 157 -303 143 -528 409 -613 723 -23 86 -26 114 -26 276 0 166 2 188 27 279 96 345 305 598 622 752 127 62 168 71 76 17z M4359 6628 c-20 -35 -17 -155 5 -213 50 -131 180 -256 386 -372 82 -47 319 -145 460 -192 69 -23 238 -73 375 -111 282 -78 346 -100 486 -169 296 -147 502 -371 595 -648 87 -258 67 -574 -52 -832 -110 -238 -310 -436 -555 -550 -115 -53 -145 -61 -88 -22 67 45 175 147 219 206 50 68 93 154 122 245 32 105 33 290 0 403 -78 272 -281 497 -652 723 -52 31 -246 135 -430 229 -509 261 -647 350 -804 516 -135 143 -196 281 -196 438 0 124 27 214 98 323 36 55 56 73 31 26z M4295 4247 c146 -51 195 -82 435 -277 199 -162 346 -274 440 -337 152 -102 323 -172 465 -191 133 -18 -279 -25 -1180 -19 -506 4 -921 7 -922 7 -11 1 0 324 13 388 44 217 200 389 405 447 81 23 253 14 344 -18z"/>
+              </g>
+            </g>
+          </svg>
+        </span>
       </header>
       <main class="bg-main">
         <div class="bg-day">
