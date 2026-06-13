@@ -72,7 +72,7 @@ The filenames are stable across regenerations, so `app/layout.tsx` never changes
 
 ## `wireframes/`
 
-Rendered wireframe mockups (dark/light PNGs + `rhythm.html`) served as static files for in-browser preview. These are exports; the canonical, editable design wireframes live in [`docs/wireframes/`](../docs/wireframes/).
+Rendered wireframe mockups (dark/light PNGs) served as static files — the landing page (`components/landing/screenshots-section.tsx`) shows them as device previews. These are **exports**; the canonical, editable design wireframes live in [`design/wireframes/`](../design/wireframes/).
 
 ## Conventions
 
