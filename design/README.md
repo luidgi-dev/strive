@@ -21,6 +21,7 @@ design/
   wireframes/        # self-contained HTML wireframes, one per surface
   ux-flow.md         # global navigation: screens, transitions, entry points
   chat-design.md     # "My Strive" AI chat — tools, cards, voice, guardrails
+  insights-page.md   # Insights — hybrid intelligence, confidence, cadence, gating
   notifications.md   # (coming — UX rules once notifications ship; see LUI-83)
 ```
 

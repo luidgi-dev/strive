@@ -50,6 +50,8 @@ Prerequisites: Node.js 24+ (see `.nvmrc`), npm.
    NEXT_PUBLIC_SUPABASE_URL=...
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
    GOOGLE_GENERATIVE_AI_API_KEY=...   # AI features (Gemini); optional STRIVE_AI_MODEL overrides the model
+   SUPABASE_SERVICE_ROLE_KEY=...      # server-only; the Insights cron generates under the service role
+   CRON_SECRET=...                    # shared secret authorizing the Insights cron route
   ```
 2. Install and run:
   ```bash
