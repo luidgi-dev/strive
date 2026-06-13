@@ -19,6 +19,7 @@ data/
 │   ├── rituals.sql
 │   ├── log_statuses.sql
 │   ├── ritual_logs.sql
+│   ├── insights.sql            # cached AI Insight Cards (premium); written by the cron
 │   ├── push_subscriptions.sql
 │   ├── circles.sql
 │   └── circle_members.sql
@@ -68,6 +69,7 @@ Strive uses **Supabase (PostgreSQL)** as its database. Row Level Security (RLS) 
 | `rituals`            | Core entity. Three types: `recurring`, `one_time`, `open`.                              |
 | `log_statuses`       | Reference table: `completed`, `rest`, `missed`, `partial`. Read-only for clients.       |
 | `ritual_logs`        | One row per logged ritual occurrence. Multiple logs per day are allowed.                |
+| `insights`           | Cached AI Insight Cards (premium). Written by the weekly/monthly cron under the **service role** (no user INSERT/DELETE policy); users only read and dismiss their own. `cadence` + `period_start` form the per-report identity. See [`design/insights-page.md`](../design/insights-page.md). |
 | `push_subscriptions` | Web Push credentials for PWA notifications (used in Phase 3).                           |
 | `circles`            | Social groups — scaffolded, empty until Phase 4.                                        |
 | `circle_members`     | Circle membership — scaffolded, empty until Phase 4.                                    |
