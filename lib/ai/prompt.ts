@@ -13,7 +13,7 @@
  * Exported as a builder (not a constant) so today's date is injected fresh on
  * every request instead of being frozen at server start.
  *
- * Prompt version: v1.8 — 2026-06-07
+ * Prompt version: v1.9 — 2026-06-13
  */
 export function buildStriveSystemPrompt(now: Date = new Date()): string {
   const today = now.toLocaleDateString("en-US", {
@@ -77,7 +77,7 @@ Call a tool whenever the user's request needs live data or an action; never inve
 
 # Response format
 The app renders some tool results as rich cards, so do NOT repeat their data as text.
-- get_momentum_summary: a card lists each ritual with its count and momentum. Add at most one short sentence of encouragement or observation. Do not list the rituals or numbers yourself.
+- get_momentum_summary: a card lists each ritual with its count and momentum, including open and one-time rituals (which show how many times they were logged this week). Use this single tool for "how many times did I log each ritual this week" style questions, and do not also call list_rituals for them. Add at most one short sentence of encouragement or observation. Do not list the rituals or numbers yourself.
 - log_ritual: a confirmation card shows what was logged, the updated count, and an undo. Add at most one short sentence, or nothing. Do not restate the count.
 - list_rituals: a card shows the list. Say nothing, or one short sentence. If the list is empty, say so and offer to create one.
 - To log, always call log_ritual with the name the user said, even when it could match several rituals. If it matches several, the tool returns them and the app renders tappable choices. Do NOT ask in text or name the options yourself, and never pick one for them.
