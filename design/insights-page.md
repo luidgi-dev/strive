@@ -29,15 +29,24 @@ The **Orchestrator** ([`lib/insights/orchestrator.ts`](../lib/insights/orchestra
 glues them: run calculators → keep the confident facts → phrase each with Gemini
 (`generateObject`, structured output) → cache in the `insights` table.
 
-## Card types (v1)
+## Card types
 
-| Type | Reads | Example |
-|---|---|---|
-| **Correlation** | weeks where ritual A is logged heavily vs ritual B's completion | "Sleep and Sport are linked." |
-| **Adjustment** | per-weekday completion for one ritual | "Your Wednesday target may be too high." |
+The first two need several weeks of patterns; the last three (added so a new user
+sees cards early) fire within a week or two and lean positive.
 
-*Suggestion* cards (from note text) are deferred to v2 — they are the fuzziest and
-hardest to ground in stats.
+| Type | Reads | Fires | Example |
+|---|---|---|---|
+| **Correlation** | weeks where ritual A is logged heavily vs ritual B's completion | slow | "Sleep and Sport are linked." |
+| **Adjustment** | per-weekday completion for one ritual | ~4 wks | "Your Wednesday target may be too high." |
+| **Strength** | each recurring ritual's avg weekly completion ratio | early | "Skincare nuit is your anchor." |
+| **Best day** | total logs per weekday across all rituals | early | "Wednesdays carry your rhythm." |
+| **Pairing** | Jaccard overlap of two daily rituals' logged days | early | "Skincare matin and nuit tend to pair." |
+
+The orchestrator caps each type (`PER_TYPE_CAP`) so one calculator can't fill a
+report — a Strength sits next to an Adjustment rather than four Adjustments.
+
+*Suggestion* cards (from note text) remain deferred — the fuzziest, hardest to
+ground in stats.
 
 ## Confidence model
 
