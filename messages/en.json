@@ -505,7 +505,10 @@
     },
     "type": {
       "correlation": "Correlation",
-      "adjustment": "Adjustment"
+      "adjustment": "Adjustment",
+      "strength": "Strength",
+      "best_day": "Best day",
+      "anchor_pair": "Pairing"
     },
     "basis": {
       "lastNWeeks": "Last {count} weeks"
