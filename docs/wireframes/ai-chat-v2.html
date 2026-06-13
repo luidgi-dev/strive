@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Chat v2 — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.28 0.005 200);
+    --primary: oklch(0.20 0.005 200);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 200);
+    --muted: oklch(0.96 0.002 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --accent: oklch(0.96 0.002 200);
+    --border: oklch(0.92 0.002 200);
+    --input: oklch(0.92 0.002 200);
+    --ring: oklch(0.80 0.01 200);
+    --momentum: oklch(0.62 0.12 154);
+    --caution: oklch(0.68 0.14 72);
+    --missed: oklch(0.62 0.17 27);
+    --radius: 0.75rem;
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --font-heading: "Sora", system-ui, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --card: oklch(0.22 0.006 200);
+    --card-foreground: oklch(0.86 0.006 200);
+    --primary: oklch(0.88 0.008 200);
+    --primary-foreground: oklch(0.18 0.006 200);
+    --secondary: oklch(0.26 0.006 200);
+    --muted: oklch(0.26 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --accent: oklch(0.26 0.006 200);
+    --border: oklch(1 0 0 / 0.07);
+    --input: oklch(1 0 0 / 0.09);
+    --ring: oklch(0.40 0.01 200);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100dvh;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  body {
+    display: block;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Wireframe theme switcher (hidden when embedded / captured) */
+  .wf-controls {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    font-size: 11px;
+  }
+  .wf-controls button {
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font: inherit;
+  }
+  .wf-controls button[aria-pressed="true"] {
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Mobile column, full viewport height. Capture at a ~7:12 mobile viewport
+     (e.g. 430×737) so the image matches the landing's screenshot box. */
+  .frame {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    height: 100dvh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  /* Faded Rhythm backdrop (visible behind the floating chat bubble) */
+  .rhythm-backdrop {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    filter: blur(2px);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .bg-header {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+  }
+  .bg-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .bg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .bg-main {
+    flex: 1;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .bg-day {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 4px 6px;
+  }
+  .bg-day-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+  .bg-line {
+    height: 12px;
+    width: 110px;
+    background: var(--muted);
+    border-radius: 4px;
+  }
+  .bg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    height: 110px;
+    flex-shrink: 0;
+  }
+  .backdrop-overlay {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--background) 22%, transparent);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Floating chat bubble (anchored above the FAB) */
+  .chat-panel {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 60px;
+    bottom: 76px;
+    background: color-mix(in oklch, var(--card) 90%, transparent);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+    box-shadow:
+      0 24px 50px oklch(0 0 0 / 0.32),
+      0 8px 20px oklch(0 0 0 / 0.18);
+  }
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+    flex-shrink: 0;
+  }
+  .sheet-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sheet-title svg { width: 16px; height: 16px; }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: transparent;
+    border: 0;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover { background: var(--accent); color: var(--foreground); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* Conversation -------------------------------------------------- */
+  .conversation {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    overflow-y: auto;
+  }
+  .bubble {
+    max-width: 84%;
+    font-size: 13px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    padding: 8px 12px;
+  }
+  .bubble.user {
+    align-self: flex-end;
+    background: color-mix(in oklch, var(--foreground) 10%, transparent);
+    border-radius: 18px 18px 4px 18px;
+    color: var(--foreground);
+  }
+  .bubble.ai {
+    align-self: flex-start;
+    background: var(--accent);
+    border-radius: 18px 18px 18px 4px;
+    color: var(--foreground);
+  }
+
+  /* Voice message bubble (user) */
+  .voice {
+    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 84%;
+    padding: 8px 12px 8px 8px;
+    background: color-mix(in oklch, var(--foreground) 10%, transparent);
+    border-radius: 18px 18px 4px 18px;
+  }
+  .voice-play {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .voice-play svg { width: 10px; height: 10px; }
+  .waveform {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 20px;
+  }
+  .waveform i {
+    display: block;
+    width: 2px;
+    background: color-mix(in oklch, var(--foreground) 55%, transparent);
+    border-radius: 1px;
+  }
+  .voice-duration {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  /* Output cards (mirror components/chat/cards/*) -------------------- */
+  .card {
+    align-self: flex-start;
+    width: 88%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    padding: 12px;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted-foreground);
+  }
+  .card-head svg { width: 14px; height: 14px; }
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .row-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row-cat {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+  .chip-period {
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+
+  /* Disambiguation chips (mirror disambiguation-card.tsx) */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    background: transparent;
+    border: 1px solid color-mix(in oklch, var(--foreground) 25%, transparent);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--foreground);
+    cursor: pointer;
+  }
+  .chip:hover { background: color-mix(in oklch, var(--foreground) 6%, transparent); }
+
+  /* X/target momentum meter (mirror momentum-meter.tsx) */
+  .meter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .meter-track {
+    height: 6px;
+    width: 64px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--foreground) 10%, transparent);
+    overflow: hidden;
+  }
+  .meter-fill { display: block; height: 100%; border-radius: 999px; }
+  .fill-strong { background: var(--momentum); }
+  .fill-steady { background: var(--caution); }
+  .fill-resting { background: color-mix(in oklch, var(--muted-foreground) 40%, transparent); }
+  .meter-count {
+    width: 34px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--foreground);
+  }
+  /* Bare count for open / one-time rituals (no target) */
+  .count-only {
+    width: 34px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--foreground);
+    flex-shrink: 0;
+  }
+
+  /* Log confirmation card (mirror log-card.tsx) */
+  .log-card {
+    align-self: flex-start;
+    width: 88%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    padding: 12px;
+  }
+  .log-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--momentum) 15%, transparent);
+    color: var(--momentum);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .log-icon svg { width: 16px; height: 16px; }
+  .log-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .log-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .undo-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--foreground);
+    background: transparent;
+    cursor: pointer;
+  }
+  .undo-btn:hover { background: var(--accent); }
+  .undo-btn svg { width: 14px; height: 14px; }
+
+  /* Input bar ------------------------------------------------------ */
+  .input-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--card);
+    flex-shrink: 0;
+  }
+  .input-bar textarea {
+    flex: 1;
+    background: var(--accent);
+    border: 0;
+    border-radius: var(--radius-2xl);
+    padding: 10px 16px;
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--foreground);
+    outline: none;
+    min-width: 0;
+    resize: none;
+    overflow: hidden;
+  }
+  .input-bar textarea::placeholder { color: var(--muted-foreground); }
+  .input-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .input-btn:hover { color: var(--foreground); background: var(--accent); }
+  .input-btn svg { width: 18px; height: 18px; }
+  .input-btn.mic { opacity: 0.6; }
+  .input-btn.mic:hover { opacity: 1; }
+  .input-btn.send {
+    background: var(--foreground);
+    color: var(--background);
+    opacity: 1;
+  }
+  .input-btn.send svg { width: 14px; height: 14px; }
+
+  /* FAB (anchors the chat bubble) */
+  .fab {
+    position: absolute;
+    right: 20px;
+    bottom: calc(64px + 18px);
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px oklch(0 0 0 / 0.18), 0 2px 6px oklch(0 0 0 / 0.1);
+    z-index: 5;
+  }
+  .fab svg { width: 22px; height: 22px; }
+
+  /* Bottom nav (app shell stays visible) */
+  .bottom-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+    border-top: 1px solid var(--border);
+    background: color-mix(in oklch, var(--background) 80%, transparent);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 5;
+  }
+  .nav-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 64px;
+    min-height: 48px;
+    color: var(--muted-foreground);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .nav-item.active { color: var(--foreground); }
+
+  /* Hide wireframe chrome when embedded / captured */
+  .embedded .wf-controls { display: none; }
+</style>
+</head>
+<body>
+  <div class="wf-controls" role="group" aria-label="Wireframe theme">
+    <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
+    <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+  </div>
+
+  <div class="frame">
+    <!-- Faded Rhythm backdrop ------------------------------------- -->
+    <div class="rhythm-backdrop" aria-hidden="true">
+      <header class="bg-header">
+        <span class="bg-brand">Strive</span>
+        <span class="bg-avatar"></span>
+      </header>
+      <main class="bg-main">
+        <div class="bg-day">
+          <span class="bg-day-title">Today</span>
+          <span class="bg-line"></span>
+        </div>
+        <div class="bg-card"></div>
+        <div class="bg-card"></div>
+        <div class="bg-card"></div>
+      </main>
+    </div>
+    <div class="backdrop-overlay" aria-hidden="true"></div>
+
+    <!-- Floating chat bubble (anchored above the FAB) -->
+    <section class="chat-panel" role="dialog" aria-labelledby="sheet-title">
+      <header class="sheet-header">
+        <span class="sheet-title" id="sheet-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+            <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
+          </svg>
+          My Strive
+        </span>
+        <button class="icon-btn" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="conversation">
+        <!-- 1. Voice message → log confirmation card -->
+        <div class="voice" aria-label="Voice message, 8 seconds">
+          <button class="voice-play" type="button" aria-label="Play voice">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21"/></svg>
+          </button>
+          <span class="waveform" aria-hidden="true">
+            <i style="height:6px"></i><i style="height:10px"></i><i style="height:4px"></i><i style="height:13px"></i>
+            <i style="height:8px"></i><i style="height:16px"></i><i style="height:10px"></i><i style="height:14px"></i>
+            <i style="height:6px"></i><i style="height:12px"></i><i style="height:5px"></i><i style="height:11px"></i>
+            <i style="height:15px"></i><i style="height:8px"></i><i style="height:10px"></i><i style="height:6px"></i>
+          </span>
+          <span class="voice-duration">0:08</span>
+        </div>
+
+        <div class="log-card">
+          <span class="log-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </span>
+          <span class="log-body">
+            <span class="log-title">Logged · Strength training</span>
+            <span class="meter">
+              <span class="meter-track"><span class="meter-fill fill-steady" style="width:67%"></span></span>
+              <span class="meter-count">2/3</span>
+            </span>
+          </span>
+          <button class="undo-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
+            Undo
+          </button>
+        </div>
+
+        <!-- 2. Ambiguous log request → disambiguation chips -->
+        <div class="bubble user">Log my workout</div>
+
+        <div class="card">
+          <div class="card-head">Which ritual?</div>
+          <div class="chips">
+            <button class="chip" type="button">Strength training</button>
+            <button class="chip" type="button">Yoga flow</button>
+          </div>
+        </div>
+
+        <!-- 3. Momentum request → momentum card -->
+        <div class="bubble user">How am I doing this week?</div>
+
+        <div class="card">
+          <div class="card-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
+            Momentum
+          </div>
+          <div class="card-list">
+            <div class="row">
+              <span class="row-name">Meditation</span>
+              <span class="meter">
+                <span class="meter-track"><span class="meter-fill fill-strong" style="width:71%"></span></span>
+                <span class="meter-count">5/7</span>
+              </span>
+            </div>
+            <div class="row">
+              <span class="row-name">Strength training</span>
+              <span class="meter">
+                <span class="meter-track"><span class="meter-fill fill-steady" style="width:67%"></span></span>
+                <span class="meter-count">2/3</span>
+              </span>
+            </div>
+            <div class="row">
+              <span class="row-name">Read 20 pages</span>
+              <span class="count-only">7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="input-bar" onsubmit="event.preventDefault()">
+        <textarea rows="1" placeholder="What did you do today?" aria-label="Message"></textarea>
+        <button class="input-btn mic" type="button" aria-label="Voice message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/><path d="M8 22h8"/>
+          </svg>
+        </button>
+        <button class="input-btn send" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- FAB: anchors the chat bubble -->
+    <button class="fab" type="button" aria-label="Talk to My Strive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
+      </svg>
+    </button>
+
+    <!-- Bottom nav: app shell stays visible -->
+    <nav class="bottom-nav" aria-label="Primary">
+      <button class="nav-item active" type="button" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/>
+        </svg>
+        <span class="nav-label">Rhythm</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08v0c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"/>
+          <path d="m18 15-2-2"/><path d="m15 18-2-2"/>
+        </svg>
+        <span class="nav-label">Rituals</span>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="nav-label">Circles</span>
+      </button>
+    </nav>
+  </div>
+
+<script>
+  const root = document.documentElement;
+  const params = new URLSearchParams(window.location.search);
+  const isEmbedded = window.parent !== window;
+  if (isEmbedded || params.has("clean")) root.classList.add("embedded");
+  // Theme can be forced via ?theme=light|dark (used for deterministic captures);
+  // otherwise it follows the OS preference.
+  const forced = params.get("theme");
+  const initial =
+    forced === "light" || forced === "dark"
+      ? forced
+      : window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+  root.dataset.theme = initial;
+  document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.setTheme;
+      root.dataset.theme = t;
+      document.querySelectorAll(".wf-controls [data-set-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>
