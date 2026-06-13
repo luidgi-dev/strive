@@ -24,8 +24,12 @@ create table insights (
     user_id      uuid not null references profiles(id) on delete cascade,
     cadence      text not null default 'weekly' check (cadence in ('weekly', 'monthly')),
     type         text not null check (type in ('correlation', 'adjustment', 'strength', 'best_day', 'anchor_pair')),
+    -- canonical English copy (fallback for non-localized surfaces)
     headline     text not null,
     body         text not null,
+    -- both languages, so switching app language re-localizes the page without
+    -- regenerating: { "en": { "headline", "body" }, "fr": { "headline", "body" } }
+    translations jsonb not null default '{}',
     -- denormalized fallback; the page renders the basis from payload.weeksObserved
     -- so it can localize (FR/EN). Kept for debugging / non-localized surfaces.
     basis_label  text not null,
