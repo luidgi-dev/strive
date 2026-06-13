@@ -12,6 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Link } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 type Tier = "lite" | "premium" | "lifetime";
@@ -84,6 +85,20 @@ export function MembershipSection({
         <span className="text-sm">{t("resetsOn")}</span>
         <span className="text-sm text-muted-foreground">{resetLabel}</span>
       </div>
+
+      {/* Insights is a premium surface: the link only appears for paid tiers. */}
+      {tier !== "lite" ? (
+        <>
+          <div className="h-px bg-border" aria-hidden />
+          <Link
+            href="/protected/settings/insights"
+            className="flex min-h-[44px] items-center justify-between gap-3 text-sm text-foreground transition-colors hover:text-muted-foreground"
+          >
+            <span>{t("myInsights")}</span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </Link>
+        </>
+      ) : null}
 
       <PlansLink currentTier={tier} />
     </section>

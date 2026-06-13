@@ -19,6 +19,7 @@ TABLES = [
     'rituals.sql',
     'log_statuses.sql',
     'ritual_logs.sql',
+    'insights.sql',
     'push_subscriptions.sql',
     'circles.sql',
     'circle_members.sql',

@@ -9,6 +9,7 @@ Shared utilities and client libraries for the Strive web app.
   - `server.ts` — Server-side client, typed with `<Database>`, cookie-based session handling
   - `middleware.ts` — Refreshes the session cookie; called from `proxy.ts`; also typed with `<Database>`
   - `database.types.ts` — Auto-generated TypeScript types reflecting the public schema (tables, views, enums). Do not edit by hand. Regenerate with `npm run db:types`.
+  - `admin.ts` — `createAdminClient()`: service-role client (reads `SUPABASE_SERVICE_ROLE_KEY`). **Bypasses RLS** — server-only, for trusted jobs (the Insights cron) that have no user session. Every query made with it must filter `user_id` explicitly. Never import into a client component or user-session path.
 - `profile.ts` — `getAuthenticatedProfile()`: server-side helper that returns `{ user, profile }` from the Supabase session + `profiles` table. Used by `app/[locale]/protected/layout.tsx` to gate access and render the header avatar.
 - `i18n/` — Locale-aware navigation helpers built on `next-intl`
   - `routing.ts` — `defineRouting` config (re-uses `locales`/`defaultLocale` from root `i18n.ts`, `localePrefix: "as-needed"` to match the proxy's clean-URL behavior for English)
@@ -26,6 +27,7 @@ Shared utilities and client libraries for the Strive web app.
 - `date.ts` — Date helpers: `todayInTimeZone`, `isoWeekday`, `startOfWeek`, `daysInMonth`
 - `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `paceToStatus` / `rollingMomentumStatus` (momentum status from the view's rolling-window figures), plus `insertRitualLog`/`insertRitual` write helpers used by the AI tools — tagged `logged_via: "ai"`)
 - `rituals/` — Ritual presentation logic: `presentation.ts` (period label, momentum tokens, freshness), `category-label.ts`, `arc.ts`
+- `insights/` — The **Insights** feature's hybrid intelligence (second AI surface). `calculators.ts` (pure Stats Engine + confidence, unit-tested), `prompts.ts` (one specialized prompt per card type; output is `{ headline, body }` only), `orchestrator.ts` (`generateInsightsForUser` — runs calculators, filters by confidence, phrases each fact with `generateObject`, caches in the `insights` table idempotently per cadence). Triggered weekly/monthly by `app/[locale]/api/cron/insights/route.ts` under the service role. See [`design/insights-page.md`](../design/insights-page.md).
 - `rhythm/` — `today-rituals.ts`: pure `selectTodayRituals` deciding what shows on the Rhythm home today (scope, daily quota, Done-today split)
 
 ## Usage
@@ -108,6 +110,7 @@ Unit tests are **co-located** with the modules they cover (Vitest, `*.test.ts`):
 
 - `date.test.ts` — `isoWeekday`, `startOfWeek`, `daysInMonth`, `todayInTimeZone`
 - `data/rituals.test.ts` — momentum derivation (`paceToStatus`, `rollingMomentumStatus`)
+- `insights/calculators.test.ts` — Stats Engine (`computeCorrelations`, `computeAdjustments`, `computeConfidence`) on deterministic fixtures
 - `rhythm/today-rituals.test.ts` — `selectTodayRituals` (scope, daily quota, open handling, sort order)
 
 Run from the repo root with `npm test` (or `npm run test:watch`). Keep new unit

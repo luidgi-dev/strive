@@ -82,6 +82,85 @@ export type Database = {
           },
         ]
       }
+      insights: {
+        Row: {
+          basis_label: string
+          body: string
+          cadence: string
+          confidence: number
+          created_at: string
+          dismissed_at: string | null
+          generated_at: string
+          headline: string
+          id: string
+          payload: Json
+          period_end: string
+          period_start: string
+          ritual_id: string | null
+          translations: Json
+          type: string
+          user_id: string
+        }
+        Insert: {
+          basis_label: string
+          body: string
+          cadence?: string
+          confidence: number
+          created_at?: string
+          dismissed_at?: string | null
+          generated_at?: string
+          headline: string
+          id?: string
+          payload?: Json
+          period_end: string
+          period_start: string
+          ritual_id?: string | null
+          translations?: Json
+          type: string
+          user_id: string
+        }
+        Update: {
+          basis_label?: string
+          body?: string
+          cadence?: string
+          confidence?: number
+          created_at?: string
+          dismissed_at?: string | null
+          generated_at?: string
+          headline?: string
+          id?: string
+          payload?: Json
+          period_end?: string
+          period_start?: string
+          ritual_id?: string | null
+          translations?: Json
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insights_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "ritual_progress"
+            referencedColumns: ["ritual_id"]
+          },
+          {
+            foreignKeyName: "insights_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "rituals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insights_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       log_statuses: {
         Row: {
           id: string
