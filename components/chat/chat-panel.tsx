@@ -18,7 +18,7 @@ const getServerSnapshot = () => false;
 
 /**
  * Mounts the AI chat: the FAB opens a floating glass panel anchored above it,
- * with the Rhythm dashboard blurred behind (per docs/wireframes/ai-chat.html).
+ * with the Rhythm dashboard blurred behind (per design/wireframes/ai-chat.html).
  * Owns the open state, the client-only guard, and the settings-page hiding that
  * previously lived in the FAB. Built on base-ui Dialog for focus-trap / Escape /
  * dismiss, but styled as a floating bubble rather than an edge-to-edge sheet.
