@@ -13,6 +13,9 @@ import { useVoiceRecorder } from "./use-voice-recorder";
 
 const SUGGESTION_KEYS = ["momentum", "log", "list"] as const;
 
+// Cap the auto-growing input at roughly five lines, then it scrolls internally.
+const MAX_INPUT_HEIGHT = 132;
+
 // Block codes the chat route puts in a non-2xx JSON body ({ code, resetAt }).
 // These two keep the input locked; any other failure is a transient retry.
 const BLOCKING_CODES = new Set(["credits_exhausted", "ai_paused"]);
@@ -120,6 +123,17 @@ export function StriveChat() {
     if (node) node.scrollTo({ top: node.scrollHeight, behavior: "smooth" });
   }, [messages, isStreaming]);
 
+  // Grow the textarea with its content (long messages stay fully visible)
+  // up to MAX_INPUT_HEIGHT, after which it scrolls. Runs on every edit and
+  // resets naturally when `input` is cleared after sending.
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT)}px`;
+  }, [input]);
+
   // Tick the on-screen recording timer; resetting happens when recording starts.
   useEffect(() => {
     if (!isRecording) return;
@@ -136,6 +150,21 @@ export function StriveChat() {
     if (!trimmed || isStreaming || isBlocked) return;
     sendMessage({ text: trimmed });
     setInput("");
+  };
+
+  // On a device with a physical keyboard, Enter sends and Shift+Enter inserts a
+  // newline. On touch devices the Enter key always inserts a newline (sending is
+  // the on-screen button), so a long message can be composed across lines.
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey &&
+      !event.nativeEvent.isComposing &&
+      window.matchMedia("(pointer: fine)").matches
+    ) {
+      event.preventDefault();
+      submitText();
+    }
   };
 
   const startRecording = () => {
@@ -238,15 +267,20 @@ export function StriveChat() {
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1">
-            <input
+          <div className="flex items-end gap-1">
+            <textarea
+              ref={inputRef}
               value={input}
               onChange={(event) => setInput(event.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder={t("placeholder")}
               aria-label={t("placeholder")}
               disabled={isStreaming || isBlocked}
               autoComplete="off"
-              className="min-w-0 flex-1 rounded-full bg-accent px-4 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
+              rows={1}
+              // text-base (16px) keeps iOS Safari from zooming the viewport on focus.
+              className="min-w-0 flex-1 resize-none overflow-y-auto rounded-3xl bg-accent px-4 py-2.5 text-base leading-relaxed text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
+              style={{ maxHeight: MAX_INPUT_HEIGHT }}
             />
             {recorder.supported ? (
               <button
