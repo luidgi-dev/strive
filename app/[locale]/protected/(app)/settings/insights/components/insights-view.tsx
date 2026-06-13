@@ -61,7 +61,7 @@ export function InsightsView({
             aria-selected={cadence === c}
             onClick={() => setCadence(c)}
             className={cn(
-              "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+              "flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors",
               cadence === c
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",

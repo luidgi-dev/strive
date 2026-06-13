@@ -21,6 +21,7 @@ type InsightRow = {
   type: string;
   headline: string;
   body: string;
+  translations: unknown;
   payload: unknown;
   generated_at: string;
   period_start: string;
@@ -50,12 +51,37 @@ function basisWeeksOf(payload: unknown, fallback: number): number {
   return fallback;
 }
 
+/**
+ * Pick the card copy for the active locale from `translations` (written by the
+ * orchestrator as { en, fr }), falling back to the canonical headline/body.
+ */
+function localizedCopy(
+  row: InsightRow,
+  locale: string,
+): { headline: string; body: string } {
+  const all = row.translations;
+  if (all && typeof all === "object" && !Array.isArray(all)) {
+    const entry = (all as Record<string, unknown>)[locale];
+    if (entry && typeof entry === "object") {
+      const { headline, body } = entry as { headline?: unknown; body?: unknown };
+      if (typeof headline === "string" && typeof body === "string") {
+        return { headline, body };
+      }
+    }
+  }
+  return { headline: row.headline, body: row.body };
+}
+
 function daysSince(iso: string): number {
   return Math.max(0, Math.floor((Date.now() - Date.parse(iso)) / MS_PER_DAY));
 }
 
 /** Keep only the latest period's cards for one cadence (rows arrive newest-first). */
-function reportFor(rows: InsightRow[], cadence: InsightCadence): InsightsReport {
+function reportFor(
+  rows: InsightRow[],
+  cadence: InsightCadence,
+  locale: string,
+): InsightsReport {
   const ofCadence = rows.filter((r) => r.cadence === cadence);
   if (ofCadence.length === 0) return { cards: [], updatedDays: null };
 
@@ -66,8 +92,7 @@ function reportFor(rows: InsightRow[], cadence: InsightCadence): InsightsReport 
   const cards: InsightCardData[] = latest.map((r) => ({
     id: r.id,
     type: toInsightType(r.type),
-    headline: r.headline,
-    body: r.body,
+    ...localizedCopy(r, locale),
     basisWeeks: basisWeeksOf(r.payload, fallbackWeeks),
     generatedAt: r.generated_at,
   }));
@@ -105,14 +130,16 @@ export default async function InsightsPage({ params }: Props) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("insights")
-    .select("id, cadence, type, headline, body, payload, generated_at, period_start")
+    .select(
+      "id, cadence, type, headline, body, translations, payload, generated_at, period_start",
+    )
     .is("dismissed_at", null)
     .order("period_start", { ascending: false })
     .order("confidence", { ascending: false });
 
-  const rows = (data ?? []) as InsightRow[];
-  const weekly = reportFor(rows, "weekly");
-  const monthly = reportFor(rows, "monthly");
+  const rows: InsightRow[] = data ?? [];
+  const weekly = reportFor(rows, "weekly", locale);
+  const monthly = reportFor(rows, "monthly", locale);
   const hasAny = weekly.cards.length > 0 || monthly.cards.length > 0;
 
   return (

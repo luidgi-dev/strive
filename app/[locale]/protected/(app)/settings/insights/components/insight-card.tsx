@@ -3,12 +3,9 @@
 import { Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-export type InsightType =
-  | "correlation"
-  | "adjustment"
-  | "strength"
-  | "best_day"
-  | "anchor_pair";
+import type { InsightType } from "@/lib/insights/calculators";
+
+export type { InsightType };
 
 export type InsightCardData = {
   id: string;
@@ -62,7 +59,7 @@ export function InsightCard({
         <button
           type="button"
           onClick={() => onDismiss(card.id)}
-          className="rounded-full border border-border px-3 py-1.5 text-[11.5px] font-semibold text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+          className="inline-flex min-h-9 items-center rounded-full border border-border px-3.5 text-[11.5px] font-semibold text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
         >
           {t("actions.dismiss")}
         </button>
