@@ -481,6 +481,8 @@ export type Database = {
           frequency_unit: string | null
           icon: string | null
           logs_this_period: number | null
+          momentum_count: number | null
+          momentum_target: number | null
           name: string | null
           ritual_id: string | null
           ritual_type: string | null

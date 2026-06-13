@@ -1,16 +1,9 @@
-import { isoWeekday } from "@/lib/date";
 import {
-  type CompletedLogRow,
-  deriveDailyMomentum,
-  deriveMomentumStatus,
   type MomentumStatus,
   type RitualProgressEntry,
+  rollingMomentumStatus,
 } from "@/lib/data/rituals";
 import { isRitualFresh } from "@/lib/rituals/presentation";
-
-// A week is seven days; daily rituals are framed against this weekly target
-// (mirrors DAILY_WEEK_TARGET in lib/rhythm/today-rituals.ts).
-export const DAILY_WEEK_TARGET = 7;
 
 export type MomentumFields = {
   ritual_type: string;
@@ -27,71 +20,38 @@ export type MomentumView = {
   on_track: boolean | null;
 };
 
-/** Distinct days logged this week per ritual id (drives a daily ritual's X/7). */
-export function weekDayCountsByRitual(
-  weekLogs: CompletedLogRow[],
-): Map<string, number> {
-  const days = new Map<string, Set<string>>();
-  for (const log of weekLogs) {
-    const set = days.get(log.ritual_id) ?? new Set<string>();
-    set.add(log.logged_at);
-    days.set(log.ritual_id, set);
-  }
-  const counts = new Map<string, number>();
-  for (const [id, set] of days) counts.set(id, set.size);
-  return counts;
-}
-
 /**
- * Per-ritual momentum exactly as the Rhythm cards present it (mirrors
- * `deriveRhythmCardView`): daily rituals are framed weekly (X/7, pace-based
- * momentum over elapsed weekdays), weekly/monthly use their period target, and
- * one_time/open carry no target. Fresh rituals with nothing logged suppress
- * momentum so the chat and the cards agree.
+ * Per-ritual momentum for the chat, read from the rolling-window figures the
+ * `ritual_progress` view exposes (`momentumCount` / `momentumTarget`, sized to
+ * the cadence). The count and target shown in the chat are therefore the rolling
+ * ones (e.g. days logged in the last 7), and the status matches them. Open /
+ * one-time rituals carry no target, so everything stays null. Mirrors the status
+ * shown on the app cards (which keep their calendar "this week" numbers).
  */
 export function buildMomentumView(
   fields: MomentumFields,
   progress: RitualProgressEntry | undefined,
-  weekDaysCount: number,
-  today: string,
 ): MomentumView {
-  const isFresh = isRitualFresh(fields.created_at);
-  const isDaily =
-    fields.ritual_type === "recurring" && fields.frequency_unit === "day";
-  const isPeriodic =
-    fields.ritual_type === "recurring" &&
-    (fields.frequency_unit === "week" || fields.frequency_unit === "month") &&
-    (fields.frequency_value ?? 0) > 0;
+  const momentum_status = rollingMomentumStatus(
+    progress,
+    fields.ritual_type,
+    isRitualFresh(fields.created_at),
+  );
 
-  let logs_this_period: number | null = null;
-  let target: number | null = null;
-  let period: "week" | "month" | null = null;
-  let momentum_status: MomentumStatus | null = null;
+  const isRecurring = fields.ritual_type === "recurring";
+  const period: "week" | "month" | null = isRecurring
+    ? fields.frequency_unit === "month"
+      ? "month"
+      : "week"
+    : null;
 
-  if (isDaily) {
-    logs_this_period = weekDaysCount;
-    target = DAILY_WEEK_TARGET;
-    period = "week";
-    momentum_status =
-      weekDaysCount === 0 && isFresh
-        ? null
-        : deriveDailyMomentum(weekDaysCount, isoWeekday(today));
-  } else if (isPeriodic) {
-    const logs = progress?.logsThisPeriod ?? 0;
-    logs_this_period = logs;
-    target = fields.frequency_value;
-    period = fields.frequency_unit === "month" ? "month" : "week";
-    momentum_status =
-      logs === 0 && isFresh
-        ? null
-        : deriveMomentumStatus(fields.ritual_type, progress?.completionRate ?? null);
-  }
-  // one_time / open: no target, no momentum (everything stays null).
+  const on_track = momentum_status !== null ? momentum_status !== "resting" : null;
 
-  const on_track =
-    fields.ritual_type === "recurring" && momentum_status !== null
-      ? momentum_status !== "resting"
-      : null;
-
-  return { logs_this_period, target, period, momentum_status, on_track };
+  return {
+    logs_this_period: progress?.momentumCount ?? null,
+    target: progress?.momentumTarget ?? null,
+    period,
+    momentum_status,
+    on_track,
+  };
 }

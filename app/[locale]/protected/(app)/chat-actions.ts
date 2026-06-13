@@ -2,12 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
-import { startOfWeek } from "@/lib/date";
 import { buildMomentumView } from "@/lib/data/momentum";
 import {
   deleteRitualLog,
   getRitualProgress,
-  getWeekCompletedLogs,
   insertRitualLog,
 } from "@/lib/data/rituals";
 import { ensureProfile, getUserToday } from "@/lib/profile";
@@ -67,16 +65,8 @@ export async function logRitualFromChat(
       loggedAt: date,
     });
 
-    const [progress, weekLogs] = await Promise.all([
-      getRitualProgress(supabase, ritual.id),
-      getWeekCompletedLogs(supabase, startOfWeek(today)),
-    ]);
-    const weekDaysCount = new Set(
-      weekLogs
-        .filter((log) => log.ritual_id === ritual.id)
-        .map((log) => log.logged_at),
-    ).size;
-    const view = buildMomentumView(ritual, progress ?? undefined, weekDaysCount, today);
+    const progress = await getRitualProgress(supabase, ritual.id);
+    const view = buildMomentumView(ritual, progress ?? undefined);
 
     revalidatePath("/protected/flow");
     revalidatePath("/protected/rituals");

@@ -73,6 +73,13 @@ export type RitualProgressEntry = {
   logsThisPeriod: number | null;
   /** Expected logs for the current period (null for open rituals / no target). */
   target: number | null;
+  /**
+   * Rolling-window momentum, sized to the cadence (daily 7d distinct days,
+   * weekly 7d logs, monthly 30d logs). Drives the momentum status pill so it no
+   * longer resets on the calendar boundary. Null for open / one-time rituals.
+   */
+  momentumCount: number | null;
+  momentumTarget: number | null;
 };
 
 export type RitualsData = {
@@ -119,7 +126,9 @@ export async function getRitualsForActiveUser(
     .order("created_at", { ascending: true });
   let progressQuery = client
     .from("ritual_progress")
-    .select("ritual_id, completion_rate, logs_this_period, target");
+    .select(
+      "ritual_id, completion_rate, logs_this_period, target, momentum_count, momentum_target",
+    );
   if (userId) {
     ritualsQuery = ritualsQuery.eq("user_id", userId);
     progressQuery = progressQuery.eq("user_id", userId);
@@ -151,6 +160,8 @@ export async function getRitualsForActiveUser(
       completionRate: p.completion_rate,
       logsThisPeriod: p.logs_this_period,
       target: p.target,
+      momentumCount: p.momentum_count,
+      momentumTarget: p.momentum_target,
     });
   }
 
@@ -260,7 +271,9 @@ export async function getRitualProgress(
   // getRitualsForActiveUser.
   let query = client
     .from("ritual_progress")
-    .select("completion_rate, logs_this_period, target")
+    .select(
+      "completion_rate, logs_this_period, target, momentum_count, momentum_target",
+    )
     .eq("ritual_id", ritualId);
   if (userId) query = query.eq("user_id", userId);
   const { data, error } = await query.maybeSingle();
@@ -271,6 +284,8 @@ export async function getRitualProgress(
     completionRate: data.completion_rate,
     logsThisPeriod: data.logs_this_period,
     target: data.target,
+    momentumCount: data.momentum_count,
+    momentumTarget: data.momentum_target,
   };
 }
 
@@ -370,26 +385,27 @@ export function paceToStatus(percent: number): MomentumStatus {
   return "resting";
 }
 
-export function deriveMomentumStatus(
+/**
+ * Momentum status from the rolling-window figures the `ritual_progress` view
+ * exposes (`momentumCount` / `momentumTarget`, sized to the cadence). The window
+ * carries across calendar boundaries, so a single log after a gap reads as
+ * "Resting", not "Strong". Only recurring rituals have momentum; a fresh ritual
+ * (created in the last 7 days) with nothing logged shows none yet.
+ */
+export function rollingMomentumStatus(
+  entry:
+    | Pick<RitualProgressEntry, "momentumCount" | "momentumTarget">
+    | null
+    | undefined,
   ritualType: string,
-  completionRate: number | null,
+  isFresh: boolean,
 ): MomentumStatus | null {
   if (ritualType !== "recurring") return null;
-  if (completionRate === null) return "resting";
-  return paceToStatus(completionRate);
-}
-
-/**
- * Momentum for a daily ritual, paced against the week so far: days done vs days
- * elapsed (Mon = 1 … today). This avoids the early-week trap of `daysDone / 7`,
- * where a perfect Tuesday (2/2) would otherwise read as 2/7 = "behind".
- */
-export function deriveDailyMomentum(
-  daysDone: number,
-  daysElapsed: number,
-): MomentumStatus {
-  if (daysElapsed <= 0) return "resting";
-  return paceToStatus((daysDone / daysElapsed) * 100);
+  const count = entry?.momentumCount ?? 0;
+  const target = entry?.momentumTarget ?? 0;
+  if (target <= 0) return null;
+  if (count === 0 && isFresh) return null;
+  return paceToStatus((count / target) * 100);
 }
 
 export type RitualGroup = {

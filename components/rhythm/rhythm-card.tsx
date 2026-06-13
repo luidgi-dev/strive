@@ -35,7 +35,7 @@ export async function RhythmCard({
   const loggedToday = initialLogCount > 0;
   const meta = ritualPeriodLabel(ritual, t);
   const { numerator, denominator, status, barWidth, showProgress } =
-    deriveRhythmCardView({ ritual, progress, weekDaysCount }, today);
+    deriveRhythmCardView({ ritual, progress, weekDaysCount });
 
   return (
     <article

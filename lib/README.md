@@ -24,7 +24,7 @@ Shared utilities and client libraries for the Strive web app.
   The user-facing surface is `components/chat/` (a floating glass panel opened by the FAB on Rhythm), which calls this route through the AI SDK v6 `useChat` hook (`@ai-sdk/react`). See `components/chat/` for the UI pieces.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
 - `date.ts` — Date helpers: `todayInTimeZone`, `isoWeekday`, `startOfWeek`, `daysInMonth`
-- `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `deriveMomentumStatus`, `deriveDailyMomentum`, plus `insertRitualLog`/`insertRitual` write helpers used by the AI tools — tagged `logged_via: "ai"`)
+- `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `paceToStatus` / `rollingMomentumStatus` (momentum status from the view's rolling-window figures), plus `insertRitualLog`/`insertRitual` write helpers used by the AI tools — tagged `logged_via: "ai"`)
 - `rituals/` — Ritual presentation logic: `presentation.ts` (period label, momentum tokens, freshness), `category-label.ts`, `arc.ts`
 - `rhythm/` — `today-rituals.ts`: pure `selectTodayRituals` deciding what shows on the Rhythm home today (scope, daily quota, Done-today split)
 
@@ -107,7 +107,7 @@ Run `npm run db:types` after any schema change (new table, new column, new view,
 Unit tests are **co-located** with the modules they cover (Vitest, `*.test.ts`):
 
 - `date.test.ts` — `isoWeekday`, `startOfWeek`, `daysInMonth`, `todayInTimeZone`
-- `data/rituals.test.ts` — momentum derivation (`paceToStatus`, `deriveMomentumStatus`, `deriveDailyMomentum`)
+- `data/rituals.test.ts` — momentum derivation (`paceToStatus`, `rollingMomentumStatus`)
 - `rhythm/today-rituals.test.ts` — `selectTodayRituals` (scope, daily quota, open handling, sort order)
 
 Run from the repo root with `npm test` (or `npm run test:watch`). Keep new unit

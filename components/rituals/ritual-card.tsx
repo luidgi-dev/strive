@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import {
-  deriveMomentumStatus,
+  rollingMomentumStatus,
   type RitualCategoryRow,
   type RitualProgressEntry,
   type RitualWithCategory,
@@ -21,14 +21,11 @@ type Props = {
 export async function RitualCard({ ritual, progress, categories }: Props) {
   const t = await getTranslations("rituals");
 
-  const logsThisPeriod = progress?.logsThisPeriod ?? 0;
-  const status =
-    logsThisPeriod === 0 && isRitualFresh(ritual.created_at)
-      ? null
-      : deriveMomentumStatus(
-          ritual.ritual_type,
-          progress?.completionRate ?? null,
-        );
+  const status = rollingMomentumStatus(
+    progress,
+    ritual.ritual_type,
+    isRitualFresh(ritual.created_at),
+  );
 
   const meta = ritualPeriodLabel(ritual, t);
 
