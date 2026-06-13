@@ -2,10 +2,7 @@ import { tool, type ToolSet } from "ai";
 import { z } from "zod";
 
 import { startOfWeek } from "@/lib/date";
-import {
-  buildMomentumView,
-  weekDayCountsByRitual,
-} from "@/lib/data/momentum";
+import { buildMomentumView } from "@/lib/data/momentum";
 import {
   getRitualProgress,
   getRitualsForActiveUser,
@@ -128,12 +125,10 @@ export function striveTools(
       }),
       execute: async ({ category_name }) =>
         runTool("list_rituals", async () => {
-          const today = await getUserToday(supabase);
-          const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
-            getRitualsForActiveUser(supabase, userId),
-            getWeekCompletedLogs(supabase, startOfWeek(today), userId),
-          ]);
-          const weekDays = weekDayCountsByRitual(weekLogs);
+          const { rituals, progressByRitualId } = await getRitualsForActiveUser(
+            supabase,
+            userId,
+          );
 
           const filter = category_name?.trim().toLowerCase();
           const scoped = filter
@@ -148,12 +143,7 @@ export function striveTools(
                 r.ritual_type,
                 r.frequency_unit,
               );
-              const view = buildMomentumView(
-                r,
-                progressByRitualId.get(r.id),
-                weekDays.get(r.id) ?? 0,
-                today,
-              );
+              const view = buildMomentumView(r, progressByRitualId.get(r.id));
               return {
                 id: r.id,
                 name: r.name,
@@ -188,7 +178,6 @@ export function striveTools(
             getRitualsForActiveUser(supabase, userId),
             getWeekCompletedLogs(supabase, startOfWeek(today), userId),
           ]);
-          const weekDays = weekDayCountsByRitual(weekLogs);
           // Total logs this week per ritual, so open / one-time rituals (which
           // carry no target) still report how many times they were logged.
           const weekTotals = new Map<string, number>();
@@ -210,17 +199,12 @@ export function striveTools(
           return {
             status: "ok" as const,
             rituals: scoped.map((r) => {
-              const view = buildMomentumView(
-                r,
-                progressByRitualId.get(r.id),
-                weekDays.get(r.id) ?? 0,
-                today,
-              );
+              const view = buildMomentumView(r, progressByRitualId.get(r.id));
               return {
                 name: r.name,
                 ritual_type: r.ritual_type,
-                // Targeted rituals keep their period count; open / one-time
-                // rituals fall back to this week's raw log count (target stays null).
+                // Recurring rituals show their rolling momentum count; open /
+                // one-time rituals (no target) fall back to this week's raw count.
                 logs_this_period: view.logs_this_period ?? (weekTotals.get(r.id) ?? 0),
                 target: view.target,
                 period: view.period,
@@ -269,23 +253,10 @@ export function striveTools(
             note,
           });
 
-          // Re-read momentum the same way the Rhythm cards present it, so the
-          // confirmation matches what the user sees (daily rituals framed as X/7).
-          const [progress, weekLogs] = await Promise.all([
-            getRitualProgress(supabase, ritual.id, userId),
-            getWeekCompletedLogs(supabase, startOfWeek(today), userId),
-          ]);
-          const weekDaysCount = new Set(
-            weekLogs
-              .filter((log) => log.ritual_id === ritual.id)
-              .map((log) => log.logged_at),
-          ).size;
-          const view = buildMomentumView(
-            ritual,
-            progress ?? undefined,
-            weekDaysCount,
-            today,
-          );
+          // Re-read momentum from the (rolling) progress view so the
+          // confirmation matches the status shown elsewhere.
+          const progress = await getRitualProgress(supabase, ritual.id, userId);
+          const view = buildMomentumView(ritual, progress ?? undefined);
 
           return {
             status: "ok" as const,

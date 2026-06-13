@@ -2,12 +2,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 
 import {
-  deriveDailyMomentum,
-  deriveMomentumStatus,
   getRitualProgress,
   getRitualsForActiveUser,
   getWeekCompletedLogs,
   paceToStatus,
+  rollingMomentumStatus,
 } from "@/lib/data/rituals";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -72,35 +71,39 @@ describe("paceToStatus", () => {
   });
 });
 
-describe("deriveMomentumStatus", () => {
+describe("rollingMomentumStatus", () => {
+  const recurring = (momentumCount: number | null, momentumTarget: number | null) =>
+    ({ momentumCount, momentumTarget });
+
   it("only applies to recurring rituals", () => {
-    expect(deriveMomentumStatus("one_time", 100)).toBeNull();
-    expect(deriveMomentumStatus("open", 100)).toBeNull();
+    expect(rollingMomentumStatus(recurring(7, 7), "one_time", false)).toBeNull();
+    expect(rollingMomentumStatus(recurring(7, 7), "open", false)).toBeNull();
   });
 
-  it("treats a null completion rate (open target) as resting", () => {
-    expect(deriveMomentumStatus("recurring", null)).toBe("resting");
+  it("returns null without a target (open target) or no progress row", () => {
+    expect(rollingMomentumStatus(recurring(0, null), "recurring", false)).toBeNull();
+    expect(rollingMomentumStatus(recurring(3, 0), "recurring", false)).toBeNull();
+    expect(rollingMomentumStatus(undefined, "recurring", false)).toBeNull();
   });
 
-  it("derives from the completion rate", () => {
-    expect(deriveMomentumStatus("recurring", 90)).toBe("strong");
-    expect(deriveMomentumStatus("recurring", 50)).toBe("steady");
-    expect(deriveMomentumStatus("recurring", 10)).toBe("resting");
-  });
-});
-
-describe("deriveDailyMomentum", () => {
-  it("paces days done against days elapsed (no early-week penalty)", () => {
-    // Tuesday, both days done -> on pace.
-    expect(deriveDailyMomentum(2, 2)).toBe("strong");
-    // Wednesday, 2 of 3 done.
-    expect(deriveDailyMomentum(2, 3)).toBe("steady");
-    // Friday, 1 of 5 done.
-    expect(deriveDailyMomentum(1, 5)).toBe("resting");
+  it("suppresses momentum for a fresh ritual with nothing logged", () => {
+    expect(rollingMomentumStatus(recurring(0, 7), "recurring", true)).toBeNull();
+    // Not fresh: an empty window reads as resting, not null.
+    expect(rollingMomentumStatus(recurring(0, 7), "recurring", false)).toBe("resting");
   });
 
-  it("returns resting before any day has elapsed", () => {
-    expect(deriveDailyMomentum(0, 0)).toBe("resting");
+  it("paces a daily ritual over the rolling 7-day window", () => {
+    // 6 of the last 7 days -> strong (carries across a Monday).
+    expect(rollingMomentumStatus(recurring(6, 7), "recurring", false)).toBe("strong");
+    // A single log after a gap -> resting (the bug this fixes).
+    expect(rollingMomentumStatus(recurring(1, 7), "recurring", false)).toBe("resting");
+  });
+
+  it("paces weekly / monthly rituals against their target", () => {
+    expect(rollingMomentumStatus(recurring(3, 3), "recurring", false)).toBe("strong");
+    expect(rollingMomentumStatus(recurring(2, 3), "recurring", false)).toBe("steady");
+    expect(rollingMomentumStatus(recurring(1, 3), "recurring", false)).toBe("resting");
+    expect(rollingMomentumStatus(recurring(8, 10), "recurring", false)).toBe("strong");
   });
 });
 

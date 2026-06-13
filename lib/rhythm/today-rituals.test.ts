@@ -33,6 +33,17 @@ function makeRitual(
   };
 }
 
+function prog(overrides: Partial<RitualProgressEntry> = {}): RitualProgressEntry {
+  return {
+    completionRate: null,
+    logsThisPeriod: null,
+    target: null,
+    momentumCount: null,
+    momentumTarget: null,
+    ...overrides,
+  };
+}
+
 function run(
   rituals: RitualWithCategory[],
   opts: {
@@ -107,7 +118,9 @@ describe("selectTodayRituals — daily quota for high targets", () => {
       frequency_value: 3,
     });
     const res = run([weekly], {
-      progress: new Map([["wt", { completionRate: 100, logsThisPeriod: 3, target: 3 }]]),
+      progress: new Map([
+        ["wt", prog({ completionRate: 100, logsThisPeriod: 3, target: 3 })],
+      ]),
     });
     expect(res.active).toHaveLength(0);
     expect(res.done).toHaveLength(0);
@@ -121,7 +134,9 @@ describe("selectTodayRituals — daily quota for high targets", () => {
     });
     // Third log of the period happens today (quota 1) -> done today, not hidden.
     const res = run([weekly], {
-      progress: new Map([["wt2", { completionRate: 100, logsThisPeriod: 3, target: 3 }]]),
+      progress: new Map([
+        ["wt2", prog({ completionRate: 100, logsThisPeriod: 3, target: 3 })],
+      ]),
       weekLogs: [{ ritual_id: "wt2", logged_at: TODAY }],
     });
     expect(ids(res.done)).toEqual(["wt2"]);
@@ -212,15 +227,25 @@ describe("selectTodayRituals — sort order", () => {
 describe("deriveRhythmCardView", () => {
   const OLD = "2020-01-01T00:00:00Z"; // not "fresh"
 
-  it("shows logs/target + completion bar for a weekly ritual", () => {
+  it("shows this-week logs/target + bar, status from the rolling window", () => {
     const ritual = makeRitual({
       frequency_unit: "week",
       frequency_value: 5,
       created_at: OLD,
     });
     const view = deriveRhythmCardView(
-      { ritual, progress: { completionRate: 60, logsThisPeriod: 3, target: 5 }, weekDaysCount: 0 },
-      TODAY,
+      {
+        ritual,
+        // numerator/bar: this week (3/5, 60%); status: rolling (3 of 5 -> steady).
+        progress: prog({
+          completionRate: 60,
+          logsThisPeriod: 3,
+          target: 5,
+          momentumCount: 3,
+          momentumTarget: 5,
+        }),
+        weekDaysCount: 0,
+      },
     );
     expect(view).toMatchObject({
       numerator: 3,
@@ -231,12 +256,15 @@ describe("deriveRhythmCardView", () => {
     });
   });
 
-  it("shows X/7 with pace-aware momentum for a daily ritual", () => {
+  it("keeps the X/7 this-week number, status from the rolling 7-day window", () => {
     const ritual = makeRitual({ frequency_unit: "day", created_at: OLD });
-    // Sunday (ISO 7): 6 of 7 elapsed days done -> ~86% pace -> strong.
+    // This week: 6 distinct days (numerator/bar). Rolling: 6 of last 7 -> strong.
     const view = deriveRhythmCardView(
-      { ritual, progress: undefined, weekDaysCount: 6 },
-      "2026-05-24",
+      {
+        ritual,
+        progress: prog({ momentumCount: 6, momentumTarget: 7 }),
+        weekDaysCount: 6,
+      },
     );
     expect(view.numerator).toBe(6);
     expect(view.denominator).toBe(7);
@@ -251,8 +279,11 @@ describe("deriveRhythmCardView", () => {
       created_at: new Date().toISOString(),
     });
     const view = deriveRhythmCardView(
-      { ritual, progress: undefined, weekDaysCount: 0 },
-      TODAY,
+      {
+        ritual,
+        progress: prog({ momentumCount: 0, momentumTarget: 7 }),
+        weekDaysCount: 0,
+      },
     );
     expect(view.status).toBeNull();
     expect(view.showProgress).toBe(true); // still shows 0/7
@@ -265,7 +296,6 @@ describe("deriveRhythmCardView", () => {
     for (const ritual of [open, oneTime]) {
       const view = deriveRhythmCardView(
         { ritual, progress: undefined, weekDaysCount: 0 },
-        TODAY,
       );
       expect(view.showProgress).toBe(false);
       expect(view.numerator).toBeNull();
