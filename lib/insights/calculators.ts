@@ -12,7 +12,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/lib/supabase/database.types";
 
-export type InsightType = "correlation" | "adjustment";
+export type InsightType =
+  | "correlation"
+  | "adjustment"
+  | "strength"
+  | "best_day"
+  | "anchor_pair";
 
 /** A completed log, reduced to the fields the calculators need. */
 export type InsightLog = {
@@ -351,6 +356,230 @@ export function computeAdjustments(
   return results;
 }
 
+// --- Strength ---------------------------------------------------------------
+
+export type StrengthOpts = { weeks?: number; minWeeks?: number; minRatio?: number };
+
+/**
+ * The recurring ritual you keep up most reliably — a celebration card that fires
+ * early. Averages each ritual's weekly completion ratio over the window (daily:
+ * distinct days / 7; weekly: distinct days / target) and surfaces the strongest
+ * one above `minRatio`. One card.
+ */
+export function computeStrengths(
+  logs: InsightLog[],
+  rituals: InsightRitual[],
+  today: string,
+  opts: StrengthOpts = {},
+): CalculatorResult[] {
+  const { weeks = 4, minWeeks = 2, minRatio = 0.6 } = opts;
+  const eligible = rituals.filter(
+    (r) =>
+      r.ritual_type === "recurring" &&
+      (r.frequency_unit === "day" || r.frequency_unit === "week") &&
+      (r.frequency_value ?? 0) > 0,
+  );
+  if (eligible.length === 0) return [];
+
+  const windowWeeks = elapsedWeekStarts(today, weeks);
+  const windowSet = new Set(windowWeeks);
+  const { count, activeWeeks } = distinctDaysByRitualWeek(logs, windowSet);
+  const weeksObserved = activeWeeks.size;
+  if (weeksObserved < minWeeks) return [];
+
+  let best: CalculatorResult | null = null;
+  for (const r of eligible) {
+    const target = r.frequency_unit === "day" ? DAYS_PER_WEEK : r.frequency_value ?? 1;
+    const avg = mean(windowWeeks.map((w) => Math.min(1, count(r.id, w) / target)));
+    if (avg < minRatio) continue;
+
+    const totalDays = windowWeeks.reduce((s, w) => s + count(r.id, w), 0);
+    const confidence = computeConfidence({
+      weeksObserved,
+      minWeeks,
+      effect: avg,
+      effectCap: 1,
+      sample: totalDays,
+      sampleTarget: weeks * 4,
+    });
+    if (!best || confidence > best.confidence) {
+      best = {
+        type: "strength",
+        confidence,
+        ritualId: r.id,
+        basisWeeks: weeks,
+        facts: { ritualName: r.name, ratioPct: Math.round(avg * 100), weeks },
+        payload: { ratio: round2(avg), totalDays, weeksObserved },
+      };
+    }
+  }
+  return best ? [best] : [];
+}
+
+// --- Best day ---------------------------------------------------------------
+
+export type BestDayOpts = {
+  weeks?: number;
+  minWeeks?: number;
+  minLogs?: number;
+  minLead?: number;
+};
+
+/**
+ * The weekday you log the most across all rituals — an observational rhythm card.
+ * Compares the leading weekday's volume to the overall average and surfaces it
+ * when it stands out by `minLead`. One card.
+ */
+export function computeBestDay(
+  logs: InsightLog[],
+  today: string,
+  opts: BestDayOpts = {},
+): CalculatorResult[] {
+  const { weeks = 8, minWeeks = 2, minLogs = 10, minLead = 0.2 } = opts;
+  const windowSet = new Set(elapsedWeekStarts(today, weeks));
+
+  const perWeekday = new Array<number>(7).fill(0);
+  const activeWeeks = new Set<string>();
+  let total = 0;
+  for (const log of logs) {
+    const w = mondayOf(log.logged_at);
+    if (!windowSet.has(w)) continue;
+    activeWeeks.add(w);
+    perWeekday[new Date(parseISO(log.logged_at)).getUTCDay()] += 1;
+    total += 1;
+  }
+  const weeksObserved = activeWeeks.size;
+  if (weeksObserved < minWeeks || total < minLogs) return [];
+
+  let topDay = 0;
+  for (let wd = 1; wd < 7; wd++) if (perWeekday[wd] > perWeekday[topDay]) topDay = wd;
+
+  const overallAvg = total / 7;
+  const lead = (perWeekday[topDay] - overallAvg) / overallAvg;
+  if (lead < minLead) return []; // too flat to name a "best" day
+
+  const confidence = computeConfidence({
+    weeksObserved,
+    minWeeks,
+    effect: lead,
+    effectCap: 0.6,
+    sample: total,
+    sampleTarget: weeks * 5,
+  });
+
+  return [
+    {
+      type: "best_day",
+      confidence,
+      ritualId: null,
+      basisWeeks: weeks,
+      facts: {
+        weekday: WEEKDAY_NAMES[topDay],
+        sharePct: Math.round((perWeekday[topDay] / total) * 100),
+        weeks,
+      },
+      payload: {
+        weekday: topDay,
+        weekdayName: WEEKDAY_NAMES[topDay],
+        count: perWeekday[topDay],
+        total,
+        weeksObserved,
+      },
+    },
+  ];
+}
+
+// --- Anchor pair ------------------------------------------------------------
+
+export type AnchorPairOpts = {
+  weeks?: number;
+  minWeeks?: number;
+  minUnionDays?: number;
+  minRate?: number;
+};
+
+/**
+ * Two daily rituals you almost always log on the same day — an observational
+ * pairing card. Uses Jaccard overlap (shared days / either-day), so it fires
+ * earlier than the full correlation, which needs a baseline comparison. One card.
+ */
+export function computeAnchorPairs(
+  logs: InsightLog[],
+  rituals: InsightRitual[],
+  today: string,
+  opts: AnchorPairOpts = {},
+): CalculatorResult[] {
+  const { weeks = 8, minWeeks = 3, minUnionDays = 8, minRate = 0.6 } = opts;
+  const daily = rituals.filter(isDailyRecurring);
+  if (daily.length < 2) return [];
+
+  const windowSet = new Set(elapsedWeekStarts(today, weeks));
+  const daysByRitual = new Map<string, Set<string>>();
+  const activeWeeks = new Set<string>();
+  for (const log of logs) {
+    const w = mondayOf(log.logged_at);
+    if (!windowSet.has(w)) continue;
+    activeWeeks.add(w);
+    let set = daysByRitual.get(log.ritual_id);
+    if (!set) {
+      set = new Set();
+      daysByRitual.set(log.ritual_id, set);
+    }
+    set.add(log.logged_at);
+  }
+  if (activeWeeks.size < minWeeks) return [];
+
+  let best: CalculatorResult | null = null;
+  for (let i = 0; i < daily.length; i++) {
+    for (let j = i + 1; j < daily.length; j++) {
+      const a = daily[i];
+      const b = daily[j];
+      const da = daysByRitual.get(a.id);
+      const db = daysByRitual.get(b.id);
+      if (!da || !db) continue;
+
+      let inter = 0;
+      for (const d of da) if (db.has(d)) inter++;
+      const union = da.size + db.size - inter;
+      if (inter === 0 || union < minUnionDays) continue;
+
+      const rate = inter / union;
+      if (rate < minRate) continue;
+
+      const confidence = computeConfidence({
+        weeksObserved: activeWeeks.size,
+        minWeeks,
+        effect: rate,
+        effectCap: 1,
+        sample: inter,
+        sampleTarget: weeks * 4,
+      });
+      if (!best || confidence > best.confidence) {
+        best = {
+          type: "anchor_pair",
+          confidence,
+          ritualId: a.id,
+          basisWeeks: weeks,
+          facts: {
+            ritualAName: a.name,
+            ritualBName: b.name,
+            pct: Math.round(rate * 100),
+            weeks,
+          },
+          payload: {
+            ritualBId: b.id,
+            sharedDays: inter,
+            unionDays: union,
+            rate: round2(rate),
+            weeksObserved: activeWeeks.size,
+          },
+        };
+      }
+    }
+  }
+  return best ? [best] : [];
+}
+
 /** Run every v1 calculator over one user's data and return all candidate facts. */
 export function buildInsightCandidates(input: {
   logs: InsightLog[];
@@ -360,6 +589,9 @@ export function buildInsightCandidates(input: {
   return [
     ...computeCorrelations(input.logs, input.rituals, input.today),
     ...computeAdjustments(input.logs, input.rituals, input.today),
+    ...computeStrengths(input.logs, input.rituals, input.today),
+    ...computeBestDay(input.logs, input.today),
+    ...computeAnchorPairs(input.logs, input.rituals, input.today),
   ];
 }
 

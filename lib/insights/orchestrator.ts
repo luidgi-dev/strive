@@ -24,7 +24,10 @@ import { daysInMonth, startOfWeek, todayInTimeZone } from "@/lib/date";
 import { getRitualsForActiveUser } from "@/lib/data/rituals";
 import {
   computeAdjustments,
+  computeAnchorPairs,
+  computeBestDay,
   computeCorrelations,
+  computeStrengths,
   fetchCompletedLogsSince,
   type CalculatorResult,
   type InsightRitual,
@@ -40,15 +43,38 @@ export type InsightCadence = "weekly" | "monthly";
 
 /** Cards below this confidence are dropped before reaching the AI. */
 const CONFIDENCE_THRESHOLD = 0.5;
+/** Keep variety: at most this many cards of the same type per report. */
+const PER_TYPE_CAP = 2;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /** Per-cadence tuning. Monthly looks back further and shows more cards. */
 const CADENCE_CONFIG: Record<
   InsightCadence,
-  { correlationWeeks: number; adjustmentWeeks: number; lookbackWeeks: number; maxCards: number }
+  {
+    correlationWeeks: number;
+    adjustmentWeeks: number;
+    strengthWeeks: number;
+    rhythmWeeks: number;
+    lookbackWeeks: number;
+    maxCards: number;
+  }
 > = {
-  weekly: { correlationWeeks: 8, adjustmentWeeks: 4, lookbackWeeks: 8, maxCards: 4 },
-  monthly: { correlationWeeks: 12, adjustmentWeeks: 8, lookbackWeeks: 12, maxCards: 6 },
+  weekly: {
+    correlationWeeks: 8,
+    adjustmentWeeks: 4,
+    strengthWeeks: 4,
+    rhythmWeeks: 8,
+    lookbackWeeks: 8,
+    maxCards: 4,
+  },
+  monthly: {
+    correlationWeeks: 12,
+    adjustmentWeeks: 8,
+    strengthWeeks: 8,
+    rhythmWeeks: 12,
+    lookbackWeeks: 12,
+    maxCards: 6,
+  },
 };
 
 const InsightCardSchema = z.object({
@@ -147,6 +173,9 @@ export async function generateInsightsForUser(
   const candidates = [
     ...computeCorrelations(logs, rituals, today, { weeks: config.correlationWeeks }),
     ...computeAdjustments(logs, rituals, today, { weeks: config.adjustmentWeeks }),
+    ...computeStrengths(logs, rituals, today, { weeks: config.strengthWeeks }),
+    ...computeBestDay(logs, today, { weeks: config.rhythmWeeks }),
+    ...computeAnchorPairs(logs, rituals, today, { weeks: config.rhythmWeeks }),
   ]
     .filter((c) => c.confidence >= CONFIDENCE_THRESHOLD)
     .sort((a, b) => b.confidence - a.confidence);
@@ -163,9 +192,18 @@ export async function generateInsightsForUser(
     (dismissed ?? []).map((d) => `${d.type}|${d.ritual_id ?? ""}`),
   );
 
-  const selected = candidates
-    .filter((c) => !dismissedKeys.has(`${c.type}|${c.ritualId ?? ""}`))
-    .slice(0, config.maxCards);
+  // Select highest-confidence first, but cap each type so one calculator can't
+  // fill the whole report — keeps a mix (e.g. a Strength alongside an Adjustment).
+  const perType = new Map<string, number>();
+  const selected: CalculatorResult[] = [];
+  for (const c of candidates) {
+    if (selected.length >= config.maxCards) break;
+    if (dismissedKeys.has(`${c.type}|${c.ritualId ?? ""}`)) continue;
+    const used = perType.get(c.type) ?? 0;
+    if (used >= PER_TYPE_CAP) continue;
+    perType.set(c.type, used + 1);
+    selected.push(c);
+  }
 
   const rows: TablesInsert<"insights">[] = [];
   for (const candidate of selected) {

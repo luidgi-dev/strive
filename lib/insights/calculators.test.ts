@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   computeAdjustments,
+  computeAnchorPairs,
+  computeBestDay,
   computeConfidence,
   computeCorrelations,
+  computeStrengths,
   type InsightLog,
   type InsightRitual,
 } from "@/lib/insights/calculators";
@@ -173,5 +176,99 @@ describe("computeAdjustments", () => {
     }
     // weeks: 2 < minWeekdayOccurrences (3) → guarded out.
     expect(computeAdjustments(logs, [meditation], TODAY, { weeks: 2 })).toEqual([]);
+  });
+});
+
+// --- computeStrengths -------------------------------------------------------
+
+describe("computeStrengths", () => {
+  const skincare = daily("s", "Skincare");
+  const boxe = daily("b", "Boxe");
+
+  it("picks the most reliably-kept ritual", () => {
+    const logs: InsightLog[] = [];
+    for (let k = 1; k <= 4; k++) {
+      logs.push(...logDays(skincare.id, k, 6)); // ~86% of days
+      logs.push(...logDays(boxe.id, k, 1)); // ~14%, below minRatio
+    }
+
+    const results = computeStrengths(logs, [skincare, boxe], TODAY);
+
+    expect(results).toHaveLength(1);
+    const [r] = results;
+    expect(r.type).toBe("strength");
+    expect(r.ritualId).toBe(skincare.id);
+    expect(r.facts).toMatchObject({ ritualName: "Skincare", ratioPct: 86 });
+    expect(r.confidence).toBeGreaterThan(0.5);
+  });
+
+  it("returns nothing when no ritual clears the ratio", () => {
+    const logs: InsightLog[] = [];
+    for (let k = 1; k <= 4; k++) logs.push(...logDays(boxe.id, k, 1));
+    expect(computeStrengths(logs, [boxe], TODAY)).toEqual([]);
+  });
+});
+
+// --- computeBestDay ---------------------------------------------------------
+
+describe("computeBestDay", () => {
+  it("surfaces the weekday with the most logs", () => {
+    const logs: InsightLog[] = [];
+    for (let k = 1; k <= 4; k++) {
+      // Tuesday (offset 1) gets 3 logs; Monday and Wednesday get 1 each.
+      logs.push(log("r1", day(k, 1)), log("r2", day(k, 1)), log("r3", day(k, 1)));
+      logs.push(log("r1", day(k, 0)), log("r1", day(k, 2)));
+    }
+
+    const results = computeBestDay(logs, TODAY, { weeks: 4 });
+
+    expect(results).toHaveLength(1);
+    const [r] = results;
+    expect(r.type).toBe("best_day");
+    expect(r.ritualId).toBeNull();
+    expect(r.facts).toMatchObject({ weekday: "Tuesday" });
+    expect(r.payload).toMatchObject({ weekday: 2 }); // getUTCDay: Tuesday = 2
+  });
+
+  it("returns nothing when every weekday is even", () => {
+    const logs: InsightLog[] = [];
+    for (let k = 1; k <= 4; k++) {
+      for (let offset = 0; offset < 7; offset++) logs.push(log("r1", day(k, offset)));
+    }
+    expect(computeBestDay(logs, TODAY, { weeks: 4 })).toEqual([]);
+  });
+});
+
+// --- computeAnchorPairs -----------------------------------------------------
+
+describe("computeAnchorPairs", () => {
+  const matin = daily("m", "Skincare matin");
+  const nuit = daily("n", "Skincare nuit");
+
+  it("surfaces two rituals logged on the same days", () => {
+    const logs: InsightLog[] = [];
+    for (let k = 1; k <= 4; k++) {
+      for (const offset of [0, 1, 2, 3, 4, 5]) {
+        logs.push(log(matin.id, day(k, offset)), log(nuit.id, day(k, offset)));
+      }
+    }
+    logs.push(log(matin.id, day(1, 6))); // one solo day → ~96%, not a flat 100
+
+    const results = computeAnchorPairs(logs, [matin, nuit], TODAY);
+
+    expect(results).toHaveLength(1);
+    const [r] = results;
+    expect(r.type).toBe("anchor_pair");
+    expect(r.facts).toMatchObject({ ritualAName: "Skincare matin", ritualBName: "Skincare nuit" });
+    expect(r.facts.pct as number).toBeGreaterThanOrEqual(90);
+  });
+
+  it("returns nothing when the two rarely overlap", () => {
+    const logs: InsightLog[] = [];
+    for (let k = 1; k <= 4; k++) {
+      for (const offset of [0, 1, 2]) logs.push(log(matin.id, day(k, offset)));
+      for (const offset of [3, 4, 5]) logs.push(log(nuit.id, day(k, offset)));
+    }
+    expect(computeAnchorPairs(logs, [matin, nuit], TODAY)).toEqual([]);
   });
 });

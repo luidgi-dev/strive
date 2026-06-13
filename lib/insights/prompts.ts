@@ -48,14 +48,38 @@ Example shape (do not copy verbatim):
   headline: "Your Wednesday target may be too high."
   body: "Meditation completion drops 35% on Wednesdays vs. other weekdays. Consider lowering the target for that day."`;
 
+const STRENGTH_GUIDANCE = `# This card: Strength
+Celebrate the ritual the user keeps up most reliably relative to their others. The facts give ritualName and ratioPct (how often it's completed). Warm but understated, no exclamation marks. Do not claim it's "almost always" if ratioPct is moderate; let the number speak.
+Example shape (do not copy verbatim):
+  headline: "Skincare nuit is your anchor."
+  body: "You complete it about 65% of the time, your steadiest ritual right now."`;
+
+const BEST_DAY_GUIDANCE = `# This card: Best day
+Point out the weekday the user logs the most. The facts give weekday and sharePct (share of all logs landing on that day). Observational, not prescriptive.
+Example shape (do not copy verbatim):
+  headline: "Tuesdays carry your rhythm."
+  body: "About 22% of your logs land on Tuesdays, more than any other day."`;
+
+const ANCHOR_PAIR_GUIDANCE = `# This card: Pairing
+Note two rituals the user often logs on the same day. The facts give ritualAName, ritualBName, and pct (how often they happen together). Match the strength of the claim to pct: use "often" or "tend to" for moderate values, not "almost always". Observational, never imply one causes the other.
+Example shape (do not copy verbatim):
+  headline: "Skincare matin and nuit tend to travel together."
+  body: "You log them on the same day about 65% of the time."`;
+
+const GUIDANCE: Record<InsightType, string> = {
+  correlation: CORRELATION_GUIDANCE,
+  adjustment: ADJUSTMENT_GUIDANCE,
+  strength: STRENGTH_GUIDANCE,
+  best_day: BEST_DAY_GUIDANCE,
+  anchor_pair: ANCHOR_PAIR_GUIDANCE,
+};
+
 /** Specialized system prompt for one insight type, in the user's language. */
 export function insightSystemPrompt(
   type: InsightType,
   locale: InsightLocale,
 ): string {
-  const guidance =
-    type === "correlation" ? CORRELATION_GUIDANCE : ADJUSTMENT_GUIDANCE;
-  return `${sharedRules(locale)}\n\n${guidance}`;
+  return `${sharedRules(locale)}\n\n${GUIDANCE[type]}`;
 }
 
 /**
