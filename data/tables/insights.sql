@@ -23,7 +23,7 @@ create table insights (
     id           uuid primary key default gen_random_uuid(),
     user_id      uuid not null references profiles(id) on delete cascade,
     cadence      text not null default 'weekly' check (cadence in ('weekly', 'monthly')),
-    type         text not null check (type in ('correlation', 'adjustment')),
+    type         text not null check (type in ('correlation', 'adjustment', 'strength', 'best_day', 'anchor_pair')),
     headline     text not null,
     body         text not null,
     -- denormalized fallback; the page renders the basis from payload.weeksObserved
