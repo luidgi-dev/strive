@@ -62,7 +62,8 @@
       "tierPremium": "Premium",
       "tierLifetime": "À vie",
       "viewPlans": "Voir les formules",
-      "currentPlan": "Plan actuel"
+      "currentPlan": "Plan actuel",
+      "myInsights": "Mes Insights"
     },
     "unlockSheet": {
       "title": "Les formules Strive",
@@ -489,5 +490,28 @@
     "title": "Une erreur est survenue.",
     "body": "Une erreur inattendue a interrompu cette page. Vous pouvez réessayer.",
     "retry": "Réessayer"
+  },
+  "insights": {
+    "title": "Insights",
+    "section": {
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "updated": "Mis à jour {days, plural, =0 {aujourd'hui} one {il y a # jour} other {il y a # jours}}",
+    "footer": "Actualisé chaque lundi, avec un bilan plus complet le 1er.",
+    "empty": {
+      "title": "Rien pour l'instant",
+      "body": "Tes premiers insights arrivent après quelques semaines d'enregistrement. Reviens bientôt."
+    },
+    "type": {
+      "correlation": "Corrélation",
+      "adjustment": "Ajustement"
+    },
+    "basis": {
+      "lastNWeeks": "{count} dernières semaines"
+    },
+    "actions": {
+      "dismiss": "Ignorer"
+    }
   }
 }

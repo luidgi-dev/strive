@@ -62,7 +62,8 @@
       "tierPremium": "Premium",
       "tierLifetime": "Lifetime",
       "viewPlans": "View plans",
-      "currentPlan": "Current plan"
+      "currentPlan": "Current plan",
+      "myInsights": "My Insights"
     },
     "unlockSheet": {
       "title": "Strive plans",
@@ -489,6 +490,29 @@
     "title": "Something went wrong.",
     "body": "An unexpected error interrupted this page. You can try again.",
     "retry": "Try again"
+  },
+  "insights": {
+    "title": "Insights",
+    "section": {
+      "week": "Week",
+      "month": "Month"
+    },
+    "updated": "Updated {days, plural, =0 {today} one {# day ago} other {# days ago}}",
+    "footer": "Refreshed every Monday, with a deeper look on the 1st.",
+    "empty": {
+      "title": "Nothing here yet",
+      "body": "Your first insights arrive after a few weeks of logging. Check back soon."
+    },
+    "type": {
+      "correlation": "Correlation",
+      "adjustment": "Adjustment"
+    },
+    "basis": {
+      "lastNWeeks": "Last {count} weeks"
+    },
+    "actions": {
+      "dismiss": "Dismiss"
+    }
   }
 }
 
