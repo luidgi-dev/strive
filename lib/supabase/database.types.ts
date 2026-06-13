@@ -97,6 +97,7 @@ export type Database = {
           period_end: string
           period_start: string
           ritual_id: string | null
+          translations: Json
           type: string
           user_id: string
         }
@@ -114,6 +115,7 @@ export type Database = {
           period_end: string
           period_start: string
           ritual_id?: string | null
+          translations?: Json
           type: string
           user_id: string
         }
@@ -131,6 +133,7 @@ export type Database = {
           period_end?: string
           period_start?: string
           ritual_id?: string | null
+          translations?: Json
           type?: string
           user_id?: string
         }
