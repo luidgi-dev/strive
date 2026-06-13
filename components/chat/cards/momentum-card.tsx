@@ -32,6 +32,11 @@ export function MomentumCard({ rituals }: { rituals: MomentumRitual[] }) {
                 target={ritual.target}
                 status={ritual.momentum_status}
               />
+            ) : ritual.logs_this_period != null ? (
+              // Open / one-time rituals have no target: show this week's raw count.
+              <span className="w-9 shrink-0 text-right text-xs font-semibold tabular-nums text-foreground">
+                {ritual.logs_this_period}
+              </span>
             ) : (
               <span className="text-xs text-muted-foreground">—</span>
             )}
