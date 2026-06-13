@@ -3,9 +3,16 @@
 import { Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+export type InsightType =
+  | "correlation"
+  | "adjustment"
+  | "strength"
+  | "best_day"
+  | "anchor_pair";
+
 export type InsightCardData = {
   id: string;
-  type: "correlation" | "adjustment";
+  type: InsightType;
   headline: string;
   body: string;
   /** Lookback window in weeks, for the "Last N weeks" basis label. */

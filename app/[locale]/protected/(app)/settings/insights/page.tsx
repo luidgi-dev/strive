@@ -11,7 +11,7 @@ import {
   InsightsView,
   type InsightsReport,
 } from "./components/insights-view";
-import type { InsightCardData } from "./components/insight-card";
+import type { InsightCardData, InsightType } from "./components/insight-card";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -27,6 +27,20 @@ type InsightRow = {
 };
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+const INSIGHT_TYPES: readonly InsightType[] = [
+  "correlation",
+  "adjustment",
+  "strength",
+  "best_day",
+  "anchor_pair",
+];
+
+function toInsightType(value: string): InsightType {
+  return (INSIGHT_TYPES as readonly string[]).includes(value)
+    ? (value as InsightType)
+    : "adjustment";
+}
 
 function basisWeeksOf(payload: unknown, fallback: number): number {
   if (payload && typeof payload === "object" && "basisWeeks" in payload) {
@@ -51,7 +65,7 @@ function reportFor(rows: InsightRow[], cadence: InsightCadence): InsightsReport 
 
   const cards: InsightCardData[] = latest.map((r) => ({
     id: r.id,
-    type: r.type === "correlation" ? "correlation" : "adjustment",
+    type: toInsightType(r.type),
     headline: r.headline,
     body: r.body,
     basisWeeks: basisWeeksOf(r.payload, fallbackWeeks),
