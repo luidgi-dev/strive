@@ -20,6 +20,7 @@ import {
   type RitualFormValues,
 } from "@/lib/data/rituals-schema";
 import { ensureProfile, getUserToday } from "@/lib/profile";
+import { matchRitualByName } from "@/lib/ai/ritual-match";
 import { runTool } from "@/lib/ai/run-tool";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
 
@@ -62,46 +63,35 @@ type NameResolution =
   | { status: "ambiguous"; candidates: { id: string; name: string }[] };
 
 /**
- * Resolve a user-supplied ritual name to a single active ritual. Tries a
- * case-insensitive exact match first, then a substring match ("run" → "Running").
- * Returns a structured result so the agent can ask the user to disambiguate.
+ * Resolve a user-supplied ritual name to a single active ritual. Loads the
+ * user's active rituals and runs fuzzy matching (`matchRitualByName`) over them,
+ * so spoken, accented, or paraphrased names still resolve ("Proteins" →
+ * "Protéines", "book of the Bible" → "Read a book of the Bible"). Returns a
+ * structured result so the agent can let the user confirm when it's ambiguous.
  */
 async function resolveRitualByName(
   supabase: StriveSupabaseClient,
   userId: string,
   rawQuery: string,
 ): Promise<NameResolution> {
-  const query = rawQuery.trim();
   const select = "id, name, ritual_type, frequency_value, frequency_unit, created_at";
-  const baseQuery = () =>
-    supabase
-      .from("rituals")
-      .select(select)
-      .eq("user_id", userId)
-      .eq("is_active", true)
-      .is("archived_at", null);
+  const { data, error } = await supabase
+    .from("rituals")
+    .select(select)
+    .eq("user_id", userId)
+    .eq("is_active", true)
+    .is("archived_at", null);
+  if (error) throw error;
 
-  const exact = await baseQuery().ilike("name", query);
-  if (exact.error) throw exact.error;
-  if (exact.data && exact.data.length === 1) {
-    return { status: "ok", ritual: exact.data[0] };
-  }
-  if (exact.data && exact.data.length > 1) {
+  const match = matchRitualByName<ResolvedRitual>(rawQuery, data ?? []);
+  if (match.status === "ok") return { status: "ok", ritual: match.ritual };
+  if (match.status === "ambiguous") {
     return {
       status: "ambiguous",
-      candidates: exact.data.map((r) => ({ id: r.id, name: r.name })),
+      candidates: match.candidates.map((r) => ({ id: r.id, name: r.name })),
     };
   }
-
-  const like = await baseQuery().ilike("name", `%${query}%`);
-  if (like.error) throw like.error;
-  const rows = like.data ?? [];
-  if (rows.length === 1) return { status: "ok", ritual: rows[0] };
-  if (rows.length === 0) return { status: "not_found", query };
-  return {
-    status: "ambiguous",
-    candidates: rows.map((r) => ({ id: r.id, name: r.name })),
-  };
+  return { status: "not_found", query: rawQuery.trim() };
 }
 
 // ---------------------------------------------------------------------------
@@ -199,6 +189,12 @@ export function striveTools(
             getWeekCompletedLogs(supabase, startOfWeek(today), userId),
           ]);
           const weekDays = weekDayCountsByRitual(weekLogs);
+          // Total logs this week per ritual, so open / one-time rituals (which
+          // carry no target) still report how many times they were logged.
+          const weekTotals = new Map<string, number>();
+          for (const log of weekLogs) {
+            weekTotals.set(log.ritual_id, (weekTotals.get(log.ritual_id) ?? 0) + 1);
+          }
 
           let scoped = rituals;
           if (ritual_name) {
@@ -223,7 +219,9 @@ export function striveTools(
               return {
                 name: r.name,
                 ritual_type: r.ritual_type,
-                logs_this_period: view.logs_this_period,
+                // Targeted rituals keep their period count; open / one-time
+                // rituals fall back to this week's raw log count (target stays null).
+                logs_this_period: view.logs_this_period ?? (weekTotals.get(r.id) ?? 0),
                 target: view.target,
                 period: view.period,
                 momentum_status: view.momentum_status,
