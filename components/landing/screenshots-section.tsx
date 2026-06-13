@@ -28,8 +28,8 @@ const screenshotConfigs: ScreenshotConfig[] = [
   {
     icon: MessageCircle,
     preview: {
-      light: "/wireframes/ai-chat-light.png",
-      dark: "/wireframes/ai-chat-dark.png",
+      light: "/wireframes/ai-chat-v2-light.png",
+      dark: "/wireframes/ai-chat-v2-dark.png",
     },
   },
 ];
