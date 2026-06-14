@@ -6,9 +6,10 @@ drop table if exists push_subscriptions cascade;
 create table push_subscriptions (
     id         uuid primary key default gen_random_uuid(),
     user_id    uuid not null references profiles(id) on delete cascade,
-    endpoint   text not null,
+    endpoint   text not null unique,
     p256dh     text not null,
     auth_key   text not null,
+    locale     text not null default 'en' check (locale in ('en', 'fr')),
     created_at timestamptz not null default now()
 );
 
