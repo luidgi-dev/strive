@@ -49,15 +49,16 @@ type is added here first, then implemented.
 | Type | Fires when | Cadence |
 |---|---|---|
 | `ritual_reminder` | The user has **one-time** rituals **due today** and not yet logged. | Once each morning (~8am local) |
+| `evening_nudge` | The user has rituals to do today but logged **nothing** by evening. | Once each evening (~9pm local) |
 | `insight_ready` | A new insight has just been generated for the user. | Weekly (Mon) + monthly (1st) |
 
 `ritual_reminder` firing conditions (grounded in the `rituals` schema):
 
 - **One-time rituals only** (`ritual_type = 'one_time'`, `due_date = today`). These
   are dated, one-off events that are easy to forget — exactly what a reminder helps
-  with. **Recurring and `open` rituals never trigger**: a daily "you have N habits"
-  push would become noise. (An evening "nothing logged yet" nudge for recurring
-  habits is deliberately a *separate* future trigger, not this one.)
+  with. **Recurring and `open` rituals never trigger here**: a daily "you have N
+  habits" push would become noise. Recurring habits are covered by the gentler
+  `evening_nudge` below.
 - Fires **only if no completed `ritual_log` exists** for the ritual (a one-time
   ritual is done once logged).
 - Respects `is_active` and `archived_at`.
@@ -65,6 +66,22 @@ type is added here first, then implemented.
   ritual — a single notification covers the day's one-time rituals. Copy: title
   `Reminder` / `Rappel`; body `Today's ritual: {name}` when there's one,
   `Today's rituals: {n} planned` when several.
+
+`evening_nudge` firing conditions:
+
+- Fires only if the user **logged nothing today** (no `ritual_log` of any status)
+  **and** still has ≥1 ritual to clear on today's Rhythm. "On today's Rhythm" reuses
+  `selectTodayRituals` ([`lib/rhythm/today-rituals.ts`](../lib/rhythm/today-rituals.ts)),
+  so it matches exactly what the user sees: daily rituals every day, weekly/monthly
+  rituals on their scheduled weekdays (or every day when no day is set) **until the
+  period target is met** (a met weekly/monthly target drops off — no nagging), and
+  `open` rituals never count on their own.
+- **Timing:** one evening send (~9pm in the user's `profiles.timezone`). Copy: title
+  `Reminder` / `Rappel`; body `Keep today's momentum going` / `Garde ton momentum
+  aujourd'hui`; deep-links to the day view (`/protected/flow`).
+- `ritual_reminder` and `evening_nudge` share the **same hourly pg_cron trigger**
+  ([`app/[locale]/api/cron/reminders/route.ts`](../app/[locale]/api/cron/reminders/route.ts)),
+  routed by the user's local hour (8 → morning, 21 → evening).
 
 `insight_ready` fires **inline from the Insights cron**
 ([`app/[locale]/api/cron/insights/route.ts`](../app/[locale]/api/cron/insights/route.ts)),
@@ -75,8 +92,8 @@ deep-links to the **Insights tab** (`/protected/settings/insights`). The page is
 (no per-ritual view) — the ritual is named inside each card's text. Deduped to once per
 user-local day via `notification_log`.
 
-Future types (e.g. an evening "nothing logged" nudge, circle activity) will be added
-to this table when scoped — not implemented speculatively.
+Future types (e.g. circle activity) will be added to this table when scoped — not
+implemented speculatively.
 
 ---
 
@@ -86,8 +103,10 @@ Hard limits, enforced server-side before sending, backed by the `notification_lo
 table (`unique (user_id, type, sent_on)`):
 
 - **`ritual_reminder`:** max **1 per user per day** (one morning digest, not per ritual).
+- **`evening_nudge`:** max **1 per user per day**.
 - **`insight_ready`:** max **1 per day** (cadence already makes this ~1/week + 1/month).
-- **Global cap:** max **3 notifications per user per day**, all types combined.
+- **Global cap:** max **3 notifications per user per day**, all types combined (a busy
+  day could be morning reminder + evening nudge + insight = 3, the ceiling).
 
 The cron **inserts the `notification_log` row before sending** (claim-then-send), so
 an overlapping run or a crash mid-send can never duplicate. When the global cap would
@@ -195,16 +214,17 @@ fan-out, like the Insights route). The open question is only *what triggers it*.
 
 - **Insights** (`/api/cron/insights`, weekly + monthly) → **Vercel Cron**
   ([`vercel.json`](../vercel.json)). Daily-or-coarser, fits even Vercel Hobby.
-- **Reminders** (`/api/cron/reminders`, hourly) → **Supabase pg_cron**. The morning
-  reminder must run sub-daily to hit ~8am in **each user's timezone**, but Vercel
-  Hobby crons are daily-only and capped at 2 jobs (both used by Insights). pg_cron
-  fires every minute/hour for free and `POST`s the route via `pg_net` with the
+- **Reminders** (`/api/cron/reminders`, hourly) → **Supabase pg_cron**. Reminders
+  must run sub-daily to hit local-morning/evening in **each user's timezone**, but
+  Vercel Hobby crons are daily-only and capped at 2 jobs (both used by Insights).
+  pg_cron fires hourly for free and `POST`s the route via `pg_net` with the
   `CRON_SECRET` bearer. (On Vercel Pro this could instead be a Vercel cron — same
   route; only the trigger changes.)
 
 The reminders route lists users with `smart_reminders_enabled = true`, `is_active`,
-and ≥1 `push_subscriptions` row, keeps those whose **local hour == 8**, dedups via
-`notification_log`, and calls `deliverToUser`.
+and ≥1 `push_subscriptions` row, then routes each by their **local hour** — `8` →
+`ritual_reminder` (morning one-time), `21` → `evening_nudge` — dedups via
+`notification_log`, and calls `deliverToUser`. One hourly job covers both slots.
 
 ### pg_cron / pg_net trigger setup (run once in Supabase)
 
