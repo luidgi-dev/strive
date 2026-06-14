@@ -4,6 +4,7 @@ import { hourInTimeZone, todayInTimeZone } from "@/lib/date";
 import { selectOneTimeDueToday } from "@/lib/reminders/select";
 import { deliverToUser } from "@/lib/push/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { chunk } from "@/lib/utils";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
 import type { Locale } from "@/lib/locales";
 
@@ -25,12 +26,6 @@ export const maxDuration = 60;
 // with a locale prefix; the trigger still calls the unprefixed path.
 const MORNING_HOUR = 8;
 const CHUNK_SIZE = 5;
-
-function chunk<T>(items: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
-  return out;
-}
 
 type Translators = Record<Locale, Awaited<ReturnType<typeof getTranslations>>>;
 
@@ -78,16 +73,42 @@ async function remindUser(
 
   const count = due.length;
   const firstName = due[0].name;
-  await deliverToUser(supabase, user.id, (locale) => ({
-    title: translators[locale]("title"),
-    body:
-      count === 1
-        ? translators[locale]("bodyOne", { name: firstName })
-        : translators[locale]("bodyMany", { count }),
-    url: "/protected/flow",
-    tag: "ritual-reminder",
-  }));
+  // The claim above is provisional: if delivery throws or reaches no device,
+  // release it so the user isn't falsely marked "reminded" (and a re-trigger can
+  // retry). The anti-duplicate guarantee holds — we only release when nothing was
+  // delivered, so a concurrent run that saw the claim never produced a send either.
+  try {
+    const { sent } = await deliverToUser(supabase, user.id, (locale) => ({
+      title: translators[locale]("title"),
+      body:
+        count === 1
+          ? translators[locale]("bodyOne", { name: firstName })
+          : translators[locale]("bodyMany", { count }),
+      url: "/protected/flow",
+      tag: "ritual-reminder",
+    }));
+    if (sent === 0) {
+      await releaseClaim(supabase, user.id, today);
+      return "skipped";
+    }
+  } catch (err) {
+    await releaseClaim(supabase, user.id, today);
+    throw err;
+  }
   return "sent";
+}
+
+function releaseClaim(
+  supabase: StriveSupabaseClient,
+  userId: string,
+  sentOn: string,
+) {
+  return supabase
+    .from("notification_log")
+    .delete()
+    .eq("user_id", userId)
+    .eq("type", "ritual_reminder")
+    .eq("sent_on", sentOn);
 }
 
 async function handle(req: Request) {

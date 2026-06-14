@@ -3,6 +3,7 @@ import {
   type InsightCadence,
 } from "@/lib/insights/orchestrator";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { chunk } from "@/lib/utils";
 
 // Scheduled Insights generation. Triggered by Vercel Cron (see vercel.json):
 //   - weekly  report every Monday  (?cadence=weekly)
@@ -27,12 +28,6 @@ const CHUNK_SIZE = 5;
 
 function parseCadence(value: string | null): InsightCadence {
   return value === "monthly" ? "monthly" : "weekly";
-}
-
-function chunk<T>(items: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
-  return out;
 }
 
 export async function GET(req: Request) {
