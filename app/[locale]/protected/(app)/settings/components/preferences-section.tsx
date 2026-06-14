@@ -161,9 +161,12 @@ function RemindersControl() {
   const [state, setState] = useState<PushState | "loading">("loading");
   const [busy, setBusy] = useState(false);
   const [tested, setTested] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    getPushState().then(setState);
+    getPushState()
+      .then(setState)
+      .catch(() => setState("unsupported"));
   }, []);
 
   const isOn = state === "on";
@@ -176,9 +179,14 @@ function RemindersControl() {
     if (disabled) return;
     setBusy(true);
     setTested(false);
+    setFailed(false);
     try {
       setState(isOn ? await disablePush() : await enablePush(locale));
-    } catch {
+    } catch (err) {
+      // Surface failures (e.g. missing VAPID env, network) instead of silently
+      // reverting — otherwise the toggle just looks dead.
+      console.error("[reminders] toggle failed", err);
+      setFailed(true);
       setState(await getPushState());
     } finally {
       setBusy(false);
@@ -190,8 +198,9 @@ function RemindersControl() {
     if (res.ok) setTested(true);
   }
 
-  const hint =
-    state === "unsupported"
+  const hint = failed
+    ? tPref("smartRemindersError")
+    : state === "unsupported"
       ? tPref("smartRemindersUnsupported")
       : state === "denied"
         ? tPref("smartRemindersDenied")
@@ -247,14 +256,18 @@ function Switch({
       suppressHydrationWarning
       {...rest}
       className={cn(
-        "relative h-5 w-9 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-        checked ? "bg-primary" : "bg-muted-foreground/30",
+        "relative h-6 w-11 shrink-0 rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+        checked
+          ? "border-primary bg-primary"
+          : "border-border bg-muted-foreground/25",
       )}
     >
       <span
         className={cn(
-          "absolute top-0.5 size-4 rounded-full bg-background transition-transform",
-          checked ? "translate-x-[18px]" : "translate-x-0.5",
+          "absolute top-1/2 size-4 -translate-y-1/2 rounded-full shadow-sm transition-all",
+          checked
+            ? "left-[25px] bg-primary-foreground"
+            : "left-[3px] bg-foreground/70",
         )}
       />
     </button>
