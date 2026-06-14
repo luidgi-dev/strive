@@ -1,11 +1,18 @@
 "use client";
 
-import { Moon, MonitorSmartphone, Sun } from "lucide-react";
+import { Moon, MonitorSmartphone, Send, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 import { defaultLocale, locales } from "@/lib/locales";
 import { usePathname } from "@/lib/i18n/navigation";
+import {
+  disablePush,
+  enablePush,
+  getPushState,
+  type PushState,
+} from "@/lib/push/client";
 import { cn } from "@/lib/utils";
 
 type Locale = "en" | "fr";
@@ -99,13 +106,7 @@ export function PreferencesSection() {
 
       <Divider />
 
-      <div className="flex min-h-[44px] items-center justify-between gap-3 opacity-60">
-        <div className="flex flex-col">
-          <span className="text-sm">{tPref("smartReminders")}</span>
-          <span className="text-xs text-muted-foreground">{tPref("comingSoon")}</span>
-        </div>
-        <FakeSwitch />
-      </div>
+      <RemindersControl />
     </section>
   );
 }
@@ -151,13 +152,111 @@ function Divider() {
   return <div className="h-px bg-border" aria-hidden />;
 }
 
-function FakeSwitch() {
+// Web Push opt-in. Drives the full subscribe/unsubscribe loop via lib/push and
+// reflects the live permission/subscription state. The "Send test" affordance is
+// exploration-only (LUI-82) and never renders in production.
+function RemindersControl() {
+  const tPref = useTranslations("settings.preferences");
+  const locale = useLocale() as Locale;
+  const [state, setState] = useState<PushState | "loading">("loading");
+  const [busy, setBusy] = useState(false);
+  const [tested, setTested] = useState(false);
+
+  useEffect(() => {
+    getPushState().then(setState);
+  }, []);
+
+  const isOn = state === "on";
+  // Can't toggle while loading, when the platform lacks support (e.g. iOS not
+  // installed as a PWA), or when the user has hard-blocked notifications.
+  const disabled =
+    busy || state === "loading" || state === "unsupported" || state === "denied";
+
+  async function toggle() {
+    if (disabled) return;
+    setBusy(true);
+    setTested(false);
+    try {
+      setState(isOn ? await disablePush() : await enablePush(locale));
+    } catch {
+      setState(await getPushState());
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function sendTest() {
+    const res = await fetch("/api/push/test", { method: "POST" });
+    if (res.ok) setTested(true);
+  }
+
+  const hint =
+    state === "unsupported"
+      ? tPref("smartRemindersUnsupported")
+      : state === "denied"
+        ? tPref("smartRemindersDenied")
+        : tPref("smartRemindersHint");
+
+  const showTest = isOn && process.env.NODE_ENV !== "production";
+
   return (
-    <div
-      aria-disabled
-      className="pointer-events-none relative h-5 w-9 rounded-full bg-muted-foreground/30"
-    >
-      <div className="absolute left-0.5 top-0.5 size-4 rounded-full bg-background" />
+    <div className="flex flex-col gap-2">
+      <div
+        className={cn(
+          "flex min-h-[44px] items-center justify-between gap-3",
+          state === "unsupported" && "opacity-60",
+        )}
+      >
+        <div className="flex flex-col">
+          <span className="text-sm">{tPref("smartReminders")}</span>
+          <span className="text-xs text-muted-foreground">{hint}</span>
+        </div>
+        <Switch
+          checked={isOn}
+          disabled={disabled}
+          onClick={toggle}
+          aria-label={tPref("smartReminders")}
+        />
+      </div>
+
+      {showTest && (
+        <button
+          type="button"
+          onClick={sendTest}
+          className="inline-flex items-center gap-1.5 self-end rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Send className="size-3.5" />
+          {tested ? tPref("testSent") : tPref("sendTest")}
+        </button>
+      )}
     </div>
+  );
+}
+
+function Switch({
+  checked,
+  ...rest
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { checked: boolean }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      // Subscription state is read client-side after mount, so the rendered
+      // value can differ from SSR until the effect resolves.
+      suppressHydrationWarning
+      {...rest}
+      className={cn(
+        "relative h-5 w-9 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+        checked ? "bg-primary" : "bg-muted-foreground/30",
+      )}
+    >
+      <span
+        className={cn(
+          "absolute top-0.5 size-4 rounded-full bg-background transition-transform",
+          checked ? "translate-x-[18px]" : "translate-x-0.5",
+        )}
+      />
+    </button>
   );
 }
