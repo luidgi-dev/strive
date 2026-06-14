@@ -228,25 +228,36 @@ and ≥1 `push_subscriptions` row, then routes each by their **local hour** — 
 
 ### pg_cron / pg_net trigger setup (run once in Supabase)
 
+The bearer secret is kept in **Supabase Vault**, not inlined — so the recurring
+command in `cron.job` never stores the `CRON_SECRET` in plaintext.
+
 ```sql
--- Enable the extensions (Supabase: Database → Extensions, or:)
+-- 1. Enable the extensions (Supabase: Database → Extensions, or:)
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
--- Hourly at minute 0: POST the reminders route with the CRON_SECRET bearer.
--- Replace <APP_URL> and <CRON_SECRET>.
+-- 2. Store the bearer secret in Vault (run once). Use the real CRON_SECRET value.
+select vault.create_secret('<CRON_SECRET>', 'cron_secret', 'Bearer secret for the reminders cron');
+
+-- 3. Hourly at minute 0 (UTC): POST the reminders route, reading the secret from
+--    Vault so it isn't persisted in cron.job. Replace <APP_URL>.
 select cron.schedule(
   'ritual-reminders-hourly',
   '0 * * * *',
   $$
   select net.http_post(
     url     := 'https://<APP_URL>/api/cron/reminders',
-    headers := '{"Authorization": "Bearer <CRON_SECRET>", "Content-Type": "application/json"}'::jsonb
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret'),
+      'Content-Type', 'application/json'
+    )
   );
   $$
 );
 ```
-> Store the secret via Supabase Vault rather than inlining it where possible.
+> One hourly job covers both the morning (8h) and evening (21h) slots — the route
+> branches on each user's local hour. Inspect runs with
+> `select * from cron.job_run_details order by start_time desc limit 10;`.
 
 ---
 
