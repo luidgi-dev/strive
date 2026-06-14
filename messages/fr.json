@@ -50,7 +50,11 @@
       "languageEnglish": "English",
       "languageFrench": "Français",
       "smartReminders": "Rappels intelligents",
-      "comingSoon": "Bientôt"
+      "smartRemindersHint": "De légers rappels pour tes rituels et tes nouveaux insights.",
+      "smartRemindersUnsupported": "Ajoute Strive à ton écran d'accueil pour activer les rappels.",
+      "smartRemindersDenied": "Les rappels sont bloqués. Active-les dans les réglages de ton navigateur.",
+      "sendTest": "Envoyer un test",
+      "testSent": "Envoyé"
     },
     "membership": {
       "label": "Abonnement",
@@ -515,6 +519,12 @@
     },
     "actions": {
       "dismiss": "Ignorer"
+    }
+  },
+  "notifications": {
+    "test": {
+      "title": "Strive",
+      "body": "Tes rappels sont activés. Voilà à quoi ils ressembleront."
     }
   }
 }
