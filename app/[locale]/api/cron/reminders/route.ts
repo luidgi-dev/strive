@@ -80,7 +80,10 @@ async function remindUser(
   const firstName = due[0].name;
   await deliverToUser(supabase, user.id, (locale) => ({
     title: translators[locale]("title"),
-    body: count === 1 ? firstName : translators[locale]("bodyMany", { count }),
+    body:
+      count === 1
+        ? translators[locale]("bodyOne", { name: firstName })
+        : translators[locale]("bodyMany", { count }),
     url: "/protected/flow",
     tag: "ritual-reminder",
   }));

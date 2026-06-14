@@ -148,11 +148,11 @@
         </div>
         <div class="body">
           <div class="row1">
-            <span class="title">Today's rituals</span>
+            <span class="title">Reminder</span>
             <span class="time">now</span>
           </div>
           <div class="from">from Strive</div>
-          <div class="text">Dentist appointment</div>
+          <div class="text">Today's ritual: Dentist appointment</div>
         </div>
       </div>
     </div>
@@ -176,8 +176,8 @@
         </span>
         <span>Strive</span><span class="dot">·</span><span>now</span>
       </div>
-      <div class="a-title">Today's rituals</div>
-      <div class="a-text">3 things planned today</div>
+      <div class="a-title">Reminder</div>
+      <div class="a-text">Today's rituals: 3 planned</div>
     </div>
   </div>
 
@@ -189,15 +189,17 @@
   <!--
     LOCKED COPY (LUI-85) — morning reminder for one-time rituals due today.
 
-    Title (one line, no app name):
-      EN "Today's rituals"   FR "Tes rituels du jour"
+    Title (short, no app name):
+      EN "Reminder"   FR "Rappel"
 
     Body:
-      one event   → the ritual name (e.g. "Dentist appointment")
-      several     → EN "{n} things planned today"  FR "{n} choses prévues aujourd'hui"
+      one event   → EN "Today's ritual: {name}"      FR "Rituel du jour : {name}"
+      several     → EN "Today's rituals: {n} planned" FR "Rituels du jour : {n} prévus"
 
-    Note: line "from Strive" is added by iOS for an installed PWA and is NOT
-    controllable — that's why the title must carry content, not the app name.
+    Why a generic title + detail in the body: iOS always adds "from Strive" on its
+    OWN line under the title, so the header is two lines no matter what — the title
+    length can't change that. So the title stays a short type label and the body
+    carries the content. Never put the app name in the title.
     Recurring habits are out of scope here; an evening "nothing logged" nudge is a
     separate issue.
   -->

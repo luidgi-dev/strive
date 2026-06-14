@@ -62,8 +62,9 @@ type is added here first, then implemented.
   ritual is done once logged).
 - Respects `is_active` and `archived_at`.
 - **Timing:** one morning send (~8am in the user's `profiles.timezone`), not per
-  ritual — a single digest covers all of the day's one-time rituals (the body names
-  the ritual when there's one, a count when there are several).
+  ritual — a single notification covers the day's one-time rituals. Copy: title
+  `Reminder` / `Rappel`; body `Today's ritual: {name}` when there's one,
+  `Today's rituals: {n} planned` when several.
 
 `insight_ready` mirrors the existing Insights cron cadence (every Monday + the 1st
 of each month — see [`vercel.json`](../vercel.json)); at most one per generation.
@@ -131,10 +132,12 @@ Keep `public/sw.js` and the `PushPayload` type in
 [`lib/push/server.ts`](../lib/push/server.ts) in sync — any new field must be handled
 in both.
 
-**Title rule:** the `title` carries the **content** (ritual name, insight headline),
-**never the app name**. iOS already prepends "from Strive" for an installed PWA, and
-the icon is brand enough — a "Strive" title just duplicates it. Keep titles short
-(≈ one line). See [`design/wireframes/push-notification.html`](wireframes/push-notification.html).
+**Title rule:** keep the `title` **short** and **never the app name**. iOS adds
+"from Strive" on its **own line** under the title for an installed PWA, so the header
+is always two lines — the title length can't change that, and a "Strive" title just
+duplicates the attribution. So the title is a short type label (e.g. `Reminder`) and
+the **detail goes in the body**. See
+[`design/wireframes/push-notification.html`](wireframes/push-notification.html).
 
 ---
 
