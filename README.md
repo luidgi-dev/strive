@@ -52,7 +52,12 @@ Prerequisites: Node.js 24+ (see `.nvmrc`), npm.
    GOOGLE_GENERATIVE_AI_API_KEY=...   # AI features (Gemini); optional STRIVE_AI_MODEL overrides the model
    SUPABASE_SERVICE_ROLE_KEY=...      # server-only; the Insights cron generates under the service role
    CRON_SECRET=...                    # shared secret authorizing the Insights cron route
+   NEXT_PUBLIC_VAPID_PUBLIC_KEY=...   # Web Push: public VAPID key (sent to the browser)
+   VAPID_PRIVATE_KEY=...              # Web Push: private VAPID key (server-only, never exposed)
+   VAPID_SUBJECT=mailto:you@example.com  # Web Push: VAPID contact (mailto: or https:)
   ```
+  Generate the VAPID pair once with `npx web-push generate-vapid-keys`. See
+  `[design/push-notifications.md](design/push-notifications.md)` for the notification rules and stack.
 2. Install and run:
   ```bash
    npm install

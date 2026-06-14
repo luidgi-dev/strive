@@ -115,6 +115,9 @@ export async function proxy(request: NextRequest) {
  */
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // sw.js and site.webmanifest must be served from the root unprefixed —
+    // without these exclusions the locale rewrite turns /sw.js into /en/sw.js
+    // (404), so the service worker can never register.
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|site\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

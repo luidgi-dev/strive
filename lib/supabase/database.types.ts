@@ -215,6 +215,7 @@ export type Database = {
           created_at: string
           endpoint: string
           id: string
+          locale: string
           p256dh: string
           user_id: string
         }
@@ -223,6 +224,7 @@ export type Database = {
           created_at?: string
           endpoint: string
           id?: string
+          locale?: string
           p256dh: string
           user_id: string
         }
@@ -231,6 +233,7 @@ export type Database = {
           created_at?: string
           endpoint?: string
           id?: string
+          locale?: string
           p256dh?: string
           user_id?: string
         }

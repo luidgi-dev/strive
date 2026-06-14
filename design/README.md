@@ -22,7 +22,7 @@ design/
   ux-flow.md         # global navigation: screens, transitions, entry points
   chat-design.md     # "My Strive" AI chat — tools, cards, voice, guardrails
   insights-page.md   # Insights — hybrid intelligence, confidence, cadence, gating
-  notifications.md   # (coming — UX rules once notifications ship; see LUI-83)
+  push-notifications.md  # Notifications — rules (opt-in, triggers, anti-spam) + Web Push stack
 ```
 
 The rendered PNG exports shown on the landing page live in [`public/wireframes/`](../public/wireframes/) (served as static assets), not here — `design/wireframes/` holds the **editable HTML sources**.
