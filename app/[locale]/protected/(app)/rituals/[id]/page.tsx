@@ -26,7 +26,10 @@ import { getCategoryLabel } from "@/lib/rituals/category-label";
 import { isRitualFresh, ritualPeriodLabel } from "@/lib/rituals/presentation";
 import { createClient } from "@/lib/supabase/server";
 
-type Props = { params: Promise<{ locale: string; id: string }> };
+type Props = {
+  params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ from?: string }>;
+};
 
 const ARC_LOOKBACK_DAYS = 90;
 
@@ -34,8 +37,9 @@ function isoDaysAgo(days: number): string {
   return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 }
 
-export default async function RitualDetailPage({ params }: Props) {
+export default async function RitualDetailPage({ params, searchParams }: Props) {
   const { locale, id } = await params;
+  const { from } = await searchParams;
   setRequestLocale(locale);
 
   const t = await getTranslations("rituals");
@@ -86,9 +90,15 @@ export default async function RitualDetailPage({ params }: Props) {
   // Archived rituals are viewable read-only: no log control, no edit/archive
   // menu, static Arc, and the back arrow returns to the archived screen.
   const isArchived = ritual.archived_at != null;
-  const backHref = isArchived
-    ? "/protected/rituals/archived"
-    : "/protected/rituals";
+  // The back arrow returns to where the user came from. `from=flow` (set by the
+  // Rhythm card) sends them back to Rhythm; archived rituals always return to the
+  // archived screen; everything else defaults to the Rituals tab.
+  const backHref =
+    from === "flow"
+      ? "/protected/flow"
+      : isArchived
+        ? "/protected/rituals/archived"
+        : "/protected/rituals";
   const archivedLabel =
     isArchived && ritual.archived_at
       ? t("archived.archivedOn", {

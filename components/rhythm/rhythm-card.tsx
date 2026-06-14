@@ -46,9 +46,10 @@ export async function RhythmCard({
       )}
     >
       <div className="flex items-center gap-3">
-        {/* Tapping the ritual opens its detail / The Arc view, like Rituals. */}
+        {/* Tapping the ritual opens its detail / The Arc view, like Rituals.
+            `from=flow` tells the detail's back arrow to return here, not to Rituals. */}
         <Link
-          href={`/protected/rituals/${ritual.id}`}
+          href={`/protected/rituals/${ritual.id}?from=flow`}
           className="group flex min-h-[44px] min-w-0 flex-1 items-center gap-3 rounded-lg text-left transition-opacity hover:opacity-80"
         >
           <span
