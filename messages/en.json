@@ -536,6 +536,10 @@
       "titleWeekly": "Weekly insights",
       "titleMonthly": "Monthly insights",
       "body": "Ready to explore in Strive"
+    },
+    "eveningNudge": {
+      "title": "Reminder",
+      "body": "Keep today's momentum going"
     }
   }
 }
