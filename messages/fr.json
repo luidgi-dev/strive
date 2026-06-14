@@ -528,8 +528,9 @@
       "body": "Voilà à quoi ils ressembleront."
     },
     "ritualReminder": {
-      "title": "Tes rituels du jour",
-      "bodyMany": "{count} choses prévues aujourd'hui"
+      "title": "Rappel",
+      "bodyOne": "Rituel du jour : {name}",
+      "bodyMany": "Rituels du jour : {count} prévus"
     }
   }
 }
