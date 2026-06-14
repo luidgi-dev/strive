@@ -5,14 +5,15 @@
 drop table if exists profiles cascade;
 
 create table profiles (
-    id         uuid primary key references auth.users(id) on delete cascade,
-    username   text unique not null,
-    avatar_url text,
-    tier       text not null default 'lite' check (tier in ('lite','premium','lifetime')),
-    timezone   text not null default 'UTC',
-    is_active  boolean not null default true,
-    created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now()
+    id                      uuid primary key references auth.users(id) on delete cascade,
+    username                text unique not null,
+    avatar_url              text,
+    tier                    text not null default 'lite' check (tier in ('lite','premium','lifetime')),
+    timezone                text not null default 'UTC',
+    smart_reminders_enabled boolean not null default false,
+    is_active               boolean not null default true,
+    created_at              timestamptz not null default now(),
+    updated_at              timestamptz not null default now()
 );
 
 -- rls

@@ -28,11 +28,13 @@ well-timed reminders beat frequent ones. Everything below enforces that.
 - A user receives notifications **only** after enabling **Smart reminders** in
   *Settings → Preferences* (the toggle wired in
   [`preferences-section.tsx`](../app/[locale]/protected/(app)/settings/components/preferences-section.tsx)).
-- Enabling asks the browser for permission and stores a push subscription. Disabling
-  removes the subscription immediately — the server has nothing to send to.
-- Consent is verified **server-side** on every send: no row in `push_subscriptions`
-  for a user ⇒ no notification. The opt-in is the only gate; there is no implicit
-  enrollment.
+- Enabling asks the browser for permission, stores a push subscription for the
+  device, and sets the account-level intent `profiles.smart_reminders_enabled = true`.
+  Disabling flips it back to `false` and removes the device's subscription.
+- Two layers, both required to receive: **intent** (`smart_reminders_enabled`, the
+  account kill-switch the cron checks) and **transport** (a row in `push_subscriptions`
+  for at least one device). No intent or no subscription ⇒ no notification. There is
+  no implicit enrollment.
 - **iOS** receives push **only when Strive is installed to the home screen** (PWA)
   on iOS 16.4+. Until then the toggle is shown disabled with an "add to home screen"
   hint — never a broken switch.
@@ -147,11 +149,15 @@ Settings toggle ──► lib/push/client.ts ──► saveSubscription (action)
 | Service worker (push + click) | [`public/sw.js`](../public/sw.js) |
 | Browser opt-in helpers | [`lib/push/client.ts`](../lib/push/client.ts) |
 | Server send + VAPID + dead-endpoint cleanup | [`lib/push/server.ts`](../lib/push/server.ts) |
-| Mutations: save / remove subscription, self-test (dev-only) | [`lib/push/actions.ts`](../lib/push/actions.ts) |
+| Mutations: save / remove subscription, set intent | [`lib/push/actions.ts`](../lib/push/actions.ts) |
+| Recipient authorization guard (pure, unit-tested) | [`lib/push/recipients.ts`](../lib/push/recipients.ts) |
+| Authenticated self-send route | `app/[locale]/api/notifications/send/route.ts` |
 | Subscription storage | [`../data/tables/push_subscriptions.sql`](../data/tables/push_subscriptions.sql) |
 
-UI-initiated mutations are **Server Actions** (repo convention), not API routes. The
-self-test action is disabled in production.
+UI **data mutations** (subscribe/unsubscribe, set intent) are **Server Actions**
+(repo convention). **Sending** is a trigger, not a row mutation, so it lives in a
+route: `/api/notifications/send` resolves the recipient from the verified session
+and rejects any cross-user target with **403** (`authorizeRecipient`, no broadcast).
 
 **Keys (VAPID).** A public/private pair authenticates the server to browser push
 services. Generate once with `npx web-push generate-vapid-keys`; store as
@@ -177,8 +183,9 @@ authorized by `CRON_SECRET`).
   (`pg_net` + plpgsql), adding complexity for no benefit here.
 
 LUI-implementation: add `/api/cron/reminders` to `vercel.json` (a minute-granularity
-schedule for the 5-min-before timing), select due rituals via the admin client, and
-call `deliverToUser` from `lib/push/server.ts`.
+schedule for the 5-min-before timing), select due rituals via the admin client
+**for users with `profiles.smart_reminders_enabled = true`**, and call
+`deliverToUser` from `lib/push/server.ts`.
 
 ---
 
@@ -221,31 +228,43 @@ Gotchas:
 
 1. `npm run dev`, sign in, open *Settings → Preferences*.
 2. Toggle **Smart reminders** on → accept the browser permission prompt.
-3. Click **Send test** (dev-only) → the notification appears (try Chrome and Safari).
+3. Click **Send test** → the notification appears (try Chrome and Safari).
 4. Switch the app to `/fr`, re-toggle, send test → body arrives in French.
 
-**iOS (at merge, via a public HTTPS preview):**
+**iOS (via a public HTTPS preview):**
 
 1. Open the Vercel preview URL in **Safari** on the iPhone → Share → **Add to Home
    Screen**.
 2. Launch Strive from the home-screen icon, sign in, enable **Smart reminders**.
-3. Trigger a send → the notification appears on the lock screen.
+3. Click **Send test** → the notification appears on the lock screen.
 
-> The **Send test** button and the `sendTestNotification` action are **exploration-only**
-> and disabled in production. They are meant to be removed once the reminders cron lands.
+> The **Send test** button renders only on dev and Vercel **preview** deploys
+> (`VERCEL_ENV !== "production"`), so it can validate iOS reception on a preview while
+> staying hidden on production. The underlying `/api/notifications/send` route is a
+> real authenticated self-send. Both are exploration aids to be removed once the
+> reminders cron lands.
 
 ---
 
 ## 12. Schema
 
-`push_subscriptions` (see [`../data/tables/push_subscriptions.sql`](../data/tables/push_subscriptions.sql)):
+**`push_subscriptions`** (see [`../data/tables/push_subscriptions.sql`](../data/tables/push_subscriptions.sql)):
 one row per device subscription — `endpoint`, `p256dh`, `auth_key`, `locale`,
-`user_id`. RLS scopes every row to its owner. The `locale` column and the
-`unique(endpoint)` constraint were added in LUI-82; apply them in the Supabase SQL
-editor (migrations are run manually, not via `migrate.py`):
+`user_id`. RLS scopes every row to its owner (a user can only read/write their own
+subscriptions). The `locale` column and the `unique(endpoint)` constraint were added
+in LUI-82.
+
+**`profiles.smart_reminders_enabled`** (boolean, default `false`): the account-level
+intent gate, added in LUI-84.
+
+Migrations are applied **manually** in the Supabase SQL editor (not via `migrate.py`):
 
 ```sql
+-- LUI-82
 alter table push_subscriptions add column if not exists locale text not null default 'en';
 alter table push_subscriptions add constraint push_subscriptions_locale_check check (locale in ('en', 'fr'));
 alter table push_subscriptions add constraint push_subscriptions_endpoint_key unique (endpoint);
+
+-- LUI-84
+alter table profiles add column if not exists smart_reminders_enabled boolean not null default false;
 ```

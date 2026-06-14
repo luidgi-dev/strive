@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 import { defaultLocale, locales } from "@/lib/locales";
 import { usePathname } from "@/lib/i18n/navigation";
-import { sendTestNotification } from "@/lib/push/actions";
+import { setSmartRemindersEnabled } from "@/lib/push/actions";
 import {
   disablePush,
   enablePush,
@@ -21,7 +21,11 @@ type ThemeMode = "light" | "dark" | "system";
 
 const KNOWN_THEMES: ReadonlySet<ThemeMode> = new Set(["light", "dark", "system"]);
 
-export function PreferencesSection() {
+export function PreferencesSection({
+  showRemindersTest = false,
+}: {
+  showRemindersTest?: boolean;
+}) {
   const t = useTranslations("settings");
   const tPref = useTranslations("settings.preferences");
   const locale = useLocale() as Locale;
@@ -107,7 +111,7 @@ export function PreferencesSection() {
 
       <Divider />
 
-      <RemindersControl />
+      <RemindersControl showRemindersTest={showRemindersTest} />
     </section>
   );
 }
@@ -153,10 +157,15 @@ function Divider() {
   return <div className="h-px bg-border" aria-hidden />;
 }
 
-// Web Push opt-in. Drives the full subscribe/unsubscribe loop via lib/push and
-// reflects the live permission/subscription state. The "Send test" affordance is
-// exploration-only (LUI-82) and never renders in production.
-function RemindersControl() {
+// Web Push opt-in. The toggle drives both the per-device subscription (lib/push)
+// and the account-level intent (profiles.smart_reminders_enabled, the cron's
+// kill-switch). Displayed state reflects this device's subscription. The "Send
+// test" affordance is exploration-only and only renders on dev/preview.
+function RemindersControl({
+  showRemindersTest,
+}: {
+  showRemindersTest: boolean;
+}) {
   const tPref = useTranslations("settings.preferences");
   const locale = useLocale() as Locale;
   const [state, setState] = useState<PushState | "loading">("loading");
@@ -182,7 +191,21 @@ function RemindersControl() {
     setTested(false);
     setFailed(false);
     try {
-      setState(isOn ? await disablePush() : await enablePush(locale));
+      if (isOn) {
+        // Flip the account intent off first, then drop this device's subscription.
+        const intent = await setSmartRemindersEnabled(false);
+        if (!intent.ok) throw new Error(intent.error);
+        setState(await disablePush());
+      } else {
+        // Subscribe this device first (may fail on permission), then persist
+        // the account intent only once a subscription actually exists.
+        const next = await enablePush(locale);
+        setState(next);
+        if (next === "on") {
+          const intent = await setSmartRemindersEnabled(true);
+          if (!intent.ok) throw new Error(intent.error);
+        }
+      }
     } catch (err) {
       // Surface failures (e.g. missing VAPID env, network) instead of silently
       // reverting — otherwise the toggle just looks dead.
@@ -195,8 +218,13 @@ function RemindersControl() {
   }
 
   async function sendTest() {
-    const res = await sendTestNotification();
-    if (res.ok) setTested(true);
+    setTested(false);
+    try {
+      const res = await fetch("/api/notifications/send", { method: "POST" });
+      setTested(res.ok);
+    } catch {
+      setTested(false);
+    }
   }
 
   const hint = failed
@@ -207,7 +235,7 @@ function RemindersControl() {
         ? tPref("smartRemindersDenied")
         : tPref("smartRemindersHint");
 
-  const showTest = isOn && process.env.NODE_ENV !== "production";
+  const showTest = isOn && showRemindersTest;
 
   return (
     <div className="flex flex-col gap-2">
@@ -233,7 +261,7 @@ function RemindersControl() {
         <button
           type="button"
           onClick={sendTest}
-          className="inline-flex items-center gap-1.5 self-end rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex min-h-11 items-center gap-1.5 self-end rounded-md px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <Send className="size-3.5" />
           {tested ? tPref("testSent") : tPref("sendTest")}

@@ -1,9 +1,8 @@
 "use server";
 
-import { getTranslations } from "next-intl/server";
+import { revalidatePath } from "next/cache";
 
 import { locales, type Locale } from "@/lib/locales";
-import { deliverToUser } from "@/lib/push/server";
 import { createClient } from "@/lib/supabase/server";
 
 // Server Actions for Web Push opt-in. UI-initiated mutations go through actions
@@ -86,34 +85,30 @@ export async function removeSubscription(
 }
 
 /**
- * Send a test notification to the caller's own devices. EXPLORATION ONLY
- * (LUI-82) — disabled in production and meant to be removed once real triggers
- * (the reminders cron) land. It is the manual loop that validates the stack.
+ * Persist the account-level smart-reminders intent. This is the cron's
+ * kill-switch (see profiles.smart_reminders_enabled): delivery only happens for
+ * users with it `true`. Devices to deliver to are tracked separately in
+ * push_subscriptions via saveSubscription/removeSubscription.
  */
-export async function sendTestNotification(): Promise<ActionResult> {
-  if (process.env.NODE_ENV === "production") {
-    return { ok: false, error: "disabled" };
-  }
-
+export async function setSmartRemindersEnabled(
+  enabled: boolean,
+): Promise<ActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
 
-  // Preload both locales so each device is messaged in its captured language.
-  const translators = {
-    en: await getTranslations({ locale: "en", namespace: "notifications.test" }),
-    fr: await getTranslations({ locale: "fr", namespace: "notifications.test" }),
-  };
+  const { error } = await supabase
+    .from("profiles")
+    .update({ smart_reminders_enabled: enabled })
+    .eq("id", user.id);
 
-  const result = await deliverToUser(supabase, user.id, (locale) => ({
-    title: translators[locale]("title"),
-    body: translators[locale]("body"),
-    url: "/protected",
-    tag: "strive-test",
-  }));
+  if (error) {
+    console.error("[push] setSmartRemindersEnabled failed", error);
+    return { ok: false, error: "saveFailed" };
+  }
 
-  if (result.sent === 0) return { ok: false, error: "noSubscription" };
+  revalidatePath("/protected/settings");
   return { ok: true };
 }
