@@ -526,6 +526,10 @@
     "test": {
       "title": "Rappels activés",
       "body": "Voilà à quoi ils ressembleront."
+    },
+    "ritualReminder": {
+      "title": "Tes rituels du jour",
+      "bodyMany": "{count} choses prévues aujourd'hui"
     }
   }
 }
