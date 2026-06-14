@@ -356,18 +356,26 @@ export async function getWeekCompletedLogs(
  * Which of the given rituals have at least one completed log (any date). Used
  * to tell whether a one-time ritual is already done. Returns an empty set
  * without a round-trip when the input is empty.
+ *
+ * Pass `userId` to add an explicit `user_id` filter on top of RLS
+ * (defense-in-depth) — required when called with the service-role client, which
+ * bypasses RLS (e.g. the reminders cron).
  */
 export async function getCompletedRitualIds(
   client: SupabaseClient<Database>,
   ritualIds: string[],
+  userId?: string,
 ): Promise<Set<string>> {
   if (ritualIds.length === 0) return new Set();
 
-  const { data, error } = await client
+  let query = client
     .from("ritual_logs")
     .select("ritual_id")
     .eq("status_id", "completed")
     .in("ritual_id", ritualIds);
+  if (userId) query = query.eq("user_id", userId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 

@@ -536,6 +536,10 @@
       "titleWeekly": "Insights de la semaine",
       "titleMonthly": "Insights du mois",
       "body": "À découvrir dans Strive"
+    },
+    "eveningNudge": {
+      "title": "Rappel",
+      "body": "Garde ton momentum aujourd'hui"
     }
   }
 }
