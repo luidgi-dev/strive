@@ -531,6 +531,11 @@
       "title": "Rappel",
       "bodyOne": "Rituel du jour : {name}",
       "bodyMany": "Rituels du jour : {count} prévus"
+    },
+    "insightReady": {
+      "titleWeekly": "Insights de la semaine",
+      "titleMonthly": "Insights du mois",
+      "body": "À découvrir dans Strive"
     }
   }
 }
