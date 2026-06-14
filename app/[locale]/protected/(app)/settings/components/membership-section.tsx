@@ -12,6 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Link } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 type Tier = "lite" | "premium" | "lifetime";
@@ -19,8 +20,8 @@ type PaidTier = Exclude<Tier, "lite">;
 
 type Props = {
   tier?: Tier;
-  used?: number;
   balance?: number;
+  quota?: number;
   resetAt?: string | Date | null;
 };
 
@@ -31,8 +32,8 @@ function nextResetFallback(): Date {
 
 export function MembershipSection({
   tier = "lite",
-  used = 0,
   balance = 5,
+  quota = 5,
   resetAt,
 }: Props) {
   const t = useTranslations("settings.membership");
@@ -75,7 +76,7 @@ export function MembershipSection({
       <div className="flex min-h-[44px] items-center justify-between gap-3">
         <span className="text-sm">{t("credits")}</span>
         <span className="text-sm text-muted-foreground">
-          {t("creditsValue", { used, total: balance })}
+          {t("creditsValue", { remaining: balance, total: quota })}
         </span>
       </div>
       <div className="h-px bg-border" aria-hidden />
@@ -84,6 +85,20 @@ export function MembershipSection({
         <span className="text-sm">{t("resetsOn")}</span>
         <span className="text-sm text-muted-foreground">{resetLabel}</span>
       </div>
+
+      {/* Insights is a premium surface: the link only appears for paid tiers. */}
+      {tier !== "lite" ? (
+        <>
+          <div className="h-px bg-border" aria-hidden />
+          <Link
+            href="/protected/settings/insights"
+            className="flex min-h-[44px] items-center justify-between gap-3 text-sm text-foreground transition-colors hover:text-muted-foreground"
+          >
+            <span>{t("myInsights")}</span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </Link>
+        </>
+      ) : null}
 
       <PlansLink currentTier={tier} />
     </section>

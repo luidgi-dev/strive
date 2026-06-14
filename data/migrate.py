@@ -14,12 +14,21 @@ TABLES = [
     'ritual_categories.sql',
     'profiles.sql',
     'user_credits.sql',
+    'tier_quotas.sql',
+    'system_settings.sql',
     'rituals.sql',
     'log_statuses.sql',
     'ritual_logs.sql',
+    'insights.sql',
     'push_subscriptions.sql',
     'circles.sql',
     'circle_members.sql',
+]
+
+FUNCTIONS = [
+    'consume_ai_credit.sql',
+    'refund_ai_credit.sql',
+    'reset_ai_credits.sql',
 ]
 
 TRIGGERS = [
@@ -29,13 +38,22 @@ TRIGGERS = [
 SEEDS = [
     'seed_log_statuses.sql',
     'seed_ritual_categories.sql',
-    'seed_test.sql' # only for tests 
+    'seed_tier_quotas.sql',
+    'seed_system_settings.sql',
+    'seed_test.sql' # only for tests
 ]
 
 VIEWS = [
     'daily_summary.sql',
     'ritual_log_history.sql',
     'ritual_progress.sql'
+]
+
+# applied last: needs the pg_cron extension, which may require enabling in the
+# Supabase dashboard first. keeping it last lets the rest of the schema land
+# even if pg_cron is unavailable.
+CRON = [
+    'reset_ai_credits.sql',
 ]
 
 BASE = os.path.dirname(__file__)
@@ -67,6 +85,9 @@ def migrate() -> None:
         print('running tables...')
         run(cursor, 'tables', TABLES)
 
+        print('running functions...')
+        run(cursor, 'functions', FUNCTIONS)
+
         print('running triggers...')
         run(cursor, 'triggers', TRIGGERS)
 
@@ -75,6 +96,9 @@ def migrate() -> None:
 
         print('running views...')
         run(cursor, 'views', VIEWS)
+
+        print('running cron...')
+        run(cursor, 'cron', CRON)
 
         print('migration complete.')
 

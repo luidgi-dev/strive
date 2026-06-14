@@ -20,6 +20,7 @@ The full product specification lives in `[docs/PRODUCT_SPEC.md](docs/PRODUCT_SPE
 - **next-intl** for routing-aware i18n (`en`, `fr`)
 - **Tailwind CSS v4** + shadcn/Base UI primitives
 - **next-themes** for light/dark theming
+- **Vercel AI SDK** (`ai` + `@ai-sdk/google`) with Google **Gemini** (`gemini-2.5-flash`) for the app's AI features
 - **Vitest** for unit tests (pure logic: dates, momentum, scheduling)
 
 ## Repository structure
@@ -42,13 +43,21 @@ Root files like `proxy.ts`, `i18n.ts`, `next.config.ts`, `tsconfig.json` are bui
 
 ## Quick start
 
-Prerequisites: Node.js 20+, npm.
+Prerequisites: Node.js 24+ (see `.nvmrc`), npm.
 
 1. Create a `.env.local` at the repo root with:
   ```env
    NEXT_PUBLIC_SUPABASE_URL=...
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+   GOOGLE_GENERATIVE_AI_API_KEY=...   # AI features (Gemini); optional STRIVE_AI_MODEL overrides the model
+   SUPABASE_SERVICE_ROLE_KEY=...      # server-only; the Insights cron generates under the service role
+   CRON_SECRET=...                    # shared secret authorizing the Insights cron route
+   NEXT_PUBLIC_VAPID_PUBLIC_KEY=...   # Web Push: public VAPID key (sent to the browser)
+   VAPID_PRIVATE_KEY=...              # Web Push: private VAPID key (server-only, never exposed)
+   VAPID_SUBJECT=mailto:you@example.com  # Web Push: VAPID contact (mailto: or https:)
   ```
+  Generate the VAPID pair once with `npx web-push generate-vapid-keys`. See
+  `[design/push-notifications.md](design/push-notifications.md)` for the notification rules and stack.
 2. Install and run:
   ```bash
    npm install

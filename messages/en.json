@@ -47,20 +47,28 @@
       "themeLight": "Light",
       "themeDark": "Dark",
       "themeSystem": "System",
+      "languageEnglish": "English",
+      "languageFrench": "Français",
       "smartReminders": "Smart reminders",
-      "comingSoon": "Coming soon"
+      "smartRemindersHint": "Gentle nudges for your rituals and fresh insights.",
+      "smartRemindersUnsupported": "Add Strive to your home screen to turn on reminders.",
+      "smartRemindersDenied": "Reminders are blocked. Turn them on in your browser settings.",
+      "smartRemindersError": "Couldn't turn on reminders. Try again.",
+      "sendTest": "Send test",
+      "testSent": "Sent"
     },
     "membership": {
       "label": "Membership",
       "plan": "Plan",
       "credits": "Credits",
-      "creditsValue": "{used} / {total}",
+      "creditsValue": "{remaining} / {total}",
       "resetsOn": "Resets on",
       "tierLite": "Lite",
       "tierPremium": "Premium",
       "tierLifetime": "Lifetime",
       "viewPlans": "View plans",
-      "currentPlan": "Current plan"
+      "currentPlan": "Current plan",
+      "myInsights": "My Insights"
     },
     "unlockSheet": {
       "title": "Strive plans",
@@ -384,6 +392,8 @@
         "monthly": "Monthly"
       },
       "target": {
+        "decrease": "Decrease",
+        "increase": "Increase",
         "unit": {
           "week": "× per week",
           "month": "× per month"
@@ -427,7 +437,45 @@
       }
     },
     "ai": {
-      "openLabel": "Talk to Strive AI"
+      "openLabel": "Talk to Strive AI",
+      "title": "My Strive",
+      "placeholder": "What did you do today?",
+      "closeLabel": "Close",
+      "sendLabel": "Send",
+      "recordLabel": "Record a voice message",
+      "recording": "Recording",
+      "stopLabel": "Send voice message",
+      "cancelLabel": "Cancel",
+      "micDenied": "Microphone access is blocked. Enable it in your browser settings.",
+      "voiceMessage": "Voice message",
+      "voicePlayLabel": "Play voice message",
+      "voicePauseLabel": "Pause voice message",
+      "thinkingLabel": "Strive is thinking",
+      "errorMessage": "Something went wrong on my end. Try again in a moment.",
+      "creditsExhausted": "You've used all your AI credits this month. They renew on {resetDate}. Upgrade anytime to keep going.",
+      "aiPaused": "Strive's AI engine is taking a short pause. Your standard access remains open. AI features will return within 24h. Thank you for your patience.",
+      "suggestions": {
+        "momentum": "How am I doing this week?",
+        "log": "Log my run",
+        "list": "What rituals do I have?"
+      },
+      "cards": {
+        "momentumTitle": "Momentum",
+        "ritualsTitle": "Your rituals",
+        "logged": "Logged",
+        "undo": "Undo",
+        "undoing": "Undoing…",
+        "undone": "Removed",
+        "pickRitual": "Which ritual?",
+        "period": {
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "monthly": "Monthly",
+          "one_time": "One-time",
+          "open": "Open"
+        }
+      },
+      "greeting": "I'm your Strive AI. I help you log rituals, track your momentum, and keep your rhythm. What can I help with?"
     }
   },
   "rhythm": {
@@ -447,6 +495,52 @@
     "title": "Something went wrong.",
     "body": "An unexpected error interrupted this page. You can try again.",
     "retry": "Try again"
+  },
+  "insights": {
+    "title": "Insights",
+    "section": {
+      "week": "Week",
+      "month": "Month"
+    },
+    "updated": "Updated {days, plural, =0 {today} one {# day ago} other {# days ago}}",
+    "footer": "Refreshed every Monday, with a deeper look on the 1st.",
+    "empty": {
+      "title": "Nothing here yet",
+      "body": "Your first insights arrive after a few weeks of logging. Check back soon."
+    },
+    "type": {
+      "correlation": "Correlation",
+      "adjustment": "Adjustment",
+      "strength": "Strength",
+      "best_day": "Best day",
+      "anchor_pair": "Pairing"
+    },
+    "basis": {
+      "lastNWeeks": "Last {count} weeks"
+    },
+    "actions": {
+      "dismiss": "Dismiss"
+    }
+  },
+  "notifications": {
+    "test": {
+      "title": "Reminders are on",
+      "body": "This is what they'll feel like."
+    },
+    "ritualReminder": {
+      "title": "Reminder",
+      "bodyOne": "Today's ritual: {name}",
+      "bodyMany": "Today's rituals: {count} planned"
+    },
+    "insightReady": {
+      "titleWeekly": "Weekly insights",
+      "titleMonthly": "Monthly insights",
+      "body": "Ready to explore in Strive"
+    },
+    "eveningNudge": {
+      "title": "Reminder",
+      "body": "Keep today's momentum going"
+    }
   }
 }
 

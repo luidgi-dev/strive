@@ -82,6 +82,85 @@ export type Database = {
           },
         ]
       }
+      insights: {
+        Row: {
+          basis_label: string
+          body: string
+          cadence: string
+          confidence: number
+          created_at: string
+          dismissed_at: string | null
+          generated_at: string
+          headline: string
+          id: string
+          payload: Json
+          period_end: string
+          period_start: string
+          ritual_id: string | null
+          translations: Json
+          type: string
+          user_id: string
+        }
+        Insert: {
+          basis_label: string
+          body: string
+          cadence?: string
+          confidence: number
+          created_at?: string
+          dismissed_at?: string | null
+          generated_at?: string
+          headline: string
+          id?: string
+          payload?: Json
+          period_end: string
+          period_start: string
+          ritual_id?: string | null
+          translations?: Json
+          type: string
+          user_id: string
+        }
+        Update: {
+          basis_label?: string
+          body?: string
+          cadence?: string
+          confidence?: number
+          created_at?: string
+          dismissed_at?: string | null
+          generated_at?: string
+          headline?: string
+          id?: string
+          payload?: Json
+          period_end?: string
+          period_start?: string
+          ritual_id?: string | null
+          translations?: Json
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insights_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "ritual_progress"
+            referencedColumns: ["ritual_id"]
+          },
+          {
+            foreignKeyName: "insights_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "rituals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insights_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       log_statuses: {
         Row: {
           id: string
@@ -97,12 +176,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          created_at: string
+          id: string
+          sent_on: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sent_on: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sent_on?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           id: string
           is_active: boolean
+          smart_reminders_enabled: boolean
           tier: string
           timezone: string
           updated_at: string
@@ -113,6 +225,7 @@ export type Database = {
           created_at?: string
           id: string
           is_active?: boolean
+          smart_reminders_enabled?: boolean
           tier?: string
           timezone?: string
           updated_at?: string
@@ -123,6 +236,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          smart_reminders_enabled?: boolean
           tier?: string
           timezone?: string
           updated_at?: string
@@ -136,6 +250,7 @@ export type Database = {
           created_at: string
           endpoint: string
           id: string
+          locale: string
           p256dh: string
           user_id: string
         }
@@ -144,6 +259,7 @@ export type Database = {
           created_at?: string
           endpoint: string
           id?: string
+          locale?: string
           p256dh: string
           user_id: string
         }
@@ -152,6 +268,7 @@ export type Database = {
           created_at?: string
           endpoint?: string
           id?: string
+          locale?: string
           p256dh?: string
           user_id?: string
         }
@@ -347,6 +464,39 @@ export type Database = {
           },
         ]
       }
+      system_settings: {
+        Row: {
+          ai_enabled: boolean
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          ai_enabled?: boolean
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          ai_enabled?: boolean
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tier_quotas: {
+        Row: {
+          monthly_quota: number
+          tier: string
+        }
+        Insert: {
+          monthly_quota: number
+          tier: string
+        }
+        Update: {
+          monthly_quota?: number
+          tier?: string
+        }
+        Relationships: []
+      }
       user_credits: {
         Row: {
           balance: number
@@ -448,6 +598,8 @@ export type Database = {
           frequency_unit: string | null
           icon: string | null
           logs_this_period: number | null
+          momentum_count: number | null
+          momentum_target: number | null
           name: string | null
           ritual_id: string | null
           ritual_type: string | null
@@ -467,7 +619,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      consume_ai_credit: {
+        Args: never
+        Returns: {
+          balance: number
+          reset_at: string
+          status: string
+        }[]
+      }
+      refund_ai_credit: { Args: never; Returns: undefined }
+      reset_ai_credits: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

@@ -1,6 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { Database, Tables } from "@/lib/supabase/database.types";
+import type { RitualFormValues } from "@/lib/data/rituals-schema";
+import type {
+  Database,
+  Tables,
+  TablesInsert,
+} from "@/lib/supabase/database.types";
 
 export type RitualType = "recurring" | "one_time" | "open";
 export type FrequencyUnit = "day" | "week" | "month";
@@ -66,6 +71,15 @@ export type RitualLogHistoryEntry = Pick<
 export type RitualProgressEntry = {
   completionRate: number | null;
   logsThisPeriod: number | null;
+  /** Expected logs for the current period (null for open rituals / no target). */
+  target: number | null;
+  /**
+   * Rolling-window momentum, sized to the cadence (daily 7d distinct days,
+   * weekly 7d logs, monthly 30d logs). Drives the momentum status pill so it no
+   * longer resets on the calendar boundary. Null for open / one-time rituals.
+   */
+  momentumCount: number | null;
+  momentumTarget: number | null;
 };
 
 export type RitualsData = {
@@ -93,20 +107,39 @@ function indexCategoriesById(
   return map;
 }
 
+/**
+ * Pass `userId` to add an explicit `user_id` filter on top of RLS
+ * (defense-in-depth). The AI agent — a higher-risk, model-driven surface — always
+ * does this; app server components may omit it and rely on RLS (which now also
+ * scopes the views via `security_invoker`). `ritual_categories` is never filtered
+ * by user_id: system categories have a null `user_id` and must stay visible.
+ */
 export async function getRitualsForActiveUser(
   client: SupabaseClient<Database>,
+  userId?: string,
 ): Promise<RitualsData> {
+  let ritualsQuery = client
+    .from("rituals")
+    .select(RITUAL_COLUMNS)
+    .eq("is_active", true)
+    .is("archived_at", null)
+    .order("created_at", { ascending: true });
+  let progressQuery = client
+    .from("ritual_progress")
+    .select(
+      "ritual_id, completion_rate, logs_this_period, target, momentum_count, momentum_target",
+    );
+  if (userId) {
+    ritualsQuery = ritualsQuery.eq("user_id", userId);
+    progressQuery = progressQuery.eq("user_id", userId);
+  }
+
   const [ritualsRes, categoriesRes, progressRes] = await Promise.all([
-    client
-      .from("rituals")
-      .select(RITUAL_COLUMNS)
-      .eq("is_active", true)
-      .is("archived_at", null)
-      .order("created_at", { ascending: true }),
+    ritualsQuery,
     // Only active categories resolve; a ritual still pointing at an archived
     // category (e.g. a failed detach) gracefully falls back to "Other".
     client.from("ritual_categories").select(CATEGORY_COLUMNS).eq("is_active", true),
-    client.from("ritual_progress").select("ritual_id, completion_rate, logs_this_period"),
+    progressQuery,
   ]);
 
   if (ritualsRes.error) throw ritualsRes.error;
@@ -126,6 +159,9 @@ export async function getRitualsForActiveUser(
     progressByRitualId.set(p.ritual_id, {
       completionRate: p.completion_rate,
       logsThisPeriod: p.logs_this_period,
+      target: p.target,
+      momentumCount: p.momentum_count,
+      momentumTarget: p.momentum_target,
     });
   }
 
@@ -229,18 +265,27 @@ export async function countArchivedRituals(
 export async function getRitualProgress(
   client: SupabaseClient<Database>,
   ritualId: string,
+  userId?: string,
 ): Promise<RitualProgressEntry | null> {
-  const { data, error } = await client
+  // Pass userId to filter explicitly on top of RLS (defense-in-depth); see
+  // getRitualsForActiveUser.
+  let query = client
     .from("ritual_progress")
-    .select("completion_rate, logs_this_period")
-    .eq("ritual_id", ritualId)
-    .maybeSingle();
+    .select(
+      "completion_rate, logs_this_period, target, momentum_count, momentum_target",
+    )
+    .eq("ritual_id", ritualId);
+  if (userId) query = query.eq("user_id", userId);
+  const { data, error } = await query.maybeSingle();
 
   if (error) throw error;
   if (!data) return null;
   return {
     completionRate: data.completion_rate,
     logsThisPeriod: data.logs_this_period,
+    target: data.target,
+    momentumCount: data.momentum_count,
+    momentumTarget: data.momentum_target,
   };
 }
 
@@ -288,12 +333,17 @@ export type CompletedLogRow = { ritual_id: string; logged_at: string };
 export async function getWeekCompletedLogs(
   client: SupabaseClient<Database>,
   weekStart: string,
+  userId?: string,
 ): Promise<CompletedLogRow[]> {
-  const { data, error } = await client
+  // Pass userId to filter explicitly on top of RLS (defense-in-depth); see
+  // getRitualsForActiveUser.
+  let query = client
     .from("ritual_logs")
     .select("ritual_id, logged_at")
     .eq("status_id", "completed")
     .gte("logged_at", weekStart);
+  if (userId) query = query.eq("user_id", userId);
+  const { data, error } = await query;
 
   if (error) throw error;
 
@@ -306,18 +356,26 @@ export async function getWeekCompletedLogs(
  * Which of the given rituals have at least one completed log (any date). Used
  * to tell whether a one-time ritual is already done. Returns an empty set
  * without a round-trip when the input is empty.
+ *
+ * Pass `userId` to add an explicit `user_id` filter on top of RLS
+ * (defense-in-depth) — required when called with the service-role client, which
+ * bypasses RLS (e.g. the reminders cron).
  */
 export async function getCompletedRitualIds(
   client: SupabaseClient<Database>,
   ritualIds: string[],
+  userId?: string,
 ): Promise<Set<string>> {
   if (ritualIds.length === 0) return new Set();
 
-  const { data, error } = await client
+  let query = client
     .from("ritual_logs")
     .select("ritual_id")
     .eq("status_id", "completed")
     .in("ritual_id", ritualIds);
+  if (userId) query = query.eq("user_id", userId);
+
+  const { data, error } = await query;
 
   if (error) throw error;
 
@@ -335,26 +393,27 @@ export function paceToStatus(percent: number): MomentumStatus {
   return "resting";
 }
 
-export function deriveMomentumStatus(
+/**
+ * Momentum status from the rolling-window figures the `ritual_progress` view
+ * exposes (`momentumCount` / `momentumTarget`, sized to the cadence). The window
+ * carries across calendar boundaries, so a single log after a gap reads as
+ * "Resting", not "Strong". Only recurring rituals have momentum; a fresh ritual
+ * (created in the last 7 days) with nothing logged shows none yet.
+ */
+export function rollingMomentumStatus(
+  entry:
+    | Pick<RitualProgressEntry, "momentumCount" | "momentumTarget">
+    | null
+    | undefined,
   ritualType: string,
-  completionRate: number | null,
+  isFresh: boolean,
 ): MomentumStatus | null {
   if (ritualType !== "recurring") return null;
-  if (completionRate === null) return "resting";
-  return paceToStatus(completionRate);
-}
-
-/**
- * Momentum for a daily ritual, paced against the week so far: days done vs days
- * elapsed (Mon = 1 … today). This avoids the early-week trap of `daysDone / 7`,
- * where a perfect Tuesday (2/2) would otherwise read as 2/7 = "behind".
- */
-export function deriveDailyMomentum(
-  daysDone: number,
-  daysElapsed: number,
-): MomentumStatus {
-  if (daysElapsed <= 0) return "resting";
-  return paceToStatus((daysDone / daysElapsed) * 100);
+  const count = entry?.momentumCount ?? 0;
+  const target = entry?.momentumTarget ?? 0;
+  if (target <= 0) return null;
+  if (count === 0 && isFresh) return null;
+  return paceToStatus((count / target) * 100);
 }
 
 export type RitualGroup = {
@@ -391,4 +450,104 @@ export function groupRitualsByCategory(
     return a.category.name.localeCompare(b.category.name);
   });
   return groups;
+}
+
+// ---------------------------------------------------------------------------
+// Writes
+//
+// Pure insert helpers (no auth concern — the caller passes a verified userId).
+// They mirror the inserts the UI server actions perform, so logging/creating a
+// ritual through the AI agent stays consistent with the app. The matching
+// server actions live in app/.../rituals/actions.ts and are intentionally not
+// reused here to keep lib/ free of any app-layer dependency.
+// ---------------------------------------------------------------------------
+
+/**
+ * Insert a "completed" log for a ritual. Tagged `logged_via: "ai"` so logs made
+ * by the agent are distinguishable from manual ones. No uniqueness check —
+ * duplicate logs on the same day are allowed, matching the app.
+ */
+export async function insertRitualLog(
+  client: SupabaseClient<Database>,
+  args: { ritualId: string; userId: string; loggedAt: string; note?: string | null },
+): Promise<{ id: string }> {
+  const { data, error } = await client
+    .from("ritual_logs")
+    .insert({
+      ritual_id: args.ritualId,
+      user_id: args.userId,
+      status_id: "completed",
+      logged_at: args.loggedAt,
+      logged_via: "ai",
+      note: args.note ?? null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return { id: data.id };
+}
+
+/**
+ * Delete a single ritual log by id, scoped to the owner. Used by the chat's
+ * "undo" card after an AI log. Safe to call with a log that no longer exists.
+ */
+export async function deleteRitualLog(
+  client: SupabaseClient<Database>,
+  args: { logId: string; userId: string },
+): Promise<void> {
+  const { error } = await client
+    .from("ritual_logs")
+    .delete()
+    .eq("id", args.logId)
+    .eq("user_id", args.userId);
+  if (error) throw error;
+}
+
+/**
+ * Insert a new ritual from validated form values. Mirrors the column mapping of
+ * the `createRitual` server action (recurring → frequency fields, one_time →
+ * due_date, open → base only). Returns the new ritual id.
+ */
+export async function insertRitual(
+  client: SupabaseClient<Database>,
+  values: RitualFormValues,
+  userId: string,
+): Promise<{ id: string }> {
+  const base: TablesInsert<"rituals"> = {
+    user_id: userId,
+    name: values.name,
+    icon: values.icon ?? null,
+    description: values.description ?? null,
+    category_id: values.category_id ?? null,
+    ritual_type: values.ritual_type,
+  };
+
+  let insert: TablesInsert<"rituals"> = base;
+  if (values.ritual_type === "recurring") {
+    insert = {
+      ...base,
+      frequency_unit: values.frequency_unit,
+      frequency_value: values.frequency_value,
+      scheduled_days:
+        values.scheduled_days && values.scheduled_days.length > 0
+          ? values.scheduled_days
+          : null,
+      scheduled_time: values.scheduled_time ?? null,
+    };
+  } else if (values.ritual_type === "one_time") {
+    insert = {
+      ...base,
+      due_date: values.due_date,
+      scheduled_time: values.scheduled_time ?? null,
+    };
+  }
+
+  const { data, error } = await client
+    .from("rituals")
+    .insert(insert)
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  return { id: data.id };
 }

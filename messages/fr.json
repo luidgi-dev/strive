@@ -47,20 +47,28 @@
       "themeLight": "Clair",
       "themeDark": "Sombre",
       "themeSystem": "Système",
+      "languageEnglish": "English",
+      "languageFrench": "Français",
       "smartReminders": "Rappels intelligents",
-      "comingSoon": "Bientôt"
+      "smartRemindersHint": "De légers rappels pour tes rituels et tes nouveaux insights.",
+      "smartRemindersUnsupported": "Ajoute Strive à ton écran d'accueil pour activer les rappels.",
+      "smartRemindersDenied": "Les rappels sont bloqués. Active-les dans les réglages de ton navigateur.",
+      "smartRemindersError": "Impossible d'activer les rappels. Réessaie.",
+      "sendTest": "Envoyer un test",
+      "testSent": "Envoyé"
     },
     "membership": {
       "label": "Abonnement",
       "plan": "Formule",
       "credits": "Crédits",
-      "creditsValue": "{used} / {total}",
+      "creditsValue": "{remaining} / {total}",
       "resetsOn": "Renouvellement",
       "tierLite": "Lite",
       "tierPremium": "Premium",
       "tierLifetime": "À vie",
       "viewPlans": "Voir les formules",
-      "currentPlan": "Plan actuel"
+      "currentPlan": "Plan actuel",
+      "myInsights": "Mes Insights"
     },
     "unlockSheet": {
       "title": "Les formules Strive",
@@ -384,6 +392,8 @@
         "monthly": "Mensuel"
       },
       "target": {
+        "decrease": "Diminuer",
+        "increase": "Augmenter",
         "unit": {
           "week": "× par semaine",
           "month": "× par mois"
@@ -427,7 +437,45 @@
       }
     },
     "ai": {
-      "openLabel": "Parler à l'IA Strive"
+      "openLabel": "Parler à l'IA Strive",
+      "title": "Mon Strive",
+      "placeholder": "Qu'as-tu fait aujourd'hui ?",
+      "closeLabel": "Fermer",
+      "sendLabel": "Envoyer",
+      "recordLabel": "Enregistrer un message vocal",
+      "recording": "Enregistrement",
+      "stopLabel": "Envoyer le message vocal",
+      "cancelLabel": "Annuler",
+      "micDenied": "L'accès au micro est bloqué. Active-le dans les réglages de ton navigateur.",
+      "voiceMessage": "Message vocal",
+      "voicePlayLabel": "Lire le message vocal",
+      "voicePauseLabel": "Mettre en pause le message vocal",
+      "thinkingLabel": "Strive réfléchit",
+      "errorMessage": "Un problème est survenu de mon côté. Réessaie dans un instant.",
+      "creditsExhausted": "Tu as utilisé tous tes crédits IA ce mois-ci. Ils se renouvellent le {resetDate}. Passe à une formule supérieure pour continuer.",
+      "aiPaused": "Le moteur IA de Strive fait une courte pause. Ton accès standard reste ouvert. Les fonctionnalités IA reviendront sous 24h. Merci de ta patience.",
+      "suggestions": {
+        "momentum": "Où en est mon momentum cette semaine ?",
+        "log": "Enregistre ma course",
+        "list": "Quels sont mes rituels ?"
+      },
+      "cards": {
+        "momentumTitle": "Momentum",
+        "ritualsTitle": "Tes rituels",
+        "logged": "Enregistré",
+        "undo": "Annuler",
+        "undoing": "Annulation…",
+        "undone": "Retiré",
+        "pickRitual": "Quel rituel ?",
+        "period": {
+          "daily": "Quotidien",
+          "weekly": "Hebdo",
+          "monthly": "Mensuel",
+          "one_time": "Ponctuel",
+          "open": "Libre"
+        }
+      },
+      "greeting": "Je suis ton IA Strive. Je t'aide à enregistrer tes rituels, suivre ton momentum et garder ton rythme. Sur quoi puis-je t'aider ?"
     }
   },
   "rhythm": {
@@ -447,5 +495,51 @@
     "title": "Une erreur est survenue.",
     "body": "Une erreur inattendue a interrompu cette page. Vous pouvez réessayer.",
     "retry": "Réessayer"
+  },
+  "insights": {
+    "title": "Insights",
+    "section": {
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "updated": "Mis à jour {days, plural, =0 {aujourd'hui} one {il y a # jour} other {il y a # jours}}",
+    "footer": "Actualisé chaque lundi, avec un bilan plus complet le 1er.",
+    "empty": {
+      "title": "Rien pour l'instant",
+      "body": "Tes premiers insights arrivent après quelques semaines d'enregistrement. Reviens bientôt."
+    },
+    "type": {
+      "correlation": "Corrélation",
+      "adjustment": "Ajustement",
+      "strength": "Points forts",
+      "best_day": "Meilleur jour",
+      "anchor_pair": "Duo"
+    },
+    "basis": {
+      "lastNWeeks": "{count} dernières semaines"
+    },
+    "actions": {
+      "dismiss": "Ignorer"
+    }
+  },
+  "notifications": {
+    "test": {
+      "title": "Rappels activés",
+      "body": "Voilà à quoi ils ressembleront."
+    },
+    "ritualReminder": {
+      "title": "Rappel",
+      "bodyOne": "Rituel du jour : {name}",
+      "bodyMany": "Rituels du jour : {count} prévus"
+    },
+    "insightReady": {
+      "titleWeekly": "Insights de la semaine",
+      "titleMonthly": "Insights du mois",
+      "body": "À découvrir dans Strive"
+    },
+    "eveningNudge": {
+      "title": "Rappel",
+      "body": "Garde ton momentum aujourd'hui"
+    }
   }
 }

@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npx tsc --noEmit
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npx eslint . --max-warnings 0
@@ -44,14 +44,26 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npx next build
 
+  test:
+    name: Vitest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
   agent-review:
     name: AI Code Review
-    needs: [typescript, lint, build]
+    needs: [typescript, lint, build, test]
     runs-on: ubuntu-latest
     if: success()
     permissions:
@@ -119,9 +131,9 @@ jobs:
           prompt: |
             PR: ${{ github.event.pull_request.title }}
 
-            CI status: TypeScript (strict), ESLint and the Next.js build have ALL PASSED
-            for this PR. Do NOT report type errors, lint violations, or build failures —
-            CI already owns those.
+            CI status: TypeScript (strict), ESLint, the Next.js build and the Vitest
+            suite have ALL PASSED for this PR. Do NOT report type errors, lint
+            violations, build failures, or failing tests — CI already owns those.
 
             Review the unified diff below using the rules in your system prompt. You can
             see ONLY this diff, not the full files. Only raise a finding for a line shown

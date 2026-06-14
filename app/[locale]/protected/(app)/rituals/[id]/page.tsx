@@ -13,7 +13,7 @@ import { TheArcLive } from "@/components/rituals/the-arc-live";
 import { Link } from "@/lib/i18n/navigation";
 import { getUserToday } from "@/lib/profile";
 import {
-  deriveMomentumStatus,
+  rollingMomentumStatus,
   getLatestCompletedLog,
   getRitualArcLogs,
   getRitualDetail,
@@ -23,7 +23,7 @@ import {
 } from "@/lib/data/rituals";
 import { buildArcModel } from "@/lib/rituals/arc";
 import { getCategoryLabel } from "@/lib/rituals/category-label";
-import { ritualPeriodLabel } from "@/lib/rituals/presentation";
+import { isRitualFresh, ritualPeriodLabel } from "@/lib/rituals/presentation";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
@@ -77,9 +77,10 @@ export default async function RitualDetailPage({ params }: Props) {
   const initialLogCount = isOneTime ? (completedAt ? 1 : 0) : todayCount;
 
   const subtitle = buildSubtitle();
-  const status = deriveMomentumStatus(
+  const status = rollingMomentumStatus(
+    progress,
     ritual.ritual_type,
-    progress?.completionRate ?? null,
+    isRitualFresh(ritual.created_at),
   );
 
   // Archived rituals are viewable read-only: no log control, no edit/archive

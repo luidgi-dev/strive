@@ -3,8 +3,10 @@
 -- -------------------------
 -- one row per user: snapshot of today's progress across all active rituals
 -- useful for the top-level header in "the flow"
- 
-create or replace view daily_summary as
+-- security_invoker: the view runs with the querying user's privileges so the
+-- underlying tables' RLS is enforced (a user only ever sees their own rows).
+
+create or replace view daily_summary with (security_invoker = on) as
 select
     r.user_id,
     count(distinct r.id) as rituals_total,

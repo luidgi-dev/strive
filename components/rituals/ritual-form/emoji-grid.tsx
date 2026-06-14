@@ -14,7 +14,7 @@ const CURATED_EMOJIS = [
   // Life & Home
   "🏠", "☀️", "📅", "🎨", "✈️",
   // Others
-  "🛒", "💰", " 👥", "🐕",
+  "🛒", "💰", "👥", "🐕",
 ] as const;
 
 type Props = {

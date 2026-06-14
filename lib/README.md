@@ -9,14 +9,25 @@ Shared utilities and client libraries for the Strive web app.
   - `server.ts` — Server-side client, typed with `<Database>`, cookie-based session handling
   - `middleware.ts` — Refreshes the session cookie; called from `proxy.ts`; also typed with `<Database>`
   - `database.types.ts` — Auto-generated TypeScript types reflecting the public schema (tables, views, enums). Do not edit by hand. Regenerate with `npm run db:types`.
+  - `admin.ts` — `createAdminClient()`: service-role client (reads `SUPABASE_SERVICE_ROLE_KEY`). **Bypasses RLS** — server-only, for trusted jobs (the Insights cron) that have no user session. Every query made with it must filter `user_id` explicitly. Never import into a client component or user-session path.
 - `profile.ts` — `getAuthenticatedProfile()`: server-side helper that returns `{ user, profile }` from the Supabase session + `profiles` table. Used by `app/[locale]/protected/layout.tsx` to gate access and render the header avatar.
 - `i18n/` — Locale-aware navigation helpers built on `next-intl`
   - `routing.ts` — `defineRouting` config (re-uses `locales`/`defaultLocale` from root `i18n.ts`, `localePrefix: "as-needed"` to match the proxy's clean-URL behavior for English)
   - `navigation.ts` — `createNavigation(routing)` re-exports: `Link`, `redirect`, `usePathname`, `useRouter`, `getPathname`. Use these instead of `next/link` / `next/navigation` for any internal route that needs to preserve the current locale.
+- `ai/` — Vercel AI SDK setup
+  - `client.ts` — Shared, typed Gemini model singleton (`striveAIModel`, default `gemini-2.5-flash`). Reads `GOOGLE_GENERATIVE_AI_API_KEY`; the model id is overridable via `STRIVE_AI_MODEL`. Reuse this instead of re-instantiating a provider per call.
+  - `prompt.ts` — `buildStriveSystemPrompt(now?)`: builds the agent's system prompt (identity, terminology, capabilities, per-tool response format, guardrails), injecting today's date at call time. Versioned; mirrors `docs/UX_WRITING.md`.
+  - `tools.ts` — `striveTools(supabase, userId)` factory returning the agent's 5 tools (`list_rituals`, `get_momentum_summary`, `log_ritual`, `create_ritual`, `get_log_history`), each bound to the verified user. Tools resolve rituals by name (case-insensitive, structured not-found/ambiguous results), return rich momentum context, and reuse the `lib/data/rituals.ts` read/write helpers.
+  - `types.ts` — shared types for the AI layer (`StriveSupabaseClient`, `StriveToolContext`).
+
+  Consumed by the chat route at `app/[locale]/api/chat/route.ts` (POST), which authenticates the user, then `streamText`s the reply via `toUIMessageStreamResponse()`. The route lives under `[locale]/` because `proxy.ts` rewrites every non-static path with a locale prefix.
+
+  The user-facing surface is `components/chat/` (a floating glass panel opened by the FAB on Rhythm), which calls this route through the AI SDK v6 `useChat` hook (`@ai-sdk/react`). See `components/chat/` for the UI pieces.
 - `utils.ts` — General helpers (Tailwind class merging via `clsx` + `tailwind-merge`, etc.)
 - `date.ts` — Date helpers: `todayInTimeZone`, `isoWeekday`, `startOfWeek`, `daysInMonth`
-- `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `deriveMomentumStatus`, `deriveDailyMomentum`)
+- `data/` — Typed query helpers + derivations against tables/views (`rituals.ts`: fetchers, `paceToStatus` / `rollingMomentumStatus` (momentum status from the view's rolling-window figures), plus `insertRitualLog`/`insertRitual` write helpers used by the AI tools — tagged `logged_via: "ai"`)
 - `rituals/` — Ritual presentation logic: `presentation.ts` (period label, momentum tokens, freshness), `category-label.ts`, `arc.ts`
+- `insights/` — The **Insights** feature's hybrid intelligence (second AI surface). `calculators.ts` (pure Stats Engine + confidence, unit-tested), `prompts.ts` (one specialized prompt per card type; output is `{ headline, body }` only), `orchestrator.ts` (`generateInsightsForUser` — runs calculators, filters by confidence, phrases each fact with `generateObject`, caches in the `insights` table idempotently per cadence). Triggered weekly/monthly by `app/[locale]/api/cron/insights/route.ts` under the service role. See [`design/insights-page.md`](../design/insights-page.md).
 - `rhythm/` — `today-rituals.ts`: pure `selectTodayRituals` deciding what shows on the Rhythm home today (scope, daily quota, Done-today split)
 
 ## Usage
@@ -98,7 +109,8 @@ Run `npm run db:types` after any schema change (new table, new column, new view,
 Unit tests are **co-located** with the modules they cover (Vitest, `*.test.ts`):
 
 - `date.test.ts` — `isoWeekday`, `startOfWeek`, `daysInMonth`, `todayInTimeZone`
-- `data/rituals.test.ts` — momentum derivation (`paceToStatus`, `deriveMomentumStatus`, `deriveDailyMomentum`)
+- `data/rituals.test.ts` — momentum derivation (`paceToStatus`, `rollingMomentumStatus`)
+- `insights/calculators.test.ts` — Stats Engine (`computeCorrelations`, `computeAdjustments`, `computeConfidence`) on deterministic fixtures
 - `rhythm/today-rituals.test.ts` — `selectTodayRituals` (scope, daily quota, open handling, sort order)
 
 Run from the repo root with `npm test` (or `npm run test:watch`). Keep new unit

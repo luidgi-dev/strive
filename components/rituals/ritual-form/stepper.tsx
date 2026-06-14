@@ -8,6 +8,8 @@ type Props = {
   min?: number;
   max?: number;
   ariaLabel: string;
+  decreaseLabel: string;
+  increaseLabel: string;
 };
 
 export function Stepper({
@@ -16,6 +18,8 @@ export function Stepper({
   min = 1,
   max = 99,
   ariaLabel,
+  decreaseLabel,
+  increaseLabel,
 }: Props) {
   const decrement = () => onChange(Math.max(min, value - 1));
   const increment = () => onChange(Math.min(max, value + 1));
@@ -28,7 +32,7 @@ export function Stepper({
     >
       <button
         type="button"
-        aria-label="Decrease"
+        aria-label={decreaseLabel}
         onClick={decrement}
         disabled={value <= min}
         className="flex h-full w-11 items-center justify-center text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-40"
@@ -43,7 +47,7 @@ export function Stepper({
       </span>
       <button
         type="button"
-        aria-label="Increase"
+        aria-label={increaseLabel}
         onClick={increment}
         disabled={value >= max}
         className="flex h-full w-11 items-center justify-center text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-40"

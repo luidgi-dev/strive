@@ -1,6 +1,5 @@
 import {
-  deriveDailyMomentum,
-  deriveMomentumStatus,
+  rollingMomentumStatus,
   type CompletedLogRow,
   type MomentumStatus,
   type RitualProgressEntry,
@@ -140,12 +139,18 @@ export function selectTodayRituals({
       satisfied = false;
       countsTowardDay = false;
     } else {
-      // Recurring: done for today once today's logs reach the daily quota, or
-      // the whole period target is already met.
-      initialLogCount = loggedToday;
+      // Recurring: clears to "Done today" once today's logs reach the daily
+      // quota. If the whole period target is already met and nothing qualifying
+      // was logged today, the ritual leaves Rhythm entirely — a met week/month
+      // shouldn't linger as "Done today" on the remaining days. It stays
+      // loggable from the rituals list. The day the target is reached by
+      // logging, loggedEnoughToday keeps it visible as done for that day.
+      const loggedEnoughToday = loggedToday >= dailyQuota(ritual, today);
       const target = ritual.frequency_value ?? 0;
       const targetMet = target > 0 && (progress?.logsThisPeriod ?? 0) >= target;
-      satisfied = loggedToday >= dailyQuota(ritual, today) || targetMet;
+      if (targetMet && !loggedEnoughToday) continue;
+      initialLogCount = loggedToday;
+      satisfied = loggedEnoughToday;
     }
 
     (satisfied ? done : active).push({
@@ -181,18 +186,18 @@ export type RhythmCardView = {
 };
 
 /**
- * The display model for a Rhythm card. A fraction + colored bar + momentum pill
- * only apply to rituals that accumulate over a period: daily counts distinct
- * days this week (X/7, paced against days elapsed); weekly/monthly count logs
- * against their target. Daily/open/one-time keep no bar. Momentum is suppressed
- * for fresh rituals (created in the last 7 days) with nothing logged yet.
+ * The display model for a Rhythm card. The fraction + colored bar stay on the
+ * CALENDAR week (daily counts distinct days this week as X/7; weekly/monthly
+ * count logs against their target), matching the day strip and The Arc. The
+ * momentum pill status, however, comes from the rolling-window figures on the
+ * progress entry, so it no longer resets on the calendar boundary. Open/one-time
+ * keep no bar; fresh rituals with nothing logged show no status.
  */
 export function deriveRhythmCardView(
   { ritual, progress, weekDaysCount }: Pick<
     RhythmItem,
     "ritual" | "progress" | "weekDaysCount"
   >,
-  today: string,
 ): RhythmCardView {
   const isFresh = isRitualFresh(ritual.created_at);
   const view: RhythmCardView = {
@@ -210,23 +215,19 @@ export function deriveRhythmCardView(
     (ritual.frequency_unit === "week" || ritual.frequency_unit === "month") &&
     (ritual.frequency_value ?? 0) > 0;
 
+  // Numerator / denominator / bar stay on the CALENDAR week (matching the day
+  // strip and The Arc); only the status pill reflects the rolling window.
   if (isDaily) {
     view.numerator = weekDaysCount;
     view.denominator = DAILY_WEEK_TARGET;
     view.barWidth = (weekDaysCount / DAILY_WEEK_TARGET) * 100;
-    view.status =
-      weekDaysCount === 0 && isFresh
-        ? null
-        : deriveDailyMomentum(weekDaysCount, isoWeekday(today));
+    view.status = rollingMomentumStatus(progress, ritual.ritual_type, isFresh);
   } else if (isPeriodic) {
     const logs = progress?.logsThisPeriod ?? 0;
     view.numerator = logs;
     view.denominator = ritual.frequency_value ?? 0;
     view.barWidth = Math.min(100, Math.max(0, progress?.completionRate ?? 0));
-    view.status =
-      logs === 0 && isFresh
-        ? null
-        : deriveMomentumStatus(ritual.ritual_type, progress?.completionRate ?? null);
+    view.status = rollingMomentumStatus(progress, ritual.ritual_type, isFresh);
   }
 
   view.showProgress = view.numerator !== null;

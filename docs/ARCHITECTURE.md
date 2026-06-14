@@ -55,11 +55,11 @@ Favicons, PWA manifest, brand SVGs and JPEGs.
 
 ### `docs/` — Documentation hub
 
-See [`docs/README.md`](README.md) for the index.
+Technical specs and rules read by anyone coding (architecture, design system, product spec, UX writing, AI security). See [`docs/README.md`](README.md) for the index. No wireframes or UX artifacts live here — those are in `design/`.
 
 ### `design/` — Design workspace
 
-See [`design/README.md`](../design/README.md). Wireframes, mockups, flows, research notes.
+UX artifacts: HTML wireframes (`wireframes/`), the global navigation flow (`ux-flow.md`), and the AI-chat design rationale (`chat-design.md`). See [`design/README.md`](../design/README.md) for the `docs/` vs `design/` rule.
 
 ### `.agents/` — Reusable AI skills
 
