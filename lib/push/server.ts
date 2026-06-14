@@ -1,9 +1,9 @@
 import "server-only";
 
-import webpush from "web-push";
+import webpush, { WebPushError } from "web-push";
 
 import type { StriveSupabaseClient } from "@/lib/ai/types";
-import type { Locale } from "@/lib/locales";
+import { locales, type Locale } from "@/lib/locales";
 
 // The payload our service worker (public/sw.js) knows how to render. Keep the
 // two in sync: any field added here must be handled there.
@@ -70,7 +70,12 @@ export async function deliverToUser(
 
   await Promise.all(
     subscriptions.map(async (row) => {
-      const payload = buildPayload((row.locale as Locale) ?? "en");
+      // Coerce unexpected stored values to a known locale instead of trusting
+      // the DB string blindly (translators only exist for `locales`).
+      const locale: Locale = locales.includes(row.locale as Locale)
+        ? (row.locale as Locale)
+        : "en";
+      const payload = buildPayload(locale);
       try {
         await webpush.sendNotification(
           {
@@ -81,8 +86,7 @@ export async function deliverToUser(
         );
         sent += 1;
       } catch (err) {
-        const statusCode = (err as { statusCode?: number }).statusCode;
-        if (statusCode === 404 || statusCode === 410) {
+        if (err instanceof WebPushError && (err.statusCode === 404 || err.statusCode === 410)) {
           expiredEndpoints.push(row.endpoint);
         } else {
           console.error("[push] send failed", row.endpoint, err);

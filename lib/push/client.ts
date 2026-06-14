@@ -2,6 +2,7 @@
 // `navigator`, `window` or `Notification`, so call these from "use client"
 // components behind a support check.
 import type { Locale } from "@/lib/locales";
+import { removeSubscription, saveSubscription } from "@/lib/push/actions";
 
 const SW_URL = "/sw.js";
 
@@ -36,12 +37,14 @@ export function isStandalone(): boolean {
 }
 
 // VAPID's applicationServerKey must be a Uint8Array; the public key ships as a
-// URL-safe base64 string, so we decode it here.
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+// URL-safe base64 string, so we decode it here. The backing ArrayBuffer is
+// allocated explicitly so the result is a Uint8Array<ArrayBuffer> that satisfies
+// BufferSource without a cast.
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
   const raw = window.atob(base64);
-  const output = new Uint8Array(raw.length);
+  const output = new Uint8Array(new ArrayBuffer(raw.length));
   for (let i = 0; i < raw.length; i += 1) output[i] = raw.charCodeAt(i);
   return output;
 }
@@ -85,17 +88,11 @@ export async function enablePush(locale: Locale): Promise<PushState> {
     (await registration.pushManager.getSubscription()) ??
     (await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      // Cast: the decoded key is ArrayBuffer-backed at runtime, but TS widens
-      // Uint8Array's buffer to ArrayBufferLike which BufferSource rejects.
-      applicationServerKey: urlBase64ToUint8Array(vapidKey) as BufferSource,
+      applicationServerKey: urlBase64ToUint8Array(vapidKey),
     }));
 
-  const res = await fetch("/api/push/subscribe", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ subscription: subscription.toJSON(), locale }),
-  });
-  if (!res.ok) throw new Error("Failed to save push subscription");
+  const res = await saveSubscription(subscription.toJSON(), locale);
+  if (!res.ok) throw new Error(`Failed to save push subscription: ${res.error}`);
 
   return "on";
 }
@@ -107,11 +104,7 @@ export async function disablePush(): Promise<PushState> {
   const registration = await navigator.serviceWorker.getRegistration(SW_URL);
   const subscription = await registration?.pushManager.getSubscription();
   if (subscription) {
-    await fetch("/api/push/unsubscribe", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ endpoint: subscription.endpoint }),
-    });
+    await removeSubscription(subscription.endpoint);
     await subscription.unsubscribe();
   }
   return "off";
