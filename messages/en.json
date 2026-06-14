@@ -53,6 +53,7 @@
       "smartRemindersHint": "Gentle nudges for your rituals and fresh insights.",
       "smartRemindersUnsupported": "Add Strive to your home screen to turn on reminders.",
       "smartRemindersDenied": "Reminders are blocked. Turn them on in your browser settings.",
+      "smartRemindersError": "Couldn't turn on reminders. Try again.",
       "sendTest": "Send test",
       "testSent": "Sent"
     },

@@ -53,6 +53,7 @@
       "smartRemindersHint": "De légers rappels pour tes rituels et tes nouveaux insights.",
       "smartRemindersUnsupported": "Ajoute Strive à ton écran d'accueil pour activer les rappels.",
       "smartRemindersDenied": "Les rappels sont bloqués. Active-les dans les réglages de ton navigateur.",
+      "smartRemindersError": "Impossible d'activer les rappels. Réessaie.",
       "sendTest": "Envoyer un test",
       "testSent": "Envoyé"
     },
