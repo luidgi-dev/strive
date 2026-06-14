@@ -182,6 +182,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          smart_reminders_enabled: boolean
           tier: string
           timezone: string
           updated_at: string
@@ -192,6 +193,7 @@ export type Database = {
           created_at?: string
           id: string
           is_active?: boolean
+          smart_reminders_enabled?: boolean
           tier?: string
           timezone?: string
           updated_at?: string
@@ -202,6 +204,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          smart_reminders_enabled?: boolean
           tier?: string
           timezone?: string
           updated_at?: string
