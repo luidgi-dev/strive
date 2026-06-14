@@ -524,8 +524,8 @@
   },
   "notifications": {
     "test": {
-      "title": "Strive",
-      "body": "Tes rappels sont activés. Voilà à quoi ils ressembleront."
+      "title": "Rappels activés",
+      "body": "Voilà à quoi ils ressembleront."
     }
   }
 }

@@ -524,8 +524,8 @@
   },
   "notifications": {
     "test": {
-      "title": "Strive",
-      "body": "Your reminders are on. This is what they'll feel like."
+      "title": "Reminders are on",
+      "body": "This is what they'll feel like."
     }
   }
 }
