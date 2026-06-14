@@ -49,7 +49,9 @@ export default async function SettingsPage({ params }: Props) {
           avatarUrl={profile?.avatar_url ?? null}
         />
 
-        <PreferencesSection />
+        <PreferencesSection
+          showRemindersTest={process.env.VERCEL_ENV !== "production"}
+        />
 
         <MembershipSection
           tier={membership?.tier}
