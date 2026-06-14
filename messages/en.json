@@ -526,6 +526,11 @@
     "test": {
       "title": "Reminders are on",
       "body": "This is what they'll feel like."
+    },
+    "ritualReminder": {
+      "title": "Reminder",
+      "bodyOne": "Today's ritual: {name}",
+      "bodyMany": "Today's rituals: {count} planned"
     }
   }
 }

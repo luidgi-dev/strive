@@ -48,40 +48,44 @@ type is added here first, then implemented.
 
 | Type | Fires when | Cadence |
 |---|---|---|
-| `ritual_reminder` | A scheduled ritual is due soon and **not yet logged** for that occurrence. | Per scheduled occurrence (see below) |
+| `ritual_reminder` | The user has **one-time** rituals **due today** and not yet logged. | Once each morning (~8am local) |
 | `insight_ready` | A new insight has just been generated for the user. | Weekly (Mon) + monthly (1st) |
 
 `ritual_reminder` firing conditions (grounded in the `rituals` schema):
 
-- Applies to `one_time` and `recurring` rituals **only**. `open` rituals have no
-  target or date and never trigger.
-- The ritual must have a scheduled moment:
-  - `one_time` → uses `due_date` (always present), plus optional `scheduled_time`.
-  - `recurring` → only if the user set `scheduled_days` and/or `scheduled_time`.
-- Fires **only if no `ritual_log` exists** for that ritual on that date (already
-  logged ⇒ no reminder).
-- **Timing:** when `scheduled_time` is set, fire **5 minutes before** it, in the
-  user's `profiles.timezone`. When no time is set, fire once at a default daily
-  anchor for the due date.
-- Respects the ritual's `started_at`/`ends_at` window, `is_active`, and `archived_at`.
+- **One-time rituals only** (`ritual_type = 'one_time'`, `due_date = today`). These
+  are dated, one-off events that are easy to forget — exactly what a reminder helps
+  with. **Recurring and `open` rituals never trigger**: a daily "you have N habits"
+  push would become noise. (An evening "nothing logged yet" nudge for recurring
+  habits is deliberately a *separate* future trigger, not this one.)
+- Fires **only if no completed `ritual_log` exists** for the ritual (a one-time
+  ritual is done once logged).
+- Respects `is_active` and `archived_at`.
+- **Timing:** one morning send (~8am in the user's `profiles.timezone`), not per
+  ritual — a single notification covers the day's one-time rituals. Copy: title
+  `Reminder` / `Rappel`; body `Today's ritual: {name}` when there's one,
+  `Today's rituals: {n} planned` when several.
 
 `insight_ready` mirrors the existing Insights cron cadence (every Monday + the 1st
 of each month — see [`vercel.json`](../vercel.json)); at most one per generation.
 
-Future types (e.g. circle activity) will be added to this table when scoped — not
-implemented speculatively.
+Future types (e.g. an evening "nothing logged" nudge, circle activity) will be added
+to this table when scoped — not implemented speculatively.
 
 ---
 
 ## 4. Anti-spam — frequency caps
 
-Hard limits, enforced server-side before sending:
+Hard limits, enforced server-side before sending, backed by the `notification_log`
+table (`unique (user_id, type, sent_on)`):
 
-- **`ritual_reminder`:** max **1 per ritual per day**.
+- **`ritual_reminder`:** max **1 per user per day** (one morning digest, not per ritual).
 - **`insight_ready`:** max **1 per day** (cadence already makes this ~1/week + 1/month).
 - **Global cap:** max **3 notifications per user per day**, all types combined.
 
-When the global cap would be exceeded, **priority** decides what gets dropped.
+The cron **inserts the `notification_log` row before sending** (claim-then-send), so
+an overlapping run or a crash mid-send can never duplicate. When the global cap would
+be exceeded, **priority** decides what gets dropped.
 
 ---
 
@@ -128,6 +132,13 @@ Keep `public/sw.js` and the `PushPayload` type in
 [`lib/push/server.ts`](../lib/push/server.ts) in sync — any new field must be handled
 in both.
 
+**Title rule:** keep the `title` **short** and **never the app name**. iOS adds
+"from Strive" on its **own line** under the title for an installed PWA, so the header
+is always two lines — the title length can't change that, and a "Strive" title just
+duplicates the attribution. So the title is a short type label (e.g. `Reminder`) and
+the **detail goes in the body**. See
+[`design/wireframes/push-notification.html`](wireframes/push-notification.html).
+
 ---
 
 ## 8. Technical stack
@@ -169,23 +180,46 @@ send path deletes that row so the table self-heals and we never retry it.
 
 ---
 
-## 9. Scheduling decision — Vercel Cron (not pg_cron)
+## 9. Scheduling decision
 
-Reminders that fire on a schedule will use **Vercel Cron**, consistent with the
-existing Insights cron ([`vercel.json`](../vercel.json) → `/api/cron/insights`,
-authorized by `CRON_SECRET`).
+**Send logic always runs in the Node/Vercel route** (`web-push` needs Node crypto;
+this reuses `CRON_SECRET` bearer auth + the service-role admin client + chunked
+fan-out, like the Insights route). The open question is only *what triggers it*.
 
-- ✅ The `web-push` library (VAPID signing + HTTPS delivery) runs naturally in the
-  Node serverless runtime the cron route already uses.
-- ✅ Reuses an established pattern (`CRON_SECRET` bearer auth, service-role admin
-  client, chunked fan-out) — see the Insights route.
-- ❌ **pg_cron** would force VAPID signing and HTTP delivery from inside Postgres
-  (`pg_net` + plpgsql), adding complexity for no benefit here.
+- **Insights** (`/api/cron/insights`, weekly + monthly) → **Vercel Cron**
+  ([`vercel.json`](../vercel.json)). Daily-or-coarser, fits even Vercel Hobby.
+- **Reminders** (`/api/cron/reminders`, hourly) → **Supabase pg_cron**. The morning
+  reminder must run sub-daily to hit ~8am in **each user's timezone**, but Vercel
+  Hobby crons are daily-only and capped at 2 jobs (both used by Insights). pg_cron
+  fires every minute/hour for free and `POST`s the route via `pg_net` with the
+  `CRON_SECRET` bearer. (On Vercel Pro this could instead be a Vercel cron — same
+  route; only the trigger changes.)
 
-LUI-implementation: add `/api/cron/reminders` to `vercel.json` (a minute-granularity
-schedule for the 5-min-before timing), select due rituals via the admin client
-**for users with `profiles.smart_reminders_enabled = true`**, and call
-`deliverToUser` from `lib/push/server.ts`.
+The reminders route lists users with `smart_reminders_enabled = true`, `is_active`,
+and ≥1 `push_subscriptions` row, keeps those whose **local hour == 8**, dedups via
+`notification_log`, and calls `deliverToUser`.
+
+### pg_cron / pg_net trigger setup (run once in Supabase)
+
+```sql
+-- Enable the extensions (Supabase: Database → Extensions, or:)
+create extension if not exists pg_cron;
+create extension if not exists pg_net;
+
+-- Hourly at minute 0: POST the reminders route with the CRON_SECRET bearer.
+-- Replace <APP_URL> and <CRON_SECRET>.
+select cron.schedule(
+  'ritual-reminders-hourly',
+  '0 * * * *',
+  $$
+  select net.http_post(
+    url     := 'https://<APP_URL>/api/cron/reminders',
+    headers := '{"Authorization": "Bearer <CRON_SECRET>", "Content-Type": "application/json"}'::jsonb
+  );
+  $$
+);
+```
+> Store the secret via Supabase Vault rather than inlining it where possible.
 
 ---
 
@@ -257,6 +291,12 @@ in LUI-82.
 **`profiles.smart_reminders_enabled`** (boolean, default `false`): the account-level
 intent gate, added in LUI-84.
 
+**`notification_log`** (see [`../data/tables/notification_log.sql`](../data/tables/notification_log.sql)):
+one row per notification sent — `user_id`, `type`, `sent_on`, with
+`unique (user_id, type, sent_on)` backing dedup + the per-type daily cap. Added in
+LUI-85. Operational data: RLS on, no user policies (only the service-role cron
+touches it).
+
 Migrations are applied **manually** in the Supabase SQL editor (not via `migrate.py`):
 
 ```sql
@@ -267,4 +307,15 @@ alter table push_subscriptions add constraint push_subscriptions_endpoint_key un
 
 -- LUI-84
 alter table profiles add column if not exists smart_reminders_enabled boolean not null default false;
+
+-- LUI-85
+create table if not exists notification_log (
+    id         uuid primary key default gen_random_uuid(),
+    user_id    uuid not null references profiles(id) on delete cascade,
+    type       text not null,
+    sent_on    date not null,
+    created_at timestamptz not null default now(),
+    unique (user_id, type, sent_on)
+);
+alter table notification_log enable row level security;
 ```

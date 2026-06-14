@@ -16,6 +16,26 @@ export function todayInTimeZone(timeZone: string): string {
   }
 }
 
+/**
+ * Hour of day (0–23) in the given IANA time zone. Used by the reminders cron to
+ * send only when it is the target morning hour in each user's local time. `now`
+ * is injectable for deterministic tests. Falls back to UTC hour on a bad zone.
+ */
+export function hourInTimeZone(timeZone: string, now: Date = new Date()): number {
+  try {
+    const hour = new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      hour: "2-digit",
+      hour12: false,
+    }).format(now);
+    const parsed = Number.parseInt(hour, 10);
+    // en-GB can render midnight as "24"; normalize to 0.
+    return parsed === 24 ? 0 : parsed;
+  } catch {
+    return now.getUTCHours();
+  }
+}
+
 /** ISO weekday for a `YYYY-MM-DD` date: 1 = Monday … 7 = Sunday. */
 export function isoWeekday(isoDate: string): number {
   // Parse at midnight UTC to avoid local-offset drift on the date part.
