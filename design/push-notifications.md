@@ -133,12 +133,12 @@ in both.
 Standard **Web Push** — no third-party service. Self-hosted, VAPID-authenticated.
 
 ```
-Settings toggle ──► lib/push/client.ts ──► /api/push/subscribe ──► push_subscriptions
-                         (subscribe)                                      │
-                                                                          ▼
+Settings toggle ──► lib/push/client.ts ──► saveSubscription (action) ──► push_subscriptions
+                         (subscribe)                                          │
+                                                                             ▼
    (trigger: self-test today, reminders cron later) ──► lib/push/server.ts (web-push + VAPID)
-                                                                          │
-                                                                          ▼
+                                                                             │
+                                                                             ▼
                                               browser push service ──► public/sw.js ──► notification
 ```
 
@@ -147,9 +147,11 @@ Settings toggle ──► lib/push/client.ts ──► /api/push/subscribe ─�
 | Service worker (push + click) | [`public/sw.js`](../public/sw.js) |
 | Browser opt-in helpers | [`lib/push/client.ts`](../lib/push/client.ts) |
 | Server send + VAPID + dead-endpoint cleanup | [`lib/push/server.ts`](../lib/push/server.ts) |
-| Save / remove subscription | `app/[locale]/api/push/{subscribe,unsubscribe}/route.ts` |
-| Self-test send (dev-only) | `app/[locale]/api/push/test/route.ts` |
+| Mutations: save / remove subscription, self-test (dev-only) | [`lib/push/actions.ts`](../lib/push/actions.ts) |
 | Subscription storage | [`../data/tables/push_subscriptions.sql`](../data/tables/push_subscriptions.sql) |
+
+UI-initiated mutations are **Server Actions** (repo convention), not API routes. The
+self-test action is disabled in production.
 
 **Keys (VAPID).** A public/private pair authenticates the server to browser push
 services. Generate once with `npx web-push generate-vapid-keys`; store as
@@ -204,6 +206,12 @@ Gotchas:
   and not removable. Installing Strive as a PWA (desktop Install button, or iOS Add
   to Home Screen) re-attributes notifications to the app — Strive's name and icon,
   no origin line. Always evaluate the final look from the **installed** PWA.
+- **Shared browser, two accounts** — endpoints are globally unique (`unique(endpoint)`).
+  If user A enabled reminders on a browser and user B later signs in on that *same*
+  browser without A unsubscribing, B's opt-in upsert targets A's row, which RLS won't
+  let B update — so B's toggle fails (surfaced as an error, not silently). Acceptable
+  edge for a personal tracker; the common single-user case works. A fix would reassign
+  ownership via the service role, which `admin.ts` reserves for trusted jobs only.
 
 ---
 
@@ -223,8 +231,8 @@ Gotchas:
 2. Launch Strive from the home-screen icon, sign in, enable **Smart reminders**.
 3. Trigger a send → the notification appears on the lock screen.
 
-> The **Send test** button and `/api/push/test` route are **exploration-only** and
-> return 404 in production. They are meant to be removed once the reminders cron lands.
+> The **Send test** button and the `sendTestNotification` action are **exploration-only**
+> and disabled in production. They are meant to be removed once the reminders cron lands.
 
 ---
 
