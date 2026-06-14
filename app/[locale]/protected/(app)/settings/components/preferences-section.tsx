@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { defaultLocale, locales } from "@/lib/locales";
 import { usePathname } from "@/lib/i18n/navigation";
+import { sendTestNotification } from "@/lib/push/actions";
 import {
   disablePush,
   enablePush,
@@ -194,7 +195,7 @@ function RemindersControl() {
   }
 
   async function sendTest() {
-    const res = await fetch("/api/push/test", { method: "POST" });
+    const res = await sendTestNotification();
     if (res.ok) setTested(true);
   }
 
@@ -265,9 +266,7 @@ function Switch({
       <span
         className={cn(
           "absolute top-1/2 size-4 -translate-y-1/2 rounded-full shadow-sm transition-all",
-          checked
-            ? "left-[25px] bg-primary-foreground"
-            : "left-[3px] bg-foreground/70",
+          checked ? "left-6 bg-primary-foreground" : "left-1 bg-foreground/70",
         )}
       />
     </button>
