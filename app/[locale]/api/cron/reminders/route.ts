@@ -1,8 +1,14 @@
 import { getTranslations } from "next-intl/server";
 
-import { hourInTimeZone, todayInTimeZone } from "@/lib/date";
-import { selectOneTimeDueToday } from "@/lib/reminders/select";
+import {
+  getCompletedRitualIds,
+  getRitualsForActiveUser,
+  getWeekCompletedLogs,
+} from "@/lib/data/rituals";
+import { hourInTimeZone, startOfWeek, todayInTimeZone } from "@/lib/date";
 import { sendOncePerDay } from "@/lib/push/notify";
+import { selectOneTimeDueToday } from "@/lib/reminders/select";
+import { selectTodayRituals } from "@/lib/rhythm/today-rituals";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { chunk, isNonProductionEnv } from "@/lib/utils";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
@@ -12,29 +18,40 @@ import type { Locale } from "@/lib/locales";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-// Morning ritual reminder (LUI-85). Sends one push per user listing the day's
-// one_time rituals (dated events) that aren't logged yet — recurring habits are
-// intentionally excluded. Triggered hourly by Supabase pg_cron (see
-// design/push-notifications.md) and fires only for users whose LOCAL hour is the
-// morning slot, so everyone is reached ~8am in their own timezone.
+// Ritual reminders, triggered hourly by Supabase pg_cron (see
+// design/push-notifications.md). One hourly trigger covers two local-time slots,
+// so every user is reached at the right hour in their OWN timezone:
+//   - 08:00 → morning reminder of the day's one_time rituals (dated events).
+//   - 21:00 → evening nudge IF nothing was logged today but there are rituals to do.
 //
-// No user session here, so the only gate is the shared CRON_SECRET. We call
-// `deliverToUser` directly with the admin client (the /api/notifications/send
-// route requires getUser(), which a cron has no way to satisfy).
+// No user session here, so the only gate is the shared CRON_SECRET. We send via
+// `sendOncePerDay` (claim-then-send dedup) with the service-role admin client.
 //
 // Lives under `[locale]/` because proxy.ts rewrites every non-static request
 // with a locale prefix; the trigger still calls the unprefixed path.
 const MORNING_HOUR = 8;
+const EVENING_HOUR = 21;
 const CHUNK_SIZE = 5;
 
+type Slot = "morning" | "evening";
 type Translators = Record<Locale, Awaited<ReturnType<typeof getTranslations>>>;
-
 type EligibleUser = { id: string; timezone: string };
 
-async function remindUser(
+function slotForHour(hour: number): Slot | null {
+  if (hour === MORNING_HOUR) return "morning";
+  if (hour === EVENING_HOUR) return "evening";
+  return null;
+}
+
+function parseSlot(value: string | null): Slot | null {
+  return value === "morning" || value === "evening" ? value : null;
+}
+
+// Morning: remind about the day's one_time rituals (dated events) not yet logged.
+async function remindMorning(
   supabase: StriveSupabaseClient,
   user: EligibleUser,
-  translators: Translators,
+  t: Translators,
 ): Promise<"sent" | "skipped"> {
   const today = todayInTimeZone(user.timezone);
 
@@ -63,13 +80,68 @@ async function remindUser(
   const count = due.length;
   const firstName = due[0].name;
   return sendOncePerDay(supabase, user.id, "ritual_reminder", today, (locale) => ({
-    title: translators[locale]("title"),
+    title: t[locale]("title"),
     body:
       count === 1
-        ? translators[locale]("bodyOne", { name: firstName })
-        : translators[locale]("bodyMany", { count }),
+        ? t[locale]("bodyOne", { name: firstName })
+        : t[locale]("bodyMany", { count }),
     url: "/protected/flow",
     tag: "ritual-reminder",
+  }));
+}
+
+// Evening: nudge only if the user logged NOTHING today yet still has rituals on
+// today's Rhythm to clear. "Actionable today" reuses selectTodayRituals so it
+// matches exactly what the user sees (daily/weekday schedules, met weekly/monthly
+// targets drop off, open rituals don't count).
+async function remindEvening(
+  supabase: StriveSupabaseClient,
+  user: EligibleUser,
+  t: Translators,
+): Promise<"sent" | "skipped"> {
+  const today = todayInTimeZone(user.timezone);
+
+  // Any log today (any status) means the user engaged → no nudge.
+  const { data: anyLog } = await supabase
+    .from("ritual_logs")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("logged_at", today)
+    .limit(1);
+  if (anyLog?.length) return "skipped";
+
+  const weekStart = startOfWeek(today);
+  const [{ rituals, progressByRitualId }, weekLogs] = await Promise.all([
+    getRitualsForActiveUser(supabase, user.id),
+    getWeekCompletedLogs(supabase, weekStart, user.id),
+  ]);
+  if (!rituals.length) return "skipped";
+
+  const oneTimeIds = rituals
+    .filter((r) => r.ritual_type === "one_time")
+    .map((r) => r.id);
+  const completedOneTimeIds = await getCompletedRitualIds(
+    supabase,
+    oneTimeIds,
+    user.id,
+  );
+
+  const { active } = selectTodayRituals({
+    rituals,
+    progressByRitualId,
+    weekLogs,
+    completedOneTimeIds,
+    today,
+  });
+  // Open rituals are ad-hoc (countsTowardDay=false) — they don't create a "to do
+  // today" obligation, so they don't trigger the nudge on their own.
+  if (!active.some((item) => item.countsTowardDay)) return "skipped";
+
+  return sendOncePerDay(supabase, user.id, "evening_nudge", today, (locale) => ({
+    title: t[locale]("title"),
+    body: t[locale]("body"),
+    url: "/protected/flow",
+    tag: "evening-nudge",
   }));
 }
 
@@ -82,15 +154,15 @@ async function handle(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  // Test affordance: `?force=1` bypasses the morning-hour gate on non-production
-  // deploys, so iOS reception can be validated on a preview at any time.
-  const force =
-    new URL(req.url).searchParams.get("force") === "1" && isNonProductionEnv();
+  // Test affordance: `?slot=morning|evening` forces that slot for every eligible
+  // user regardless of their local hour, on non-production deploys only.
+  const forcedSlot = isNonProductionEnv()
+    ? parseSlot(new URL(req.url).searchParams.get("slot"))
+    : null;
 
   const supabase = createAdminClient();
 
-  // Eligible = reminders enabled, active, AND at least one device subscribed
-  // (push_subscriptions!inner). One row per such profile.
+  // Eligible = reminders enabled, active, AND at least one device subscribed.
   const { data: users, error } = await supabase
     .from("profiles")
     .select("id, timezone, push_subscriptions!inner(user_id)")
@@ -102,22 +174,34 @@ async function handle(req: Request) {
     return new Response("Failed to list users", { status: 500 });
   }
 
-  const dueNow: EligibleUser[] = (users ?? [])
-    .map((u) => ({ id: u.id, timezone: u.timezone }))
-    .filter((u) => force || hourInTimeZone(u.timezone) === MORNING_HOUR);
+  // Assign each user the slot matching their local hour (or the forced slot).
+  const tasks = (users ?? [])
+    .map((u): { user: EligibleUser; slot: Slot } | null => {
+      const slot = forcedSlot ?? slotForHour(hourInTimeZone(u.timezone));
+      return slot ? { user: { id: u.id, timezone: u.timezone }, slot } : null;
+    })
+    .filter((task): task is { user: EligibleUser; slot: Slot } => task !== null);
 
-  const translators = {
+  const reminderT = {
     en: await getTranslations({ locale: "en", namespace: "notifications.ritualReminder" }),
     fr: await getTranslations({ locale: "fr", namespace: "notifications.ritualReminder" }),
+  } satisfies Translators;
+  const nudgeT = {
+    en: await getTranslations({ locale: "en", namespace: "notifications.eveningNudge" }),
+    fr: await getTranslations({ locale: "fr", namespace: "notifications.eveningNudge" }),
   } satisfies Translators;
 
   let sent = 0;
   let skipped = 0;
   let failed = 0;
 
-  for (const group of chunk(dueNow, CHUNK_SIZE)) {
+  for (const group of chunk(tasks, CHUNK_SIZE)) {
     const results = await Promise.allSettled(
-      group.map((user) => remindUser(supabase, user, translators)),
+      group.map(({ user, slot }) =>
+        slot === "morning"
+          ? remindMorning(supabase, user, reminderT)
+          : remindEvening(supabase, user, nudgeT),
+      ),
     );
     results.forEach((result, i) => {
       if (result.status === "fulfilled") {
@@ -125,14 +209,14 @@ async function handle(req: Request) {
         else skipped += 1;
       } else {
         failed += 1;
-        console.error("[cron/reminders] failed for user", group[i].id, result.reason);
+        console.error("[cron/reminders] failed for user", group[i].user.id, result.reason);
       }
     });
   }
 
   return Response.json({
     eligible: users?.length ?? 0,
-    due: dueNow.length,
+    scheduled: tasks.length,
     sent,
     skipped,
     failed,
