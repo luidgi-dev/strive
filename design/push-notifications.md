@@ -199,6 +199,11 @@ Gotchas:
   cleanup above.
 - **`userVisibleOnly: true`** is mandatory in Chrome — every push must show a
   notification (no silent pushes).
+- **Desktop browser-tab notifications** show the page origin (e.g. `localhost:3000`,
+  `striveapp.cc`) and the **browser's** icon (Chrome's), enforced by the browser/OS
+  and not removable. Installing Strive as a PWA (desktop Install button, or iOS Add
+  to Home Screen) re-attributes notifications to the app — Strive's name and icon,
+  no origin line. Always evaluate the final look from the **installed** PWA.
 
 ---
 
