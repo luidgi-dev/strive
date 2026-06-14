@@ -2,9 +2,9 @@ import { getTranslations } from "next-intl/server";
 
 import { hourInTimeZone, todayInTimeZone } from "@/lib/date";
 import { selectOneTimeDueToday } from "@/lib/reminders/select";
-import { deliverToUser } from "@/lib/push/server";
+import { sendOncePerDay } from "@/lib/push/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { chunk } from "@/lib/utils";
+import { chunk, isNonProductionEnv } from "@/lib/utils";
 import type { StriveSupabaseClient } from "@/lib/ai/types";
 import type { Locale } from "@/lib/locales";
 
@@ -60,55 +60,17 @@ async function remindUser(
   const due = selectOneTimeDueToday(rituals, today, completed);
   if (!due.length) return "skipped";
 
-  // Claim the day's slot BEFORE sending: insert first so an overlapping run or a
-  // crash mid-send can never produce a duplicate. The unique(user_id,type,sent_on)
-  // constraint makes a second claim fail fast.
-  const { error: claimError } = await supabase
-    .from("notification_log")
-    .insert({ user_id: user.id, type: "ritual_reminder", sent_on: today });
-  if (claimError) {
-    if (claimError.code === "23505") return "skipped"; // already reminded today
-    throw claimError;
-  }
-
   const count = due.length;
   const firstName = due[0].name;
-  // The claim above is provisional: if delivery throws or reaches no device,
-  // release it so the user isn't falsely marked "reminded" (and a re-trigger can
-  // retry). The anti-duplicate guarantee holds — we only release when nothing was
-  // delivered, so a concurrent run that saw the claim never produced a send either.
-  try {
-    const { sent } = await deliverToUser(supabase, user.id, (locale) => ({
-      title: translators[locale]("title"),
-      body:
-        count === 1
-          ? translators[locale]("bodyOne", { name: firstName })
-          : translators[locale]("bodyMany", { count }),
-      url: "/protected/flow",
-      tag: "ritual-reminder",
-    }));
-    if (sent === 0) {
-      await releaseClaim(supabase, user.id, today);
-      return "skipped";
-    }
-  } catch (err) {
-    await releaseClaim(supabase, user.id, today);
-    throw err;
-  }
-  return "sent";
-}
-
-function releaseClaim(
-  supabase: StriveSupabaseClient,
-  userId: string,
-  sentOn: string,
-) {
-  return supabase
-    .from("notification_log")
-    .delete()
-    .eq("user_id", userId)
-    .eq("type", "ritual_reminder")
-    .eq("sent_on", sentOn);
+  return sendOncePerDay(supabase, user.id, "ritual_reminder", today, (locale) => ({
+    title: translators[locale]("title"),
+    body:
+      count === 1
+        ? translators[locale]("bodyOne", { name: firstName })
+        : translators[locale]("bodyMany", { count }),
+    url: "/protected/flow",
+    tag: "ritual-reminder",
+  }));
 }
 
 async function handle(req: Request) {
@@ -123,8 +85,7 @@ async function handle(req: Request) {
   // Test affordance: `?force=1` bypasses the morning-hour gate on non-production
   // deploys, so iOS reception can be validated on a preview at any time.
   const force =
-    new URL(req.url).searchParams.get("force") === "1" &&
-    process.env.VERCEL_ENV !== "production";
+    new URL(req.url).searchParams.get("force") === "1" && isNonProductionEnv();
 
   const supabase = createAdminClient();
 

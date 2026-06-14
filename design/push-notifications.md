@@ -66,8 +66,14 @@ type is added here first, then implemented.
   `Reminder` / `Rappel`; body `Today's ritual: {name}` when there's one,
   `Today's rituals: {n} planned` when several.
 
-`insight_ready` mirrors the existing Insights cron cadence (every Monday + the 1st
-of each month — see [`vercel.json`](../vercel.json)); at most one per generation.
+`insight_ready` fires **inline from the Insights cron**
+([`app/[locale]/api/cron/insights/route.ts`](../app/[locale]/api/cron/insights/route.ts)),
+right after a user's generation produces ≥1 new card (weekly Mon, monthly 1st — see
+[`vercel.json`](../vercel.json)), gated on opt-in + a subscription. Copy: title
+`Weekly insights` / `Monthly insights` (by cadence), body `Ready to explore in Strive`;
+deep-links to the **Insights tab** (`/protected/settings/insights`). The page is global
+(no per-ritual view) — the ritual is named inside each card's text. Deduped to once per
+user-local day via `notification_log`.
 
 Future types (e.g. an evening "nothing logged" nudge, circle activity) will be added
 to this table when scoped — not implemented speculatively.
@@ -161,6 +167,7 @@ Settings toggle ──► lib/push/client.ts ──► saveSubscription (action)
 | Browser opt-in helpers | [`lib/push/client.ts`](../lib/push/client.ts) |
 | Server send + VAPID + dead-endpoint cleanup | [`lib/push/server.ts`](../lib/push/server.ts) |
 | Mutations: save / remove subscription, set intent | [`lib/push/actions.ts`](../lib/push/actions.ts) |
+| Once-per-day claim-then-send helper (both crons) | [`lib/push/notify.ts`](../lib/push/notify.ts) |
 | Recipient authorization guard (pure, unit-tested) | [`lib/push/recipients.ts`](../lib/push/recipients.ts) |
 | Authenticated self-send route | `app/[locale]/api/notifications/send/route.ts` |
 | Subscription storage | [`../data/tables/push_subscriptions.sql`](../data/tables/push_subscriptions.sql) |

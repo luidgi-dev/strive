@@ -531,6 +531,11 @@
       "title": "Reminder",
       "bodyOne": "Today's ritual: {name}",
       "bodyMany": "Today's rituals: {count} planned"
+    },
+    "insightReady": {
+      "titleWeekly": "Weekly insights",
+      "titleMonthly": "Monthly insights",
+      "body": "Ready to explore in Strive"
     }
   }
 }
