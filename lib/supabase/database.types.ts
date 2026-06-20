@@ -781,6 +781,23 @@ export type Database = {
         }[]
       }
       generate_circle_invite_code: { Args: never; Returns: string }
+      get_circle_shared_rituals: {
+        Args: never
+        Returns: {
+          circle_id: string
+          icon: string
+          name: string
+          ritual_id: string
+        }[]
+      }
+      get_circles_momentum: {
+        Args: never
+        Returns: {
+          circle_id: string
+          on_track_count: number
+          participant_count: number
+        }[]
+      }
       is_circle_member: {
         Args: { p_circle_id: string; p_user_id?: string }
         Returns: boolean
