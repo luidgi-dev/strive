@@ -30,6 +30,8 @@ data/
 ├── functions/                  # sql functions
 │   ├── is_circle_member.sql            # security-definer helper, breaks circle RLS recursion (pre-tables)
 │   ├── generate_circle_invite_code.sql # 8-char invite code, default for circle_invites.code (pre-tables)
+│   ├── get_circles_momentum.sql        # security-definer: collective weekly momentum per circle
+│   ├── get_circle_shared_rituals.sql   # security-definer: shared ritual names/icons per circle
 │   ├── consume_ai_credit.sql   # atomically reserves one AI credit (caller-scoped)
 │   ├── refund_ai_credit.sql    # returns a reserved credit when an AI call fails
 │   └── reset_ai_credits.sql    # monthly reset to tier quota for due users
@@ -115,6 +117,7 @@ The social tables enforce "no cross-user data without verified membership" entir
 - **Invites are never world-readable.** The public `/i/[code]` landing reads through a `security definer` preview function (LUI-65), so the anon role can't enumerate the `circle_invites` table.
 - **Shared rituals are opt-in.** A row in `circle_rituals` only exists for rituals a member explicitly shared, and the insert policy verifies the ritual is theirs. Private rituals never appear.
 - **Leaving is clean.** An `after delete` trigger on `circle_members` (`cleanup_circle_membership`) removes the departed member's `circle_rituals` and `nudges` in that circle, so a former member's shared progress stops being visible the moment they leave or are removed. It is `security definer` (an owner can remove someone else, and `nudges` has no delete policy, so an invoker-rights cleanup would be filtered by RLS).
+- **Collective reads go through security-definer functions.** `rituals` / `ritual_logs` are owner-only and `ritual_progress` is `security_invoker`, so a member can't read co-members' rituals or progress directly. Two functions cross that boundary, each scoped to circles the caller belongs to: `get_circles_momentum()` returns how many sharing members are on track this week ("X of Y") as aggregate counts only, and `get_circle_shared_rituals()` returns the name + icon of rituals members opted to share. Neither ever exposes a private (unshared) ritual or another member's raw rows.
 
 Verify the policies and the cap with the test script (it runs inside a transaction and rolls back, so it touches nothing):
 

@@ -234,11 +234,31 @@
     "rituals": {
       "description": "Build consistency through meaningful daily practices."
     },
-    "circles": {
-      "description": "Share your momentum with a private collective."
-    },
     "flow": {
       "description": "Your daily momentum, visualized."
+    }
+  },
+  "circles": {
+    "title": "Circles",
+    "newCircle": "New circle",
+    "you": "you",
+    "section": {
+      "myCircles": "My circles"
+    },
+    "momentum": {
+      "onTrack": "{x} of {y} this week",
+      "steady": "Steady this week"
+    },
+    "empty": {
+      "title": "Build with others.",
+      "body": "Start a small circle and share your rhythm with people you trust.",
+      "cta": "Start a circle"
+    },
+    "create": {
+      "comingSoon": {
+        "title": "Circles are almost ready",
+        "body": "Creating a circle and sharing an invite link arrives in the next update."
+      }
     }
   },
   "rituals": {
