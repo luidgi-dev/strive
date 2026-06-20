@@ -234,11 +234,31 @@
     "rituals": {
       "description": "Développez votre constance grâce à des rituels quotidiens porteurs de sens."
     },
-    "circles": {
-      "description": "Partagez votre élan avec un cercle privé."
-    },
     "flow": {
       "description": "Votre dynamique quotidienne, visualisée."
+    }
+  },
+  "circles": {
+    "title": "Cercles",
+    "newCircle": "Nouveau cercle",
+    "you": "vous",
+    "section": {
+      "myCircles": "Mes cercles"
+    },
+    "momentum": {
+      "onTrack": "{x} sur {y} cette semaine",
+      "steady": "Régulier cette semaine"
+    },
+    "empty": {
+      "title": "Construisez à plusieurs.",
+      "body": "Lancez un petit cercle et partagez votre rythme avec des personnes de confiance.",
+      "cta": "Lancer un cercle"
+    },
+    "create": {
+      "comingSoon": {
+        "title": "Les cercles arrivent",
+        "body": "La création d'un cercle et le partage du lien d'invitation arrivent dans la prochaine mise à jour."
+      }
     }
   },
   "rituals": {
