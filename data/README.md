@@ -21,16 +21,22 @@ data/
 │   ├── ritual_logs.sql
 │   ├── insights.sql            # cached AI Insight Cards (premium); written by the cron
 │   ├── push_subscriptions.sql
-│   ├── circles.sql
-│   └── circle_members.sql
+│   ├── circles.sql             # social groups (max 8 members)
+│   ├── circle_members.sql      # circle membership
+│   ├── circle_invites.sql      # shareable invite links (/i/[code])
+│   ├── nudges.sql              # in-app waves between circle members
+│   └── circle_rituals.sql      # opt-in: rituals a member shares in a circle
 │
-├── functions/                  # sql functions, applied after tables
+├── functions/                  # sql functions
+│   ├── is_circle_member.sql            # security-definer helper, breaks circle RLS recursion (pre-tables)
+│   ├── generate_circle_invite_code.sql # 8-char invite code, default for circle_invites.code (pre-tables)
 │   ├── consume_ai_credit.sql   # atomically reserves one AI credit (caller-scoped)
 │   ├── refund_ai_credit.sql    # returns a reserved credit when an AI call fails
 │   └── reset_ai_credits.sql    # monthly reset to tier quota for due users
 │
 ├── triggers/
-│   └── handle_new_user.sql     # auto-creates profile + user_credits rows on auth sign-up
+│   ├── handle_new_user.sql              # auto-creates profile + user_credits rows on auth sign-up
+│   └── enforce_circle_member_limit.sql  # rejects a 9th member (8-member product cap)
 │
 ├── cron/                       # pg_cron schedules, applied last
 │   └── reset_ai_credits.sql    # daily job that calls reset_ai_credits()
@@ -41,7 +47,11 @@ data/
 ├── seeds/
 │   ├── seed_log_statuses.sql   # reference data: completed, rest, missed, partial
 │   ├── seed_ritual_categories.sql  # system categories: Sport, Nutrition, etc.
-│   └── seed_test.sql           # fake data for local dev and view testing only
+│   ├── seed_test.sql           # fake data for local dev and view testing only
+│   └── seed_circles_dev.sql    # one populated circle (real accounts) — manual, not in migrate.py
+│
+├── tests/
+│   └── circles_rls.sql         # RLS + cap-trigger checks, runs in a rolled-back transaction
 │
 └── views/
     ├── daily_summary.sql
@@ -71,8 +81,11 @@ Strive uses **Supabase (PostgreSQL)** as its database. Row Level Security (RLS) 
 | `ritual_logs`        | One row per logged ritual occurrence. Multiple logs per day are allowed.                |
 | `insights`           | Cached AI Insight Cards (premium). Written by the weekly/monthly cron under the **service role** (no user INSERT/DELETE policy); users only read and dismiss their own. `cadence` + `period_start` form the per-report identity. See [`design/insights-page.md`](../design/insights-page.md). |
 | `push_subscriptions` | Web Push credentials for PWA notifications (used in Phase 3).                           |
-| `circles`            | Social groups — scaffolded, empty until Phase 4.                                        |
-| `circle_members`     | Circle membership — scaffolded, empty until Phase 4.                                    |
+| `circles`            | Social groups. A circle is a capped "trust circle" (max 8 members). `owner_id` is the creator; `description` is optional. |
+| `circle_members`     | Circle membership (`role` = `admin` for the owner, else `member`). Unique per `(circle_id, user_id)`. Capped at 8 by a trigger. |
+| `circle_invites`     | Shareable invite links (Discord-style). Auto-generated `code`, 7-day `expires_at`, optional `max_uses`. A circle can hold several active links. |
+| `nudges`             | Lightweight in-app waves between members of the same circle. No push, no email. `seen_at` null = unread. |
+| `circle_rituals`     | Opt-in join table: which of a member's own rituals are surfaced in a given circle. Anything not listed stays private. |
 
 
 ### Views
@@ -90,6 +103,28 @@ Strive uses **Supabase (PostgreSQL)** as its database. Row Level Security (RLS) 
 - **Momentum** — computed on the fly via views and SQL functions. Never stored.
 - **Momentum badges** — computed in application logic (Phase 2/3). No table needed.
 - **Notification history** — out of scope for Phase 1.
+
+### Circles RLS design (Phase 4)
+
+The social tables enforce "no cross-user data without verified membership" entirely in the database:
+
+- **`is_circle_member(circle_id, user_id)`** is a `security definer` helper. Membership-visibility policies need to ask "is the caller a member of this circle?", but querying `circle_members` from inside its own policy would raise *infinite recursion*. The helper runs as the function owner for that one scoped lookup, so every policy stays simple. It is applied **before** the tables (their policies reference it).
+- **Member inserts are owner-only.** Only the circle owner can self-insert (the create-circle flow). Every other join goes through `redeem_circle_invite()` (added in LUI-65), a `security definer` function that validates the invite (expiry, cap, `max_uses`, already-member) — so a user can never self-insert into an arbitrary circle by hitting the table directly.
+- **The 8-member cap is a trigger** (`enforce_circle_member_limit`), not app logic, so no client can bypass it.
+- **Invites are never world-readable.** The public `/i/[code]` landing reads through a `security definer` preview function (LUI-65), so the anon role can't enumerate the `circle_invites` table.
+- **Shared rituals are opt-in.** A row in `circle_rituals` only exists for rituals a member explicitly shared, and the insert policy verifies the ritual is theirs. Private rituals never appear.
+
+Verify the policies and the cap with the test script (it runs inside a transaction and rolls back, so it touches nothing):
+
+```bash
+psql "$DATABASE_URL" -f tests/circles_rls.sql
+```
+
+The dev seed (`seeds/seed_circles_dev.sql`) creates one populated circle from the real accounts so the Circles UI has something to render. It resolves accounts by username and is **not** part of `migrate.py`:
+
+```bash
+psql "$DATABASE_URL" -f seeds/seed_circles_dev.sql
+```
 
 ### Storage buckets
 
@@ -126,12 +161,13 @@ python migrate.py
 
 The runner executes files in this order:
 
-1. **Tables** — in dependency order (categories before profiles before rituals, etc.)
-2. **Functions** — after tables (credit consume/refund/reset)
-3. **Triggers** — after tables are created
-4. **Seeds** — reference data (log statuses, system categories, tier quotas, settings)
-5. **Views** — depend on all tables
-6. **Cron** — last; `pg_cron` schedules
+1. **Pre-table functions** — helpers that table policies / column defaults reference (`is_circle_member`, `generate_circle_invite_code`), so they must exist before the tables.
+2. **Tables** — in dependency order (categories before profiles before rituals, etc.)
+3. **Functions** — after tables (credit consume/refund/reset)
+4. **Triggers** — after tables are created
+5. **Seeds** — reference data (log statuses, system categories, tier quotas, settings)
+6. **Views** — depend on all tables
+7. **Cron** — last; `pg_cron` schedules
 
 > **pg_cron**: the monthly reset job (`cron/reset_ai_credits.sql`) needs the
 > `pg_cron` extension. On Supabase, enable it once under **Database > Extensions**.
