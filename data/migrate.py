@@ -44,6 +44,7 @@ FUNCTIONS = [
 TRIGGERS = [
     'handle_new_user.sql',
     'enforce_circle_member_limit.sql',  # caps a circle at 8 members
+    'cleanup_circle_membership.sql',    # drops a departed member's shared rituals + nudges
 ]
 
 SEEDS = [

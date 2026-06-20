@@ -36,7 +36,8 @@ data/
 │
 ├── triggers/
 │   ├── handle_new_user.sql              # auto-creates profile + user_credits rows on auth sign-up
-│   └── enforce_circle_member_limit.sql  # rejects a 9th member (8-member product cap)
+│   ├── enforce_circle_member_limit.sql  # rejects a 9th member (8-member product cap)
+│   └── cleanup_circle_membership.sql    # on member removal, drops their circle_rituals + nudges
 │
 ├── cron/                       # pg_cron schedules, applied last
 │   └── reset_ai_credits.sql    # daily job that calls reset_ai_credits()
@@ -113,6 +114,7 @@ The social tables enforce "no cross-user data without verified membership" entir
 - **The 8-member cap is a trigger** (`enforce_circle_member_limit`), not app logic, so no client can bypass it.
 - **Invites are never world-readable.** The public `/i/[code]` landing reads through a `security definer` preview function (LUI-65), so the anon role can't enumerate the `circle_invites` table.
 - **Shared rituals are opt-in.** A row in `circle_rituals` only exists for rituals a member explicitly shared, and the insert policy verifies the ritual is theirs. Private rituals never appear.
+- **Leaving is clean.** An `after delete` trigger on `circle_members` (`cleanup_circle_membership`) removes the departed member's `circle_rituals` and `nudges` in that circle, so a former member's shared progress stops being visible the moment they leave or are removed. It is `security definer` (an owner can remove someone else, and `nudges` has no delete policy, so an invoker-rights cleanup would be filtered by RLS).
 
 Verify the policies and the cap with the test script (it runs inside a transaction and rolls back, so it touches nothing):
 

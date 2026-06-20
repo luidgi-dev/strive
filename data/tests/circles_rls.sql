@@ -140,6 +140,46 @@ do $$ begin
 end $$;
 \echo 'PASS 7 — 8-member cap enforced (9th rejected)'
 
+-- ---------------------------------------------------------------------------
+-- 8. leaving a circle cleans up the member's shared rituals and nudges
+--    (cleanup_circle_membership trigger). the member shared a ritual in check 6;
+--    add a nudge, then remove the membership and assert both are gone.
+-- ---------------------------------------------------------------------------
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"aaaaaaaa-0000-0000-0000-000000000002"}';
+insert into nudges (circle_id, sender_id, receiver_id)
+    values ('cccccccc-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000002', 'aaaaaaaa-0000-0000-0000-000000000001');
+
+set local role postgres;
+do $$ begin
+    assert (select count(*) from circle_rituals
+            where circle_id = 'cccccccc-0000-0000-0000-000000000001'
+              and user_id = 'aaaaaaaa-0000-0000-0000-000000000002') = 1,
+        'precondition: member has 1 shared ritual';
+    assert (select count(*) from nudges
+            where circle_id = 'cccccccc-0000-0000-0000-000000000001'
+              and (sender_id = 'aaaaaaaa-0000-0000-0000-000000000002'
+                   or receiver_id = 'aaaaaaaa-0000-0000-0000-000000000002')) = 1,
+        'precondition: 1 nudge involves the member';
+end $$;
+
+delete from circle_members
+    where circle_id = 'cccccccc-0000-0000-0000-000000000001'
+      and user_id = 'aaaaaaaa-0000-0000-0000-000000000002';
+
+do $$ begin
+    assert (select count(*) from circle_rituals
+            where circle_id = 'cccccccc-0000-0000-0000-000000000001'
+              and user_id = 'aaaaaaaa-0000-0000-0000-000000000002') = 0,
+        'leaving must remove the member''s shared rituals';
+    assert (select count(*) from nudges
+            where circle_id = 'cccccccc-0000-0000-0000-000000000001'
+              and (sender_id = 'aaaaaaaa-0000-0000-0000-000000000002'
+                   or receiver_id = 'aaaaaaaa-0000-0000-0000-000000000002')) = 0,
+        'leaving must remove the member''s nudges';
+end $$;
+\echo 'PASS 8 — leaving a circle cleans up shared rituals and nudges'
+
 rollback;
 
 \echo ''
