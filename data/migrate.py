@@ -39,6 +39,10 @@ FUNCTIONS = [
     'consume_ai_credit.sql',
     'refund_ai_credit.sql',
     'reset_ai_credits.sql',
+    # reads ritual_progress (created later, in VIEWS) — plpgsql late-binds, so
+    # creating it here is fine; it only runs once a circle is queried.
+    'get_circles_momentum.sql',       # collective weekly momentum per circle
+    'get_circle_shared_rituals.sql',  # shared ritual names/icons per circle
 ]
 
 TRIGGERS = [
