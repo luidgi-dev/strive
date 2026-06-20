@@ -27,6 +27,10 @@ begin
     join circle_members me
         on me.circle_id = cr.circle_id and me.user_id = auth.uid()
     join rituals r on r.id = cr.ritual_id
+    -- skip rituals a member archived but left shared, matching ritual_progress
+    -- (which the momentum function reads), so the strip and momentum stay in sync.
+    where r.is_active = true
+      and r.archived_at is null
     order by cr.circle_id, r.name;
 end;
 $$;
