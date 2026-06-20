@@ -44,8 +44,10 @@ Files use **kebab-case** (`login-form.tsx`); component identifiers stay **Pascal
 See [`data/README.md`](../data/README.md) for the full migration guide and schema overview.
 
 - `tables/` — DDL files in dependency order
-- `triggers/` — DB triggers (e.g. `handle_new_user.sql`)
-- `seeds/` — Reference data and a local-dev test fixture
+- `functions/` — SQL functions (credit guard, circle helpers)
+- `triggers/` — DB triggers (e.g. `handle_new_user.sql`, `enforce_circle_member_limit.sql`)
+- `seeds/` — Reference data and local-dev fixtures
+- `tests/` — SQL verification scripts (e.g. `circles_rls.sql`, runs in a rolled-back transaction)
 - `views/` — SQL views (`ritual_progress`, `daily_summary`, `ritual_log_history`)
 - `migrate.py` — Python migration runner
 
