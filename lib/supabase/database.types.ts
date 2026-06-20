@@ -14,26 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      circle_invites: {
+        Row: {
+          circle_id: string
+          code: string
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          max_uses: number | null
+          uses_count: number
+        }
+        Insert: {
+          circle_id: string
+          code?: string
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          max_uses?: number | null
+          uses_count?: number
+        }
+        Update: {
+          circle_id?: string
+          code?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          max_uses?: number | null
+          uses_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_invites_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "circle_invites_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       circle_members: {
         Row: {
           circle_id: string
           id: string
           joined_at: string
-          role: string | null
+          role: string
           user_id: string
         }
         Insert: {
           circle_id: string
           id?: string
           joined_at?: string
-          role?: string | null
+          role?: string
           user_id: string
         }
         Update: {
           circle_id?: string
           id?: string
           joined_at?: string
-          role?: string | null
+          role?: string
           user_id?: string
         }
         Relationships: [
@@ -53,21 +101,77 @@ export type Database = {
           },
         ]
       }
+      circle_rituals: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          ritual_id: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          ritual_id: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          ritual_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_rituals_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "circle_rituals_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "ritual_progress"
+            referencedColumns: ["ritual_id"]
+          },
+          {
+            foreignKeyName: "circle_rituals_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "rituals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "circle_rituals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       circles: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           name: string
           owner_id: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           name: string
           owner_id: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
           owner_id?: string
@@ -202,6 +306,55 @@ export type Database = {
           {
             foreignKeyName: "notification_log_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nudges: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          receiver_id: string
+          seen_at: string | null
+          sender_id: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          receiver_id: string
+          seen_at?: string | null
+          sender_id: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          receiver_id?: string
+          seen_at?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nudges_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nudges_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nudges_sender_id_fkey"
+            columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -626,6 +779,11 @@ export type Database = {
           reset_at: string
           status: string
         }[]
+      }
+      generate_circle_invite_code: { Args: never; Returns: string }
+      is_circle_member: {
+        Args: { p_circle_id: string; p_user_id?: string }
+        Returns: boolean
       }
       refund_ai_credit: { Args: never; Returns: undefined }
       reset_ai_credits: { Args: never; Returns: undefined }
