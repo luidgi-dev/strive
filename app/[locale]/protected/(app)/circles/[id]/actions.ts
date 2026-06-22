@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { circleNameSchema } from "@/lib/data/circles-schema";
+import { startOfLocalDayIso } from "@/lib/date";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult<T = undefined> =
@@ -202,5 +203,60 @@ export async function deleteCircle(circleId: string): Promise<ActionResult> {
   }
 
   revalidatePath(CIRCLES_PATH);
+  return { ok: true };
+}
+
+/**
+ * Send a nudge to a circle member. Rate-limited to one per receiver per circle
+ * per local day, enforced here (no DB unique by design). The insert policy on
+ * nudges verifies the sender is the caller and both are members.
+ */
+export async function sendNudge(
+  circleId: string,
+  receiverId: string,
+): Promise<ActionResult> {
+  if (!isNonEmptyString(circleId) || !isNonEmptyString(receiverId)) {
+    return { ok: false, error: "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+  if (receiverId === user.id) return { ok: false, error: "validationFailed" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("timezone")
+    .eq("id", user.id)
+    .maybeSingle();
+  const since = startOfLocalDayIso(profile?.timezone ?? "UTC");
+
+  // One nudge per sender/receiver/circle/day. head:true keeps this count-only.
+  const { count, error: countError } = await supabase
+    .from("nudges")
+    .select("id", { count: "exact", head: true })
+    .eq("sender_id", user.id)
+    .eq("receiver_id", receiverId)
+    .eq("circle_id", circleId)
+    .gte("created_at", since);
+  if (countError) {
+    console.error("[sendNudge] rate-limit check failed", countError);
+    return { ok: false, error: "unknown" };
+  }
+  if ((count ?? 0) > 0) return { ok: false, error: "alreadyNudged" };
+
+  const { error } = await supabase.from("nudges").insert({
+    circle_id: circleId,
+    sender_id: user.id,
+    receiver_id: receiverId,
+  });
+  if (error) {
+    console.error("[sendNudge] insert failed", error);
+    return { ok: false, error: "unknown" };
+  }
+
+  revalidatePath(circlePath(circleId));
   return { ok: true };
 }

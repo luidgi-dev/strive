@@ -350,8 +350,8 @@
   .status-dot.steady   { background: var(--caution); }
   .status-dot.resting  { background: var(--muted-foreground); }
   .nudge-btn {
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: 999px;
     border: 1px solid var(--border);
     background: transparent;
@@ -362,8 +362,9 @@
     justify-content: center;
     flex-shrink: 0;
     padding: 0;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
-  .nudge-btn svg { width: 14px; height: 14px; }
+  .nudge-btn svg { width: 16px; height: 16px; }
   .nudge-btn:hover {
     border-color: color-mix(in oklch, var(--foreground) 35%, transparent);
     color: var(--foreground);
@@ -372,15 +373,88 @@
   /*
     POST-TAP STATE (for dev):
     After tap, the nudge button switches to .sent state — kept visible (not removed)
-    to confirm the action landed, but muted to prevent spam taps. Rate-limited at
-    DB level via UNIQUE (from_user, to_user, ritual_id, week_of) on circle_nudges.
+    to confirm the action landed: the icon fills (solid, highlighted) and the button
+    is disabled to prevent re-sends. Rate-limited in the Server Action to one nudge
+    per sender / receiver / circle per day (no DB unique by design). The brief pop
+    animation plays on transition.
   */
   .nudge-btn.sent {
-    color: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
-    border-color: color-mix(in oklch, var(--border) 50%, transparent);
-    background: var(--accent);
+    background: var(--foreground);
+    border-color: var(--foreground);
+    color: var(--background);
     cursor: default;
+    animation: nudge-pop 0.3s ease;
   }
+  @keyframes nudge-pop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+
+  /*
+    IN-APP NUDGE TOAST — what the RECEIVER sees on app open when they have unseen
+    nudges. Global (shown over any screen by the protected layout), placed here for
+    preview. Calm, auto-dismisses, dismissible. Multiple nudges aggregate into one
+    line with a "+N" tail. Marked seen on display so it shows once.
+  */
+  .nudge-toast {
+    position: absolute;
+    top: calc(56px + 8px);
+    left: 16px;
+    right: 16px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px -12px oklch(0 0 0 / 0.25), 0 2px 6px oklch(0 0 0 / 0.08);
+    animation: nudge-toast-in 0.3s ease-out;
+  }
+  @keyframes nudge-toast-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .nudge-toast-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--foreground);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .nudge-toast-icon svg { width: 17px; height: 17px; }
+  .nudge-toast-body {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--foreground);
+  }
+  .nudge-toast-body strong {
+    font-family: var(--font-heading);
+    font-weight: 600;
+  }
+  .nudge-toast-dismiss {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .nudge-toast-dismiss:hover { background: var(--accent); color: var(--foreground); }
+  .nudge-toast-dismiss svg { width: 15px; height: 15px; }
   /* Self row marker (replaces the nudge slot for visual balance) */
   .self-marker {
     font-family: var(--font-sans);
@@ -604,6 +678,29 @@
       </button>
     </header>
 
+    <!--
+      Receiver-side preview: this toast appears on app open when you have unseen
+      nudges, over any screen (mounted by the protected layout). It references a
+      different circle (Morning crew) to show the cross-circle case. Multiple
+      nudges collapse into one line with a "+N" tail. Marked seen on display.
+    -->
+    <div class="nudge-toast" role="status">
+      <span class="nudge-toast-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/>
+          <path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/>
+          <path d="m2 15 6 6"/>
+          <path d="M19.5 8.5c.7-.7 1.5-1.6 1.5-2.7A2.73 2.73 0 0 0 16 4a2.78 2.78 0 0 0-5 1.8c0 1.2.8 2 1.5 2.8L16 12Z"/>
+        </svg>
+      </span>
+      <span class="nudge-toast-body"><strong>Sam</strong> gave you a nudge in <strong>Morning crew</strong></span>
+      <button class="nudge-toast-dismiss" type="button" aria-label="Dismiss">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+        </svg>
+      </button>
+    </div>
+
     <main class="content">
       <!--
         Hero zone: circle identity. The description maps to circles.description,
@@ -695,7 +792,8 @@
           <div class="member-head">
             <div class="feed-avatar">S</div>
             <span class="member-name">Sarah</span>
-            <button class="nudge-btn" type="button" aria-label="Send a nudge to Sarah">
+            <!-- Sarah's nudge shown in post-tap "sent" state: filled + disabled -->
+            <button class="nudge-btn sent" type="button" aria-label="Nudge sent to Sarah" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/>
                 <path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/>

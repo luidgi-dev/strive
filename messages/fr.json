@@ -274,6 +274,7 @@
       "sharedPrivacy": "Visible de vous seul. Le cercle ne voit que ce que vous activez.",
       "noRituals": "Vous n'avez pas encore de rituel actif à partager.",
       "nudge": "Encourager {name}",
+      "nudged": "Encouragé {name}",
       "menu": {
         "open": "Options du cercle",
         "rename": "Renommer le cercle",
@@ -305,6 +306,14 @@
         "nameTooLong": "Ce nom est un peu trop long.",
         "ownerCannotLeave": "En tant que propriétaire, supprimez le cercle plutôt que de le quitter."
       }
+    }
+  },
+  "nudges": {
+    "someone": "Quelqu'un",
+    "toast": {
+      "single": "{sender} vous a encouragé dans {circle}",
+      "more": "et {count} de plus",
+      "dismiss": "Fermer"
     }
   },
   "rituals": {

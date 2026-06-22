@@ -1,7 +1,7 @@
-import { HeartHandshake } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { CircleMomentumIndicator } from "@/components/circles/circle-momentum-indicator";
+import { CircleNudgeButton } from "@/components/circles/circle-nudge-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   memberInitial,
@@ -32,26 +32,32 @@ function sortSelfLast(
 type Props = {
   feed: CircleFeedMemberGroup[];
   currentUserId: string;
+  circleId: string;
   weekLabel: string;
   participantCount: number;
   onTrackCount: number;
+  /** Receiver ids the current user already nudged today (drives the sent state). */
+  nudgedReceiverIds: string[];
 };
 
 /**
  * The weekly feed, grouped by member ("how is each person doing this week?").
  * Each member shows the rituals they share with their rolling momentum, plus one
- * nudge per person (a disabled placeholder until LUI-67). The header carries the
- * collective momentum so the page echoes the calm signal from the circles list.
+ * nudge per person. The header carries the collective momentum so the page echoes
+ * the calm signal from the circles list.
  */
 export async function CircleWeeklyFeed({
   feed,
   currentUserId,
+  circleId,
   weekLabel,
   participantCount,
   onTrackCount,
+  nudgedReceiverIds,
 }: Props) {
   const t = await getTranslations("circles");
   const tDetail = await getTranslations("circles.detail");
+  const nudgedSet = new Set(nudgedReceiverIds);
 
   return (
     <section className="flex flex-col gap-4">
@@ -87,16 +93,12 @@ export async function CircleWeeklyFeed({
                   {isSelf ? t("you") : member.username}
                 </span>
                 {isSelf ? null : (
-                  <button
-                    type="button"
-                    disabled
-                    aria-label={tDetail("nudge", {
-                      name: member.username ?? "",
-                    })}
-                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground/60"
-                  >
-                    <HeartHandshake aria-hidden className="size-4" />
-                  </button>
+                  <CircleNudgeButton
+                    circleId={circleId}
+                    receiverId={member.userId}
+                    receiverName={member.username}
+                    nudged={nudgedSet.has(member.userId)}
+                  />
                 )}
               </div>
 

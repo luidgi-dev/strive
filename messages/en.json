@@ -274,6 +274,7 @@
       "sharedPrivacy": "Visible to you only. The circle sees only what you turn on.",
       "noRituals": "You have no active rituals to share yet.",
       "nudge": "Nudge {name}",
+      "nudged": "Nudged {name}",
       "menu": {
         "open": "Circle options",
         "rename": "Rename circle",
@@ -305,6 +306,14 @@
         "nameTooLong": "That name is a bit too long.",
         "ownerCannotLeave": "As the owner, delete the circle instead of leaving."
       }
+    }
+  },
+  "nudges": {
+    "someone": "Someone",
+    "toast": {
+      "single": "{sender} gave you a nudge in {circle}",
+      "more": "and {count} more",
+      "dismiss": "Dismiss"
     }
   },
   "rituals": {

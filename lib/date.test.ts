@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { daysInMonth, isoWeekday, startOfWeek, todayInTimeZone } from "@/lib/date";
+import {
+  daysInMonth,
+  isoWeekday,
+  startOfLocalDayIso,
+  startOfWeek,
+  todayInTimeZone,
+} from "@/lib/date";
 
 describe("isoWeekday", () => {
   it("returns 1 for Monday and 7 for Sunday", () => {
@@ -42,5 +48,34 @@ describe("todayInTimeZone", () => {
 
   it("falls back to a valid date for an invalid timezone", () => {
     expect(todayInTimeZone("Not/AZone")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe("startOfLocalDayIso", () => {
+  // 2026-06-22T15:30:45.250Z — a fixed instant to make the math checkable.
+  const now = new Date("2026-06-22T15:30:45.250Z");
+
+  it("returns UTC midnight for the UTC zone", () => {
+    expect(startOfLocalDayIso("UTC", now)).toBe("2026-06-22T00:00:00.000Z");
+  });
+
+  it("handles a positive offset zone (Asia/Tokyo, UTC+9)", () => {
+    // 15:30 UTC is 00:30 next day in Tokyo -> local midnight is 15:00 UTC.
+    expect(startOfLocalDayIso("Asia/Tokyo", now)).toBe(
+      "2026-06-22T15:00:00.000Z",
+    );
+  });
+
+  it("handles a negative offset zone (America/New_York, EDT -4 in June)", () => {
+    // 15:30 UTC is 11:30 EDT -> local midnight (00:00 EDT) is 04:00 UTC.
+    expect(startOfLocalDayIso("America/New_York", now)).toBe(
+      "2026-06-22T04:00:00.000Z",
+    );
+  });
+
+  it("falls back to UTC midnight on an invalid zone", () => {
+    expect(startOfLocalDayIso("Not/AZone", now)).toBe(
+      "2026-06-22T00:00:00.000Z",
+    );
   });
 });

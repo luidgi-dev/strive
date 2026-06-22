@@ -156,8 +156,20 @@
   animation: log-pulse 0.45s ease-out;
 }
 
+/* A brief pop confirms a nudge landed as the button fills into its "sent" state. */
+@keyframes nudge-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+.animate-nudge-pop {
+  animation: nudge-pop 0.3s ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-log-pulse {
+  .animate-log-pulse,
+  .animate-nudge-pop {
     animation: none;
   }
 }
