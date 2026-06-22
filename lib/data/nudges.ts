@@ -14,31 +14,40 @@ export type UnseenNudge = {
  * name and the circle they were sent in. Drives the in-app nudge toast. RLS
  * scopes nudges to the receiver; sender profiles are publicly readable and the
  * circle is readable to its members.
+ *
+ * Fail-soft: this runs in the protected layout on every page, but the toast is
+ * non-critical, so a transient failure degrades to "no toast" rather than
+ * breaking the whole protected tree.
  */
 export async function getUnseenNudges(
   client: SupabaseClient<Database>,
 ): Promise<UnseenNudge[]> {
-  const {
-    data: { user },
-  } = await client.auth.getUser();
-  if (!user) return [];
+  try {
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+    if (!user) return [];
 
-  const { data, error } = await client
-    .from("nudges")
-    .select(
-      "id, sender:profiles!nudges_sender_id_fkey(username), circle:circles!nudges_circle_id_fkey(name)",
-    )
-    .eq("receiver_id", user.id)
-    .is("seen_at", null)
-    .order("created_at", { ascending: false });
+    const { data, error } = await client
+      .from("nudges")
+      .select(
+        "id, sender:profiles!nudges_sender_id_fkey(username), circle:circles!nudges_circle_id_fkey(name)",
+      )
+      .eq("receiver_id", user.id)
+      .is("seen_at", null)
+      .order("created_at", { ascending: false });
 
-  if (error) throw error;
+    if (error) throw error;
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    senderName: row.sender?.username ?? null,
-    circleName: row.circle?.name ?? null,
-  }));
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      senderName: row.sender?.username ?? null,
+      circleName: row.circle?.name ?? null,
+    }));
+  } catch (err) {
+    console.error("[getUnseenNudges] failed", err);
+    return [];
+  }
 }
 
 /**
