@@ -25,6 +25,7 @@
     --momentum: oklch(0.62 0.12 154);
     --caution: oklch(0.68 0.14 72);
     --missed: oklch(0.62 0.17 27);
+    --brand: oklch(0.78 0.07 75);
     --radius: 0.75rem;
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
@@ -197,53 +198,71 @@
   .section-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
-  /* Circle card (each row in My circles) */
+  /* Circle card */
   .circle-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 14px 16px;
+    border-radius: var(--radius-2xl);
+    padding: 18px;
     display: flex;
-    align-items: center;
-    gap: 14px;
+    flex-direction: column;
+    gap: 16px;
     cursor: pointer;
     text-align: left;
     width: 100%;
     color: inherit;
     font: inherit;
+    transition: border-color 0.15s ease;
   }
   .circle-card:hover {
-    border-color: color-mix(in oklch, var(--foreground) 18%, transparent);
+    border-color: color-mix(in oklch, var(--foreground) 20%, var(--border));
   }
-  .avatar-stack {
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
-    /* Fixed width so circle names align regardless of member count
-       (30 + 22 + 22 = 74 for 3 visible avatars max) */
-    min-width: 74px;
+
+  .cc-top { display: flex; align-items: flex-start; gap: 12px; }
+  .cc-id { flex: 1; min-width: 0; }
+  .circle-name {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    line-height: 1.25;
   }
+  .circle-desc {
+    font-size: 12.5px;
+    color: var(--muted-foreground);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .avatar-stack { display: inline-flex; flex-shrink: 0; }
   .stack-avatar,
   .stack-more {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     border-radius: 999px;
-    background: var(--accent);
-    border: 2px solid var(--card);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 11px;
+    font-size: 12px;
+    border: 2px solid var(--card);
+    background: var(--accent);
     color: var(--foreground);
     margin-left: -8px;
   }
   .stack-avatar:first-child,
   .stack-more:first-child { margin-left: 0; }
+  .stack-avatar.brand {
+    background: linear-gradient(140deg, var(--brand), oklch(0.62 0.08 60));
+    color: oklch(0.2 0.01 75);
+  }
   .stack-more {
     background: var(--card);
     border: 1px dashed color-mix(in oklch, var(--muted-foreground) 35%, transparent);
@@ -252,129 +271,51 @@
     font-weight: 600;
     font-size: 10.5px;
   }
-  .circle-info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .circle-name {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: -0.005em;
-    color: var(--foreground);
-    line-height: 1.25;
-  }
-  .circle-meta {
-    font-size: 11px;
-    color: var(--muted-foreground);
-    letter-spacing: 0.02em;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-  }
-  .circle-meta > span { white-space: nowrap; }
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--muted-foreground);
-    flex-shrink: 0;
-    display: inline-block;
-  }
-  .status-dot.on-track { background: var(--momentum); }
-  .status-dot.steady   { background: var(--caution); }
-  .status-dot.resting  { background: var(--muted-foreground); }
-  .meta-summary { font-weight: 500; }
-  .meta-summary.on-track { color: var(--momentum); }
-  .meta-summary.steady   { color: var(--caution); }
-  .circle-meatball {
-    width: 18px;
-    height: 18px;
-    color: var(--muted-foreground);
-    flex-shrink: 0;
-  }
-  .circle-card:hover .circle-meatball { color: var(--foreground); }
 
-  /* Invitation card */
-  .invite-card {
-    background: var(--card);
-    border: 1px solid color-mix(in oklch, var(--foreground) 18%, transparent);
-    border-radius: var(--radius-xl);
-    padding: 14px 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .invite-top {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .invite-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    background: var(--accent);
-    color: var(--foreground);
+  .cc-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .ritual-chip {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 13px;
+    gap: 6px;
+    background: var(--accent);
+    border-radius: 999px;
+    padding: 5px 10px 5px 7px;
+    font-size: 11.5px;
+    color: var(--foreground);
+    white-space: nowrap;
+  }
+  .ritual-chip .emoji { font-size: 13px; line-height: 1; }
+  .ritual-chip.more { color: var(--muted-foreground); padding: 5px 10px; }
+
+  .cc-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .cc-members {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cc-momentum {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 12px;
     flex-shrink: 0;
   }
-  .invite-text {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .invite-headline {
-    font-size: 13.5px;
-    line-height: 1.4;
-    color: var(--foreground);
-  }
-  .invite-headline strong {
-    font-family: var(--font-heading);
-    font-weight: 600;
-  }
-  .invite-time {
-    font-size: 11px;
-    color: var(--muted-foreground);
-    letter-spacing: 0.02em;
-  }
-  .invite-actions {
-    display: flex;
-    gap: 6px;
-  }
-  .btn-accept,
-  .btn-decline {
-    flex: 1;
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 12.5px;
-    letter-spacing: 0.01em;
-    cursor: pointer;
-  }
-  .btn-accept {
-    background: var(--foreground);
-    color: var(--background);
-    border: 0;
-  }
-  .btn-decline {
-    background: transparent;
-    color: var(--foreground);
-    border: 1px solid var(--border);
-  }
-  .btn-decline:hover { border-color: color-mix(in oklch, var(--foreground) 35%, transparent); }
+  .cc-momentum .dot { width: 7px; height: 7px; border-radius: 999px; display: inline-block; }
+  .cc-momentum.on-track { color: var(--momentum); }
+  .cc-momentum.on-track .dot { background: var(--momentum); }
+  .cc-momentum.steady { color: var(--caution); }
+  .cc-momentum.steady .dot { background: var(--caution); }
 
   /* Floating action button — Strive AI */
   .fab {
@@ -462,7 +403,6 @@
     </header>
 
     <main class="content">
-      <!-- Page title + primary action -->
       <div class="page-title-row">
         <h2 class="page-title">Circles</h2>
         <button class="define-pill" type="button">
@@ -471,94 +411,62 @@
         </button>
       </div>
 
-      <!-- MY CIRCLES -->
       <section class="section">
         <span class="section-label">My circles</span>
         <div class="section-list">
-          <!--
-            Circle card structure (for dev):
-            - avatar stack = first 3 members of circle_members (joined to profiles)
-            - meta line aggregates: members count + nb of YOUR shared rituals in this
-              circle (count from circle_rituals where user_id = self) + status of YOUR
-              latest week on shared rituals (best/aggregate momentum)
-          -->
-          <button class="circle-card" type="button">
-            <div class="avatar-stack" aria-label="3 members">
-              <span class="stack-avatar">P</span>
-              <span class="stack-avatar">S</span>
-              <span class="stack-avatar">L</span>
-            </div>
-            <div class="circle-info">
-              <span class="circle-name">Running crew</span>
-              <span class="circle-meta">
-                <span>3 members</span>
-                <span class="status-dot on-track"></span>
-                <span class="meta-summary on-track">5/5 this week</span>
-              </span>
-            </div>
-            <svg class="circle-meatball" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="5" cy="12" r="1"/>
-              <circle cx="12" cy="12" r="1"/>
-              <circle cx="19" cy="12" r="1"/>
-            </svg>
-          </button>
 
           <button class="circle-card" type="button">
-            <div class="avatar-stack" aria-label="4 members">
-              <span class="stack-avatar">M</span>
-              <span class="stack-avatar">D</span>
-              <span class="stack-more" aria-hidden="true">+2</span>
-            </div>
-            <div class="circle-info">
-              <span class="circle-name">Family</span>
-              <span class="circle-meta">
-                <span>4 members</span>
-                <span class="status-dot steady"></span>
-                <span class="meta-summary steady">Steady this week</span>
-              </span>
-            </div>
-            <svg class="circle-meatball" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="5" cy="12" r="1"/>
-              <circle cx="12" cy="12" r="1"/>
-              <circle cx="19" cy="12" r="1"/>
-            </svg>
-          </button>
-        </div>
-      </section>
-
-      <!-- INVITATIONS -->
-      <!--
-        Invitation card (for dev):
-        - Source: circle_invitations where invited_user_id = self AND status = 'pending'
-        - Accept = INSERT into circle_members + UPDATE invitation.status = 'accepted'
-        - Decline = UPDATE invitation.status = 'declined' (keep history, soft-delete)
-        - Card slightly more present (border foreground 18%) vs neutral circle cards
-          to signal "needs action"
-        - When zero invitations, hide the whole section (no empty list)
-      -->
-      <section class="section">
-        <span class="section-label">Invitations</span>
-        <div class="section-list">
-          <div class="invite-card">
-            <div class="invite-top">
-              <div class="invite-avatar">P</div>
-              <div class="invite-text">
-                <span class="invite-headline">
-                  <strong>Pierre</strong> invited you to <strong>Morning meditation circle</strong>.
-                </span>
-                <span class="invite-time">2 days ago</span>
+            <div class="cc-top">
+              <div class="cc-id">
+                <div class="circle-name">Morning crew</div>
+                <div class="circle-desc">Small steps, shared.</div>
+              </div>
+              <div class="avatar-stack" aria-label="3 members">
+                <span class="stack-avatar">A</span>
+                <span class="stack-avatar">M</span>
+                <span class="stack-avatar">L</span>
               </div>
             </div>
-            <div class="invite-actions">
-              <button class="btn-accept" type="button">Accept</button>
-              <button class="btn-decline" type="button">Decline</button>
+            <div class="cc-strip">
+              <span class="ritual-chip"><span class="emoji">🧘</span> Meditation</span>
+              <span class="ritual-chip"><span class="emoji">💧</span> Hydration</span>
+              <span class="ritual-chip"><span class="emoji">📖</span> Reading</span>
+              <span class="ritual-chip more">+1</span>
             </div>
-          </div>
+            <div class="cc-foot">
+              <span class="cc-members">Alex · Maya · you</span>
+              <span class="cc-momentum steady"><span class="dot"></span> Steady this week</span>
+            </div>
+          </button>
+
+          <button class="circle-card" type="button">
+            <div class="cc-top">
+              <div class="cc-id">
+                <div class="circle-name">Running crew</div>
+                <div class="circle-desc">Saturday long runs, weekday easy miles.</div>
+              </div>
+              <div class="avatar-stack" aria-label="5 members">
+                <span class="stack-avatar">P</span>
+                <span class="stack-avatar">S</span>
+                <span class="stack-avatar">L</span>
+                <span class="stack-more" aria-hidden="true">+2</span>
+              </div>
+            </div>
+            <div class="cc-strip">
+              <span class="ritual-chip"><span class="emoji">🏃</span> Morning run</span>
+              <span class="ritual-chip"><span class="emoji">🧘</span> Stretching</span>
+              <span class="ritual-chip more">+1</span>
+            </div>
+            <div class="cc-foot">
+              <span class="cc-members">Pierre · Sarah · you +2</span>
+              <span class="cc-momentum on-track"><span class="dot"></span> 4 of 5 this week</span>
+            </div>
+          </button>
+
         </div>
       </section>
     </main>
 
-    <!-- FAB: Strive AI -->
     <button class="fab" type="button" aria-label="Talk to Strive">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
@@ -569,7 +477,6 @@
       </svg>
     </button>
 
-    <!-- Bottom nav: Circles active -->
     <nav class="bottom-nav" aria-label="Primary">
       <button class="nav-item" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -580,9 +487,6 @@
       <button class="nav-item" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-          <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08v0c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"/>
-          <path d="m18 15-2-2"/>
-          <path d="m15 18-2-2"/>
         </svg>
         <span class="nav-label">Rituals</span>
       </button>

@@ -38,10 +38,20 @@ const signUpSchema = z.object({
 
 type SignUpValues = z.infer<typeof signUpSchema>
 
-export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export function SignUpForm({
+  className,
+  next,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'> & { next?: string }) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+
+  // Open-redirect guard: only same-origin paths, and never protocol-relative.
+  const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : null
+  const loginHref = safeNext
+    ? `/auth/login?next=${encodeURIComponent(safeNext)}`
+    : '/auth/login'
 
   const {
     register,
@@ -70,7 +80,9 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             username: values.username,
             timezone: timezone,
           },
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm${
+            safeNext ? `?next=${encodeURIComponent(safeNext)}` : ''
+          }`,
         },
       })
 
@@ -198,8 +210,8 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             <div className="text-center pt-2">
               <p className="font-dm-sans text-sm text-muted-foreground">
                 Already steady?{' '}
-                <Link 
-                  href="/auth/login" 
+                <Link
+                  href={loginHref}
                   className="font-medium text-foreground underline underline-offset-4 hover:text-primary transition-colors"
                 >
                   Sign in

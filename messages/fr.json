@@ -234,11 +234,154 @@
     "rituals": {
       "description": "Développez votre constance grâce à des rituels quotidiens porteurs de sens."
     },
-    "circles": {
-      "description": "Partagez votre élan avec un cercle privé."
-    },
     "flow": {
       "description": "Votre dynamique quotidienne, visualisée."
+    }
+  },
+  "circles": {
+    "title": "Cercles",
+    "newCircle": "Nouveau cercle",
+    "you": "vous",
+    "section": {
+      "myCircles": "Mes cercles"
+    },
+    "momentum": {
+      "onTrack": "{x} sur {y} cette semaine",
+      "steady": "Régulier cette semaine"
+    },
+    "empty": {
+      "title": "Construisez à plusieurs.",
+      "body": "Lancez un petit cercle et partagez votre rythme avec des personnes de confiance.",
+      "cta": "Lancer un cercle"
+    },
+    "create": {
+      "title": "Lancer un cercle",
+      "nameLabel": "Nom du cercle",
+      "namePlaceholder": "Nom du cercle",
+      "noteLabel": "Note",
+      "notePlaceholder": "De quoi parle ce cercle ?",
+      "addNote": "Ajouter une note",
+      "cta": "Créer le cercle",
+      "creating": "Création…",
+      "cancel": "Annuler",
+      "success": {
+        "title": "{name} est prêt.",
+        "body": "Partagez ce lien avec les personnes avec qui vous voulez garder le rythme.",
+        "doneLater": "Terminé, inviter plus tard"
+      },
+      "errors": {
+        "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
+        "unauthorized": "Veuillez vous reconnecter et réessayer.",
+        "unknown": "Une erreur est survenue. Veuillez réessayer.",
+        "nameRequired": "Donnez un nom à votre cercle.",
+        "nameTooLong": "Ce nom est un peu trop long.",
+        "noteTooLong": "Cette note est un peu trop longue."
+      }
+    },
+    "invite": {
+      "shareTitle": "Rejoins mon cercle sur Strive",
+      "linkLabel": "Lien d'invitation",
+      "copy": "Copier",
+      "copied": "Copié",
+      "copyCode": "Copier le code",
+      "orCode": "ou partagez le code",
+      "share": "Partager le lien",
+      "sheetTitle": "Inviter dans ce cercle",
+      "close": "Fermer",
+      "sheetBody": "Partagez ce lien avec les personnes avec qui vous voulez garder le rythme. Il expire après 7 jours.",
+      "generate": "Générer un lien d'invitation",
+      "generating": "Génération…",
+      "noLink": "Aucun lien d'invitation actif. Demandez au propriétaire d'en créer un."
+    },
+    "join": {
+      "cta": "Rejoindre avec un code",
+      "title": "Rejoindre un cercle",
+      "body": "Saisissez le code d'invitation qu'on vous a partagé.",
+      "label": "Code d'invitation",
+      "placeholder": "Code d'invitation",
+      "joining": "Ajout…",
+      "close": "Fermer",
+      "errors": {
+        "validationFailed": "Saisissez un code d'invitation.",
+        "unauthorized": "Veuillez vous reconnecter et réessayer.",
+        "unauthenticated": "Veuillez vous reconnecter et réessayer.",
+        "unknown": "Une erreur est survenue. Veuillez réessayer.",
+        "invalid": "Ce code d'invitation n'est pas valide.",
+        "expired": "Ce lien d'invitation a expiré. Demandez-en un nouveau.",
+        "full": "Ce cercle est complet (8 membres)."
+      }
+    },
+    "detail": {
+      "back": "Retour",
+      "members": "{count, plural, one {# membre} other {# membres}}",
+      "invite": "Inviter",
+      "inviteComingSoon": {
+        "title": "Les invitations arrivent",
+        "body": "Le partage d'un lien d'invitation vers votre cercle arrive dans la prochaine mise à jour."
+      },
+      "weekOf": "Semaine du {date}",
+      "feedEmpty": "Aucun rituel partagé pour l'instant. Activez-en un ci-dessous pour partager votre rythme avec le cercle.",
+      "mySharedRituals": "Mes rituels partagés",
+      "sharedPrivacy": "Visible de vous seul. Le cercle ne voit que ce que vous activez.",
+      "noRituals": "Vous n'avez pas encore de rituel actif à partager.",
+      "nudge": "Encourager {name}",
+      "nudged": "Encouragé {name}",
+      "menu": {
+        "open": "Options du cercle",
+        "rename": "Renommer le cercle",
+        "leave": "Quitter le cercle",
+        "delete": "Supprimer le cercle"
+      },
+      "rename": {
+        "title": "Renommer le cercle",
+        "label": "Nom du cercle",
+        "placeholder": "Nom du cercle",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      },
+      "confirm": {
+        "leaveTitle": "Quitter ce cercle ?",
+        "leaveBody": "Vous ne partagerez plus votre rythme ici et perdrez l'accès au fil du cercle. Vous pourrez le rejoindre plus tard avec un lien d'invitation.",
+        "leaveConfirm": "Quitter",
+        "deleteTitle": "Supprimer ce cercle ?",
+        "deleteBody": "Cela supprime le cercle pour tout le monde et est irréversible.",
+        "deleteConfirm": "Supprimer",
+        "cancel": "Annuler"
+      },
+      "errors": {
+        "unauthorized": "Veuillez vous reconnecter et réessayer.",
+        "unknown": "Une erreur est survenue. Veuillez réessayer.",
+        "notFound": "Ce cercle n'est plus disponible.",
+        "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
+        "nameRequired": "Donnez un nom à votre cercle.",
+        "nameTooLong": "Ce nom est un peu trop long.",
+        "ownerCannotLeave": "En tant que propriétaire, supprimez le cercle plutôt que de le quitter."
+      }
+    }
+  },
+  "nudges": {
+    "someone": "Quelqu'un",
+    "toast": {
+      "single": "{sender} vous a encouragé dans {circle}",
+      "more": "et {count} de plus",
+      "dismiss": "Fermer"
+    }
+  },
+  "invite": {
+    "kicker": "Vous êtes invité",
+    "guestTitle": "Vous êtes invité à rejoindre {circle}",
+    "joinTitle": "Rejoindre {circle}",
+    "byline": "{creator} · {count, plural, one {# membre} other {# membres}}",
+    "guestCta": "Rejoindre — créer un compte",
+    "loginCta": "J'ai déjà un compte",
+    "joinCta": "Rejoindre {circle}",
+    "invalidTitle": "Ce lien d'invitation n'est plus valide.",
+    "invalidBody": "Demandez un nouveau lien au créateur du cercle.",
+    "fullBody": "Ce cercle est complet (8 membres). Demandez au créateur de faire de la place.",
+    "someone": "Quelqu'un",
+    "meta": {
+      "title": "Rejoindre {circle} sur Strive",
+      "description": "{circle} vous invite à garder le rythme ensemble sur Strive."
     }
   },
   "rituals": {

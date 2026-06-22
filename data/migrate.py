@@ -10,6 +10,13 @@ ENV_PATH = os.path.join(BASE, '..', '.env.local')
 load_dotenv(ENV_PATH)
 
 
+# helper functions that table RLS policies / column defaults depend on, so they
+# must exist BEFORE the tables are created (the circle tables reference them).
+PRE_TABLE_FUNCTIONS = [
+    'is_circle_member.sql',            # security-definer helper, breaks RLS recursion
+    'generate_circle_invite_code.sql', # default for circle_invites.code
+]
+
 TABLES = [
     'ritual_categories.sql',
     'profiles.sql',
@@ -23,16 +30,25 @@ TABLES = [
     'push_subscriptions.sql',
     'circles.sql',
     'circle_members.sql',
+    'circle_invites.sql',
+    'nudges.sql',
+    'circle_rituals.sql',
 ]
 
 FUNCTIONS = [
     'consume_ai_credit.sql',
     'refund_ai_credit.sql',
     'reset_ai_credits.sql',
+    # reads ritual_progress (created later, in VIEWS) — plpgsql late-binds, so
+    # creating it here is fine; it only runs once a circle is queried.
+    'get_circles_momentum.sql',       # collective weekly momentum per circle
+    'get_circle_shared_rituals.sql',  # shared ritual names/icons per circle
 ]
 
 TRIGGERS = [
     'handle_new_user.sql',
+    'enforce_circle_member_limit.sql',  # caps a circle at 8 members
+    'cleanup_circle_membership.sql',    # drops a departed member's shared rituals + nudges
 ]
 
 SEEDS = [
@@ -81,6 +97,9 @@ def migrate() -> None:
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
         conn.autocommit = True
         cursor = conn.cursor()
+
+        print('running pre-table functions...')
+        run(cursor, 'functions', PRE_TABLE_FUNCTIONS)
 
         print('running tables...')
         run(cursor, 'tables', TABLES)
