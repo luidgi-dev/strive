@@ -59,3 +59,36 @@ export function daysInMonth(isoDate: string): number {
   // Day 0 of the next month is the last day of this one.
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
 }
+
+/**
+ * The UTC instant (ISO string) of the start of "today" in the given IANA time
+ * zone — i.e. local midnight. Computed by subtracting the elapsed local
+ * wall-clock time-of-day from `now`, so it stays correct across DST without an
+ * offset table. `now` is injectable for deterministic tests. Falls back to UTC
+ * midnight on an invalid zone.
+ */
+export function startOfLocalDayIso(
+  timeZone: string,
+  now: Date = new Date(),
+): string {
+  try {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).formatToParts(now);
+    const get = (type: string) =>
+      Number.parseInt(parts.find((p) => p.type === type)?.value ?? "0", 10);
+    const hour = get("hour") % 24; // en-GB renders midnight as "24"
+    const msIntoDay =
+      ((hour * 60 + get("minute")) * 60 + get("second")) * 1000 +
+      now.getMilliseconds();
+    return new Date(now.getTime() - msIntoDay).toISOString();
+  } catch {
+    const utcMidnight = new Date(now);
+    utcMidnight.setUTCHours(0, 0, 0, 0);
+    return utcMidnight.toISOString();
+  }
+}
