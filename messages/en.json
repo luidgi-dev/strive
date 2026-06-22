@@ -255,9 +255,60 @@
       "cta": "Start a circle"
     },
     "create": {
-      "comingSoon": {
-        "title": "Circles are almost ready",
-        "body": "Creating a circle and sharing an invite link arrives in the next update."
+      "title": "Start a circle",
+      "nameLabel": "Circle name",
+      "namePlaceholder": "Circle name",
+      "noteLabel": "Note",
+      "notePlaceholder": "What is this circle about?",
+      "addNote": "Add a note",
+      "cta": "Create circle",
+      "creating": "Creating…",
+      "cancel": "Cancel",
+      "success": {
+        "title": "{name} is ready.",
+        "body": "Share this link with people you'd like to keep rhythm with.",
+        "doneLater": "Done, invite later"
+      },
+      "errors": {
+        "validationFailed": "Please check your input and try again.",
+        "unauthorized": "Please sign in and try again.",
+        "unknown": "Something went wrong. Please try again.",
+        "nameRequired": "Give your circle a name.",
+        "nameTooLong": "That name is a bit too long.",
+        "noteTooLong": "That note is a bit too long."
+      }
+    },
+    "invite": {
+      "shareTitle": "Join my circle on Strive",
+      "linkLabel": "Invite link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyCode": "Copy code",
+      "orCode": "or share the code",
+      "share": "Share invite link",
+      "sheetTitle": "Invite to this circle",
+      "close": "Close",
+      "sheetBody": "Share this link with people you'd like to keep rhythm with. It expires after 7 days.",
+      "generate": "Generate invite link",
+      "generating": "Generating…",
+      "noLink": "No active invite link yet. Ask the circle owner to create one."
+    },
+    "join": {
+      "cta": "Join with a code",
+      "title": "Join a circle",
+      "body": "Enter the invite code someone shared with you.",
+      "label": "Invite code",
+      "placeholder": "Invite code",
+      "joining": "Joining…",
+      "close": "Close",
+      "errors": {
+        "validationFailed": "Enter an invite code.",
+        "unauthorized": "Please sign in and try again.",
+        "unauthenticated": "Please sign in and try again.",
+        "unknown": "Something went wrong. Please try again.",
+        "invalid": "This invite code is not valid.",
+        "expired": "This invite link has expired. Ask for a new one.",
+        "full": "This circle is full (8 members)."
       }
     },
     "detail": {
@@ -314,6 +365,23 @@
       "single": "{sender} gave you a nudge in {circle}",
       "more": "and {count} more",
       "dismiss": "Dismiss"
+    }
+  },
+  "invite": {
+    "kicker": "You're invited",
+    "guestTitle": "You've been invited to join {circle}",
+    "joinTitle": "Join {circle}",
+    "byline": "{creator} · {count, plural, one {# member} other {# members}}",
+    "guestCta": "Join — create an account",
+    "loginCta": "I already have an account",
+    "joinCta": "Join {circle}",
+    "invalidTitle": "This invite link is no longer valid.",
+    "invalidBody": "Ask the circle creator for a new one.",
+    "fullBody": "This circle is full (8 members). Ask the creator to make room.",
+    "someone": "Someone",
+    "meta": {
+      "title": "Join {circle} on Strive",
+      "description": "{circle} invited you to keep rhythm together on Strive."
     }
   },
   "rituals": {
