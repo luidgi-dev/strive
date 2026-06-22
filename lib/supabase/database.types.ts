@@ -781,6 +781,19 @@ export type Database = {
         }[]
       }
       generate_circle_invite_code: { Args: never; Returns: string }
+      get_circle_feed: {
+        Args: { p_circle_id: string }
+        Returns: {
+          avatar_url: string
+          momentum_count: number
+          momentum_target: number
+          ritual_icon: string
+          ritual_id: string
+          ritual_name: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_circle_shared_rituals: {
         Args: never
         Returns: {
