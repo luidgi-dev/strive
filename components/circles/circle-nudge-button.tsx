@@ -54,7 +54,9 @@ export function CircleNudgeButton({
       disabled={nudged}
       aria-label={nudged ? t("nudged", { name }) : t("nudge", { name })}
       className={cn(
-        "inline-flex size-9 shrink-0 items-center justify-center rounded-full border transition-colors",
+        // 36px visual, with an invisible padded hit area so the tap target clears
+        // 44px on mobile (same approach as the Switch primitive).
+        "relative inline-flex size-9 shrink-0 items-center justify-center rounded-full border transition-colors before:absolute before:-inset-1 before:content-['']",
         nudged
           ? "cursor-default border-foreground bg-foreground text-background"
           : "border-border text-muted-foreground hover:border-foreground/35 hover:bg-accent hover:text-foreground",

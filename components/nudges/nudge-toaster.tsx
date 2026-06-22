@@ -21,15 +21,15 @@ type Props = {
 export function NudgeToaster({ nudges }: Props) {
   const t = useTranslations("nudges");
   const [visible, setVisible] = useState(true);
-  const marked = useRef(false);
+  // Capture the nudges present on open. The toast acts on them once; it must not
+  // react to later layout re-renders (which would clear the dismiss timer).
+  const nudgesRef = useRef(nudges);
 
   useEffect(() => {
-    if (marked.current || nudges.length === 0) return;
-    marked.current = true;
-    void markNudgesSeen(nudges.map((n) => n.id));
+    void markNudgesSeen(nudgesRef.current.map((n) => n.id));
     const timer = setTimeout(() => setVisible(false), DISMISS_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [nudges]);
+  }, []);
 
   if (nudges.length === 0 || !visible) return null;
 
