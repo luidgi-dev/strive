@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import { Link } from "@/lib/i18n/navigation";
 import type { CircleOverview } from "@/lib/data/circles";
 
 import { CircleAvatarStack } from "./circle-avatar-stack";
@@ -32,13 +33,15 @@ function memberNames(
 /**
  * One circle in the list: identity (name + description + avatars), the shared
  * rituals it is built around, and a footer with member names and the collective
- * momentum. Non-interactive for now — the link to the detail page lands in LUI-66.
+ * momentum. Links to the circle detail page.
  */
 export async function CircleCard({ circle, currentUserId }: Props) {
   const t = await getTranslations("circles");
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-[18px]">
+    <Link
+      href={`/protected/circles/${circle.id}`}
+      className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-[18px] transition-colors hover:border-muted-foreground/30">
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-heading text-[16px] font-semibold tracking-[-0.01em] text-foreground">
@@ -68,6 +71,6 @@ export async function CircleCard({ circle, currentUserId }: Props) {
           />
         ) : null}
       </div>
-    </div>
+    </Link>
   );
 }
