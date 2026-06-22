@@ -4,13 +4,10 @@ import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+
+import { CircleCreateFlow } from "./circle-create-flow";
 
 type Variant = "pill" | "cta";
 
@@ -19,9 +16,8 @@ type Props = {
 };
 
 /**
- * Entry point to create a circle. The button is fully styled; the bottom sheet is
- * a placeholder until the real create flow (name + note + invite link) lands in
- * LUI-64, which will swap the sheet body for the form.
+ * Entry point to create a circle. Opens a bottom sheet running the create flow
+ * (name + optional note, then a confirmation with the shareable invite link).
  */
 export function NewCircleButton({ variant }: Props) {
   const t = useTranslations("circles");
@@ -51,8 +47,7 @@ export function NewCircleButton({ variant }: Props) {
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent>
-          <SheetTitle>{t("create.comingSoon.title")}</SheetTitle>
-          <SheetDescription>{t("create.comingSoon.body")}</SheetDescription>
+          <CircleCreateFlow onClose={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
     </>

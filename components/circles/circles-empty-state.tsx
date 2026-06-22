@@ -1,6 +1,7 @@
 import { Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import { JoinCircleButton } from "./join-circle-button";
 import { NewCircleButton } from "./new-circle-button";
 
 export async function CirclesEmptyState() {
@@ -21,6 +22,7 @@ export async function CirclesEmptyState() {
         {t("empty.body")}
       </p>
       <NewCircleButton variant="cta" />
+      <JoinCircleButton variant="link" />
     </div>
   );
 }

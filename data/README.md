@@ -33,6 +33,9 @@ data/
 │   ├── get_circles_momentum.sql        # security-definer: collective weekly momentum per circle
 │   ├── get_circle_shared_rituals.sql   # security-definer: shared ritual names/icons per circle
 │   ├── get_circle_feed.sql             # security-definer: per-member weekly progress feed for one circle
+│   ├── create_circle_with_invite.sql   # atomic create: circle + owner membership + first invite link
+│   ├── get_circle_invite_preview.sql   # security-definer: public /i/[code] preview (anon-readable)
+│   ├── redeem_circle_invite.sql        # security-definer: validate invite + join + bump uses_count
 │   ├── consume_ai_credit.sql   # atomically reserves one AI credit (caller-scoped)
 │   ├── refund_ai_credit.sql    # returns a reserved credit when an AI call fails
 │   └── reset_ai_credits.sql    # monthly reset to tier quota for due users
