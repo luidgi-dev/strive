@@ -260,3 +260,35 @@ export async function sendNudge(
   revalidatePath(circlePath(circleId));
   return { ok: true };
 }
+
+/**
+ * Mint a fresh invite link for a circle. Owner-only: the circle_invites insert
+ * policy rejects non-owners. Used by the detail-page Invite button and to replace
+ * a link once the 7-day one expires.
+ */
+export async function generateInviteLink(
+  circleId: string,
+): Promise<ActionResult<{ code: string }>> {
+  if (!isNonEmptyString(circleId)) {
+    return { ok: false, error: "validationFailed" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  const { data, error } = await supabase
+    .from("circle_invites")
+    .insert({ circle_id: circleId, created_by: user.id })
+    .select("code")
+    .single();
+  if (error) {
+    console.error("[generateInviteLink] insert failed", error);
+    return { ok: false, error: "unknown" };
+  }
+
+  revalidatePath(circlePath(circleId));
+  return { ok: true, data: { code: data.code } };
+}

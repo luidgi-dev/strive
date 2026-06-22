@@ -16,6 +16,7 @@ import {
   getCircleMomentum,
   getMyCircleRituals,
 } from "@/lib/data/circles";
+import { getActiveCircleInvite } from "@/lib/data/invites";
 import { getSentNudgeReceiversToday } from "@/lib/data/nudges";
 import { getUserToday } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -55,6 +56,7 @@ export default async function CircleDetailPage({ params }: Props) {
     momentum,
     myRituals,
     nudgedReceiverIds,
+    activeInviteCode,
     today,
   ] = await Promise.all([
     supabase.auth.getUser(),
@@ -62,6 +64,7 @@ export default async function CircleDetailPage({ params }: Props) {
     getCircleMomentum(supabase, id),
     getMyCircleRituals(supabase, id),
     getSentNudgeReceiversToday(supabase, id),
+    getActiveCircleInvite(supabase, id),
     getUserToday(supabase),
   ]);
 
@@ -100,7 +103,11 @@ export default async function CircleDetailPage({ params }: Props) {
           <span className="text-[12.5px] text-muted-foreground">
             {t("members", { count: circle.members.length })}
           </span>
-          <CircleInviteButton />
+          <CircleInviteButton
+            circleId={circle.id}
+            isOwner={isOwner}
+            activeCode={activeInviteCode}
+          />
         </div>
       </div>
 

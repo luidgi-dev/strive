@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { CirclesEmptyState } from "@/components/circles/circles-empty-state";
 import { CirclesList } from "@/components/circles/circles-list";
+import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { NewCircleButton } from "@/components/circles/new-circle-button";
 import { getCirclesOverview } from "@/lib/data/circles";
 import { createClient } from "@/lib/supabase/server";
@@ -31,7 +32,10 @@ export default async function CirclesPage({ params }: Props) {
         <h1 className="font-heading text-[22px] font-bold tracking-tight">
           {t("title")}
         </h1>
-        <NewCircleButton variant="pill" />
+        <div className="flex items-center gap-2">
+          <JoinCircleButton variant="pill" />
+          <NewCircleButton variant="pill" />
+        </div>
       </div>
       <CirclesList circles={circles} currentUserId={user?.id ?? null} />
     </div>

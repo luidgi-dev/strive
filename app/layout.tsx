@@ -30,6 +30,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.STRIVE_LIVE_URL ?? "https://striveapp.cc"),
   title: "Strive",
   description: "Consistency over intensity.",
   manifest: "/site.webmanifest",
