@@ -37,9 +37,11 @@ begin
         return;
     end if;
 
+    -- Qualify columns: the OUT param `circle_id` would otherwise make an
+    -- unqualified `circle_id` ambiguous (Postgres error 42702).
     if exists (
-        select 1 from circle_members
-        where circle_id = v_invite.circle_id and user_id = v_uid
+        select 1 from circle_members cm
+        where cm.circle_id = v_invite.circle_id and cm.user_id = v_uid
     ) then
         return query select 'already_member'::text, v_invite.circle_id;
         return;
