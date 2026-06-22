@@ -393,6 +393,78 @@
     min-width: 30px;
   }
 
+  /* Feed section header: week label + collective momentum (echoes the card) */
+  .feed-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 4px;
+  }
+  .collective-momentum {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .collective-momentum .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+  }
+  .collective-momentum.on-track { color: var(--momentum); }
+  .collective-momentum.on-track .dot { background: var(--momentum); }
+  .collective-momentum.steady { color: var(--caution); }
+  .collective-momentum.steady .dot { background: var(--caution); }
+
+  /* Weekly feed grouped by MEMBER: header (avatar + name + nudge) then their rows */
+  .member-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .member-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4px;
+  }
+  .member-name {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.005em;
+    color: var(--foreground);
+  }
+  .ritual-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ritual-row:last-child { border-bottom: 0; }
+  .ritual-row-emoji { font-size: 15px; line-height: 1; flex-shrink: 0; }
+  .ritual-row-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  /* Privacy note under a section label (opt-in clarity) */
+  .section-note {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: color-mix(in oklch, var(--muted-foreground) 80%, transparent);
+    padding: 0 4px;
+  }
+
   /* Shared ritual row (toggle) */
   .shared-icon {
     width: 32px;
@@ -570,35 +642,29 @@
       </div>
 
       <!--
-        WEEKLY FEED structure (for dev).
-        Current wireframe = one row per member, single shared ritual ("Morning run").
-        When members share MULTIPLE rituals each, the recommended structure is to
-        GROUP BY RITUAL rather than by member:
+        WEEKLY FEED — grouped by MEMBER, not by ritual.
+        Each member shows the rituals they share with their rolling weekly
+        momentum, plus a single nudge per person (the nudge table is per member,
+        not per ritual). Self ("You") sits last and has no nudge.
 
-          MORNING RUN
-            Pierre · 4/5 ● [nudge]
-            Sarah  · 2/5 ● [sent]
-            You    · 5/5 ●  you
-
-          MORNING MEDITATION
-            Pierre · 6/7 ● [nudge]
-            You    · 7/7 ●  you
-
-        Rationale: a circle is built around shared activities. Grouping by ritual
-        matches the mental model ("how are we all doing on running this week?")
-        and naturally hides members who haven't opted into that ritual.
+        Why by member, not by ritual: members name their own rituals, so a shared
+        ritual name almost never matches across people. Grouping by ritual would
+        fragment the feed into one-row groups ("Skincare → only Léa", "Swimming →
+        only Tom"). Grouping by person answers "how is each of us doing this
+        week?" and is robust to free-form ritual names. The header carries the
+        collective momentum ("X of Y this week"), echoing the circles-list card.
       -->
       <section class="section">
-        <span class="section-label">Week of May 11</span>
-        <div class="grouped-list" aria-label="Weekly progress of circle members">
-          <div class="feed-row">
+        <div class="feed-head">
+          <span class="section-label">Week of May 11</span>
+          <span class="collective-momentum on-track"><span class="dot"></span> 2 of 3 this week</span>
+        </div>
+
+        <!-- Pierre: two shared rituals, one nudge for the person -->
+        <div class="member-group">
+          <div class="member-head">
             <div class="feed-avatar">P</div>
-            <div class="feed-info">
-              <span class="feed-name">Pierre</span>
-              <span class="feed-ritual">Morning run</span>
-            </div>
-            <span class="feed-score">4<span class="denom">/5</span></span>
-            <span class="status-dot on-track"></span>
+            <span class="member-name">Pierre</span>
             <button class="nudge-btn" type="button" aria-label="Send a nudge to Pierre">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/>
@@ -608,17 +674,28 @@
               </svg>
             </button>
           </div>
-
-          <div class="feed-row">
-            <div class="feed-avatar">S</div>
-            <div class="feed-info">
-              <span class="feed-name">Sarah</span>
-              <span class="feed-ritual">Morning run</span>
+          <div class="grouped-list">
+            <div class="ritual-row">
+              <span class="ritual-row-emoji" aria-hidden="true">🏃</span>
+              <span class="ritual-row-name">Morning run</span>
+              <span class="feed-score">5<span class="denom">/5</span></span>
+              <span class="status-dot on-track"></span>
             </div>
-            <span class="feed-score">2<span class="denom">/5</span></span>
-            <span class="status-dot steady"></span>
-            <!-- Sarah's nudge shown in POST-TAP "sent" state (dev reference) -->
-            <button class="nudge-btn sent" type="button" aria-label="Nudge already sent to Sarah" disabled>
+            <div class="ritual-row">
+              <span class="ritual-row-emoji" aria-hidden="true">🧘</span>
+              <span class="ritual-row-name">Meditation</span>
+              <span class="feed-score">6<span class="denom">/7</span></span>
+              <span class="status-dot on-track"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sarah: one shared ritual, behind pace this week -->
+        <div class="member-group">
+          <div class="member-head">
+            <div class="feed-avatar">S</div>
+            <span class="member-name">Sarah</span>
+            <button class="nudge-btn" type="button" aria-label="Send a nudge to Sarah">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/>
                 <path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/>
@@ -627,17 +704,29 @@
               </svg>
             </button>
           </div>
-
-          <div class="feed-row">
-            <div class="feed-avatar">L</div>
-            <div class="feed-info">
-              <span class="feed-name">You</span>
-              <span class="feed-ritual">Morning run</span>
+          <div class="grouped-list">
+            <div class="ritual-row">
+              <span class="ritual-row-emoji" aria-hidden="true">📖</span>
+              <span class="ritual-row-name">Reading</span>
+              <span class="feed-score">3<span class="denom">/5</span></span>
+              <span class="status-dot steady"></span>
             </div>
-            <span class="feed-score">5<span class="denom">/5</span></span>
-            <span class="status-dot on-track"></span>
-            <!-- Self row marker — no nudge possible on yourself, label balances the right side -->
-            <span class="self-marker">you</span>
+          </div>
+        </div>
+
+        <!-- You: no nudge possible on yourself -->
+        <div class="member-group">
+          <div class="member-head">
+            <div class="feed-avatar">L</div>
+            <span class="member-name">You</span>
+          </div>
+          <div class="grouped-list">
+            <div class="ritual-row">
+              <span class="ritual-row-emoji" aria-hidden="true">🏃</span>
+              <span class="ritual-row-name">Morning run</span>
+              <span class="feed-score">5<span class="denom">/5</span></span>
+              <span class="status-dot on-track"></span>
+            </div>
           </div>
         </div>
       </section>
@@ -662,6 +751,7 @@
             </svg>
           </button>
         </div>
+        <p class="section-note">Visible to you only. The circle sees only what you turn on.</p>
         <div class="grouped-list" aria-label="Which of your rituals are visible to this circle">
           <div class="shared-row">
             <div class="shared-icon" aria-hidden="true">
