@@ -16,6 +16,7 @@ import {
   getCircleMomentum,
   getMyCircleRituals,
 } from "@/lib/data/circles";
+import { getSentNudgeReceiversToday } from "@/lib/data/nudges";
 import { getUserToday } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
@@ -53,12 +54,14 @@ export default async function CircleDetailPage({ params }: Props) {
     feed,
     momentum,
     myRituals,
+    nudgedReceiverIds,
     today,
   ] = await Promise.all([
     supabase.auth.getUser(),
     getCircleFeed(supabase, id),
     getCircleMomentum(supabase, id),
     getMyCircleRituals(supabase, id),
+    getSentNudgeReceiversToday(supabase, id),
     getUserToday(supabase),
   ]);
 
@@ -104,9 +107,11 @@ export default async function CircleDetailPage({ params }: Props) {
       <CircleWeeklyFeed
         feed={feed}
         currentUserId={user.id}
+        circleId={circle.id}
         weekLabel={weekLabel}
         participantCount={momentum.participantCount}
         onTrackCount={momentum.onTrackCount}
+        nudgedReceiverIds={nudgedReceiverIds}
       />
 
       <CircleSharedRitualsToggle circleId={circle.id} rituals={myRituals} />
