@@ -1,5 +1,6 @@
 "use client";
 
+import { Collapsible } from "@base-ui/react/collapsible";
 import { ChevronDown, ListChecks } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -20,11 +21,12 @@ type Props = {
 /**
  * The current user's private control panel: which of their rituals are visible in
  * this circle. Toggling opts a ritual in/out (server action), updated optimistically
- * and reverted on failure. Collapsible so the weekly feed stays the focus.
+ * and reverted on failure. Collapsible (label-as-trigger, matching the app's other
+ * sections) so the weekly feed stays the focus.
  */
 export function CircleSharedRitualsToggle({ circleId, rituals }: Props) {
   const t = useTranslations("circles.detail");
-  const [expanded, setExpanded] = useState(true);
+  const [open, setOpen] = useState(true);
   const [shared, setShared] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(rituals.map((r) => [r.ritualId, r.shared])),
   );
@@ -44,35 +46,31 @@ export function CircleSharedRitualsToggle({ circleId, rituals }: Props) {
   };
 
   return (
-    <section className="flex flex-col gap-2.5">
-      <div className="flex flex-col gap-1 px-1">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+    <Collapsible.Root
+      open={open}
+      onOpenChange={setOpen}
+      render={<section className="flex flex-col gap-2.5" />}
+    >
+      <div className="flex min-h-8 items-center pl-1">
+        <h2 className="min-w-0">
+          <Collapsible.Trigger className="group flex items-center gap-1.5 text-left text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground outline-none">
             {t("mySharedRituals")}
-          </span>
-          <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            aria-expanded={expanded}
-            aria-label={t("mySharedRituals")}
-            className="inline-flex size-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
             <ChevronDown
               aria-hidden
               className={cn(
-                "size-3.5 transition-transform",
-                !expanded && "-rotate-90",
+                "size-3 transition-transform duration-200 ease-out",
+                !open && "-rotate-90",
               )}
             />
-          </button>
-        </div>
-        <p className="text-[11.5px] leading-snug text-muted-foreground/80">
-          {t("sharedPrivacy")}
-        </p>
+          </Collapsible.Trigger>
+        </h2>
       </div>
 
-      {expanded ? (
-        rituals.length === 0 ? (
+      <Collapsible.Panel className="flex flex-col gap-2.5">
+        <p className="px-1 text-[11.5px] leading-snug text-muted-foreground/80">
+          {t("sharedPrivacy")}
+        </p>
+        {rituals.length === 0 ? (
           <p className="rounded-2xl border border-border bg-card px-4 py-6 text-center text-[13px] text-muted-foreground">
             {t("noRituals")}
           </p>
@@ -102,8 +100,8 @@ export function CircleSharedRitualsToggle({ circleId, rituals }: Props) {
               </li>
             ))}
           </ul>
-        )
-      ) : null}
-    </section>
+        )}
+      </Collapsible.Panel>
+    </Collapsible.Root>
   );
 }

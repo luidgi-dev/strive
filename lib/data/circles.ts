@@ -295,3 +295,8 @@ export function circleFeedStatus(
   if (count == null || count <= 0) return "resting";
   return count / target >= 0.8 ? "on_track" : "steady";
 }
+
+/** First letter of a member's name for an avatar fallback; "?" when unknown. */
+export function memberInitial(name: string | null): string {
+  return name?.trim().charAt(0).toUpperCase() || "?";
+}

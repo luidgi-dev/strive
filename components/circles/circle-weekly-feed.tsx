@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 
 import { CircleMomentumIndicator } from "@/components/circles/circle-momentum-indicator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type {
-  CircleFeedMemberGroup,
-  CircleFeedStatus,
+import {
+  memberInitial,
+  type CircleFeedMemberGroup,
+  type CircleFeedStatus,
 } from "@/lib/data/circles";
 import { cn } from "@/lib/utils";
 
@@ -14,10 +15,6 @@ const STATUS_DOT: Record<CircleFeedStatus, string> = {
   steady: "bg-caution",
   resting: "bg-muted-foreground",
 };
-
-function initial(name: string | null): string {
-  return name?.trim().charAt(0).toUpperCase() || "?";
-}
 
 // Others first (by name), self last, matching the wireframe ("you" at the foot).
 function sortSelfLast(
@@ -84,7 +81,7 @@ export async function CircleWeeklyFeed({
                   {member.avatarUrl ? (
                     <AvatarImage src={member.avatarUrl} alt="" />
                   ) : null}
-                  <AvatarFallback>{initial(member.username)}</AvatarFallback>
+                  <AvatarFallback>{memberInitial(member.username)}</AvatarFallback>
                 </Avatar>
                 <span className="min-w-0 flex-1 truncate font-heading text-[14px] font-semibold tracking-[-0.005em] text-foreground">
                   {isSelf ? t("you") : member.username}
@@ -96,9 +93,9 @@ export async function CircleWeeklyFeed({
                     aria-label={tDetail("nudge", {
                       name: member.username ?? "",
                     })}
-                    className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground/60"
+                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground/60"
                   >
-                    <HeartHandshake aria-hidden className="size-3.5" />
+                    <HeartHandshake aria-hidden className="size-4" />
                   </button>
                 )}
               </div>

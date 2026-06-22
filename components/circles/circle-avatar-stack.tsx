@@ -7,13 +7,9 @@ import {
   AvatarGroupCount,
   AvatarImage,
 } from "@/components/ui/avatar";
-import type { CircleMemberPreview } from "@/lib/data/circles";
+import { memberInitial, type CircleMemberPreview } from "@/lib/data/circles";
 
 const MAX_VISIBLE = 3;
-
-function initial(name: string | null): string {
-  return name?.trim().charAt(0).toUpperCase() || "?";
-}
 
 type Props = {
   members: CircleMemberPreview[];
@@ -31,7 +27,7 @@ export function CircleAvatarStack({ members }: Props) {
           {member.avatarUrl ? (
             <AvatarImage src={member.avatarUrl} alt="" />
           ) : null}
-          <AvatarFallback>{initial(member.username)}</AvatarFallback>
+          <AvatarFallback>{memberInitial(member.username)}</AvatarFallback>
         </Avatar>
       ))}
       {overflow > 0 ? <AvatarGroupCount>+{overflow}</AvatarGroupCount> : null}
