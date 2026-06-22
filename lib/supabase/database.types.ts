@@ -780,6 +780,13 @@ export type Database = {
           status: string
         }[]
       }
+      create_circle_with_invite: {
+        Args: { p_description?: string; p_name: string }
+        Returns: {
+          circle_id: string
+          invite_code: string
+        }[]
+      }
       generate_circle_invite_code: { Args: never; Returns: string }
       get_circle_feed: {
         Args: { p_circle_id: string }
@@ -792,6 +799,18 @@ export type Database = {
           ritual_name: string
           user_id: string
           username: string
+        }[]
+      }
+      get_circle_invite_preview: {
+        Args: { p_code: string }
+        Returns: {
+          circle_id: string
+          circle_name: string
+          creator_username: string
+          description: string
+          is_expired: boolean
+          is_full: boolean
+          member_count: number
         }[]
       }
       get_circle_shared_rituals: {
@@ -814,6 +833,13 @@ export type Database = {
       is_circle_member: {
         Args: { p_circle_id: string; p_user_id?: string }
         Returns: boolean
+      }
+      redeem_circle_invite: {
+        Args: { p_code: string }
+        Returns: {
+          circle_id: string
+          status: string
+        }[]
       }
       refund_ai_credit: { Args: never; Returns: undefined }
       reset_ai_credits: { Args: never; Returns: undefined }
