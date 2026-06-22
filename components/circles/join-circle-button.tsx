@@ -42,8 +42,10 @@ export function JoinCircleButton({ variant }: Props) {
         setError(result.error);
         return;
       }
-      setOpen(false);
-      router.push(`/protected/circles/${result.data!.circleId}`);
+      if (result.data) {
+        setOpen(false);
+        router.push(`/protected/circles/${result.data.circleId}`);
+      }
     });
   };
 

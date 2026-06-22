@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { defaultLocale } from "@/i18n";
+import { defaultLocale, locales } from "@/i18n";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -13,8 +13,13 @@ import { createClient } from "@/lib/supabase/server";
  */
 export async function joinCircle(formData: FormData): Promise<void> {
   const code = formData.get("code");
+  // locale comes from an untrusted hidden field — only accept a known locale, or
+  // `/${locale}` could become a protocol-relative path (open redirect).
   const localeValue = formData.get("locale");
-  const locale = typeof localeValue === "string" ? localeValue : defaultLocale;
+  const locale =
+    typeof localeValue === "string" && locales.some((l) => l === localeValue)
+      ? localeValue
+      : defaultLocale;
   const prefix = locale === defaultLocale ? "" : `/${locale}`;
 
   if (typeof code !== "string" || code.length === 0) {
