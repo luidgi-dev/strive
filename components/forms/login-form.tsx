@@ -17,7 +17,17 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export function LoginForm({
+  className,
+  next,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'> & { next?: string }) {
+  // Open-redirect guard: only same-origin paths, and never protocol-relative.
+  const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : null
+  const target = safeNext ?? '/protected'
+  const signupHref = safeNext
+    ? `/auth/sign-up?next=${encodeURIComponent(safeNext)}`
+    : '/auth/sign-up'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -37,7 +47,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       if (error) throw error
       
       // Force a full navigation so the server reads fresh auth cookies immediately.
-      window.location.assign('/protected')
+      window.location.assign(target)
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -145,8 +155,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           <div className="mt-8 text-center">
             <p className="font-dm-sans text-sm text-muted-foreground">
               New here?{' '}
-              <Link 
-                href="/auth/sign-up" 
+              <Link
+                href={signupHref}
                 className="font-medium text-foreground underline underline-offset-4 hover:text-primary transition-colors"
               >
                 Start your arc
