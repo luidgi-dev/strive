@@ -259,6 +259,52 @@
         "title": "Circles are almost ready",
         "body": "Creating a circle and sharing an invite link arrives in the next update."
       }
+    },
+    "detail": {
+      "back": "Back",
+      "members": "{count, plural, one {# member} other {# members}}",
+      "invite": "Invite",
+      "inviteComingSoon": {
+        "title": "Invites are almost ready",
+        "body": "Sharing an invite link to your circle arrives in the next update."
+      },
+      "weekOf": "Week of {date}",
+      "feedEmpty": "No shared rituals yet. Toggle one below to share your rhythm with the circle.",
+      "mySharedRituals": "My shared rituals",
+      "sharedPrivacy": "Visible to you only. The circle sees only what you turn on.",
+      "noRituals": "You have no active rituals to share yet.",
+      "nudge": "Nudge {name}",
+      "menu": {
+        "open": "Circle options",
+        "rename": "Rename circle",
+        "leave": "Leave circle",
+        "delete": "Delete circle"
+      },
+      "rename": {
+        "title": "Rename circle",
+        "label": "Circle name",
+        "placeholder": "Circle name",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "confirm": {
+        "leaveTitle": "Leave this circle?",
+        "leaveBody": "You'll stop sharing your rhythm here and lose access to the circle's feed. You can rejoin later with an invite link.",
+        "leaveConfirm": "Leave",
+        "deleteTitle": "Delete this circle?",
+        "deleteBody": "This removes the circle for everyone and can't be undone.",
+        "deleteConfirm": "Delete",
+        "cancel": "Cancel"
+      },
+      "errors": {
+        "unauthorized": "Please sign in and try again.",
+        "unknown": "Something went wrong. Please try again.",
+        "notFound": "This circle is no longer available.",
+        "validationFailed": "Please check your input and try again.",
+        "nameRequired": "Give your circle a name.",
+        "nameTooLong": "That name is a bit too long.",
+        "ownerCannotLeave": "As the owner, delete the circle instead of leaving."
+      }
     }
   },
   "rituals": {

@@ -259,6 +259,52 @@
         "title": "Les cercles arrivent",
         "body": "La création d'un cercle et le partage du lien d'invitation arrivent dans la prochaine mise à jour."
       }
+    },
+    "detail": {
+      "back": "Retour",
+      "members": "{count, plural, one {# membre} other {# membres}}",
+      "invite": "Inviter",
+      "inviteComingSoon": {
+        "title": "Les invitations arrivent",
+        "body": "Le partage d'un lien d'invitation vers votre cercle arrive dans la prochaine mise à jour."
+      },
+      "weekOf": "Semaine du {date}",
+      "feedEmpty": "Aucun rituel partagé pour l'instant. Activez-en un ci-dessous pour partager votre rythme avec le cercle.",
+      "mySharedRituals": "Mes rituels partagés",
+      "sharedPrivacy": "Visible de vous seul. Le cercle ne voit que ce que vous activez.",
+      "noRituals": "Vous n'avez pas encore de rituel actif à partager.",
+      "nudge": "Encourager {name}",
+      "menu": {
+        "open": "Options du cercle",
+        "rename": "Renommer le cercle",
+        "leave": "Quitter le cercle",
+        "delete": "Supprimer le cercle"
+      },
+      "rename": {
+        "title": "Renommer le cercle",
+        "label": "Nom du cercle",
+        "placeholder": "Nom du cercle",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      },
+      "confirm": {
+        "leaveTitle": "Quitter ce cercle ?",
+        "leaveBody": "Vous ne partagerez plus votre rythme ici et perdrez l'accès au fil du cercle. Vous pourrez le rejoindre plus tard avec un lien d'invitation.",
+        "leaveConfirm": "Quitter",
+        "deleteTitle": "Supprimer ce cercle ?",
+        "deleteBody": "Cela supprime le cercle pour tout le monde et est irréversible.",
+        "deleteConfirm": "Supprimer",
+        "cancel": "Annuler"
+      },
+      "errors": {
+        "unauthorized": "Veuillez vous reconnecter et réessayer.",
+        "unknown": "Une erreur est survenue. Veuillez réessayer.",
+        "notFound": "Ce cercle n'est plus disponible.",
+        "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
+        "nameRequired": "Donnez un nom à votre cercle.",
+        "nameTooLong": "Ce nom est un peu trop long.",
+        "ownerCannotLeave": "En tant que propriétaire, supprimez le cercle plutôt que de le quitter."
+      }
     }
   },
   "rituals": {
