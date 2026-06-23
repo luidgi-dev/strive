@@ -84,6 +84,10 @@ export async function proxy(request: NextRequest) {
   const isAuthPage = pathAfterLocale.startsWith("/auth");
   const isProtectedRoute = pathAfterLocale.startsWith("/protected");
   const isLandingPage = pathAfterLocale === "/";
+  // `/protected` has no content of its own — it only forwards to the app home
+  // (Rhythm). We forward here, before any render, so the protected layout is
+  // never mounted on it (see the authenticated-redirect block below).
+  const isProtectedHome = pathAfterLocale === "/protected";
 
   // Auth callback routes that must never be intercepted, even when the user
   // is already logged in — consuming the token requires the page to load fully
@@ -97,12 +101,23 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Authenticated users are redirected away from landing and auth pages.
+  // Authenticated users have no use for the landing page, auth pages, or the
+  // bare `/protected` forwarder — send them straight to the app home with a
+  // clean 307. Routing through `/protected` would render the protected layout
+  // (and its unseen-nudge toast) on a throwaway page; on mount the toast fires
+  // the markNudgesSeen server action, which then races the onward client
+  // navigation to `/protected/flow` and breaks it — a standalone PWA surfaces
+  // that as a native "This page couldn't load". Redirecting before any render
+  // removes the race entirely.
   // Exception: auth callback routes (/auth/confirm, /auth/confirmed) are always
   // allowed through so the confirmation token can be consumed correctly.
-  if (user && !isAuthCallback && (isLandingPage || isAuthPage)) {
+  if (
+    user &&
+    !isAuthCallback &&
+    (isLandingPage || isAuthPage || isProtectedHome)
+  ) {
     const url = request.nextUrl.clone();
-    url.pathname = withLocale("/protected");
+    url.pathname = withLocale("/protected/flow");
     return NextResponse.redirect(url);
   }
 
