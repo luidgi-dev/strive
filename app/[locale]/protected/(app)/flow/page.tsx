@@ -25,24 +25,29 @@ export default async function RhythmPage({ params }: Props) {
   const t = await getTranslations("rhythm");
   const supabase = await createClient();
 
-  const today = await getUserToday(supabase);
-  const weekStart = startOfWeek(today);
-
-  const [{ rituals, progressByRitualId }, categories, weekLogs] =
+  // getUserToday, rituals and categories are independent — fetch them together
+  // instead of blocking the rituals/categories queries behind the timezone read.
+  const [today, { rituals, progressByRitualId }, categories] =
     await Promise.all([
+      getUserToday(supabase),
       getRitualsForActiveUser(supabase),
       getVisibleCategoriesForUser(supabase),
-      getWeekCompletedLogs(supabase, weekStart),
     ]);
 
   if (rituals.length === 0) {
     return <RhythmEmptyState categories={categories} />;
   }
 
+  const weekStart = startOfWeek(today);
   const oneTimeIds = rituals
     .filter((r) => r.ritual_type === "one_time")
     .map((r) => r.id);
-  const completedOneTimeIds = await getCompletedRitualIds(supabase, oneTimeIds);
+  // weekLogs needs weekStart, completedOneTimeIds needs the one-time ids — both
+  // are known now, so run them in parallel instead of one after the other.
+  const [weekLogs, completedOneTimeIds] = await Promise.all([
+    getWeekCompletedLogs(supabase, weekStart),
+    getCompletedRitualIds(supabase, oneTimeIds),
+  ]);
 
   const { active, done } = selectTodayRituals({
     rituals,
