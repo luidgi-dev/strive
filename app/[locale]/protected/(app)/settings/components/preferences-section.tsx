@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, MonitorSmartphone, Send, Sun } from "lucide-react";
+import { Moon, MonitorSmartphone, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -22,10 +22,8 @@ type ThemeMode = "light" | "dark" | "system";
 const KNOWN_THEMES: ReadonlySet<ThemeMode> = new Set(["light", "dark", "system"]);
 
 export function PreferencesSection({
-  showRemindersTest = false,
   isDemo = false,
 }: {
-  showRemindersTest?: boolean;
   isDemo?: boolean;
 }) {
   const t = useTranslations("settings");
@@ -113,7 +111,7 @@ export function PreferencesSection({
 
       <Divider />
 
-      <RemindersControl showRemindersTest={showRemindersTest} isDemo={isDemo} />
+      <RemindersControl isDemo={isDemo} />
     </section>
   );
 }
@@ -161,20 +159,16 @@ function Divider() {
 
 // Web Push opt-in. The toggle drives both the per-device subscription (lib/push)
 // and the account-level intent (profiles.smart_reminders_enabled, the cron's
-// kill-switch). Displayed state reflects this device's subscription. The "Send
-// test" affordance is exploration-only and only renders on dev/preview.
+// kill-switch). Displayed state reflects this device's subscription.
 function RemindersControl({
-  showRemindersTest,
   isDemo = false,
 }: {
-  showRemindersTest: boolean;
   isDemo?: boolean;
 }) {
   const tPref = useTranslations("settings.preferences");
   const locale = useLocale() as Locale;
   const [state, setState] = useState<PushState | "loading">("loading");
   const [busy, setBusy] = useState(false);
-  const [tested, setTested] = useState(false);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -196,7 +190,6 @@ function RemindersControl({
   async function toggle() {
     if (disabled) return;
     setBusy(true);
-    setTested(false);
     setFailed(false);
     try {
       if (isOn) {
@@ -225,25 +218,13 @@ function RemindersControl({
     }
   }
 
-  async function sendTest() {
-    setTested(false);
-    try {
-      const res = await fetch("/api/notifications/send", { method: "POST" });
-      setTested(res.ok);
-    } catch {
-      setTested(false);
-    }
-  }
-
   const hint = failed
     ? tPref("smartRemindersError")
     : state === "unsupported"
       ? tPref("smartRemindersUnsupported")
       : state === "denied"
         ? tPref("smartRemindersDenied")
-        : tPref("smartRemindersHint");
-
-  const showTest = isOn && showRemindersTest;
+        : "";
 
   return (
     <div className="flex flex-col gap-2">
@@ -255,7 +236,9 @@ function RemindersControl({
       >
         <div className="flex flex-col">
           <span className="text-sm">{tPref("smartReminders")}</span>
-          <span className="text-xs text-muted-foreground">{hint}</span>
+          {hint ? (
+            <span className="text-xs text-muted-foreground">{hint}</span>
+          ) : null}
         </div>
         <Switch
           checked={isOn}
@@ -265,16 +248,6 @@ function RemindersControl({
         />
       </div>
 
-      {showTest && (
-        <button
-          type="button"
-          onClick={sendTest}
-          className="inline-flex min-h-11 items-center gap-1.5 self-end rounded-md px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <Send className="size-3.5" />
-          {tested ? tPref("testSent") : tPref("sendTest")}
-        </button>
-      )}
     </div>
   );
 }

@@ -21,7 +21,10 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/80 backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
+    <nav
+      aria-label={t("ariaLabel")}
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/80 backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.75rem)]"
+    >
       <div className="flex h-16 items-center justify-around">
         {navItems.map((item) => {
           
@@ -31,6 +34,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "relative flex flex-col items-center justify-center gap-1 transition-colors min-w-[64px] min-h-[48px]",
                 isActive ? "text-foreground" : "text-muted-foreground"

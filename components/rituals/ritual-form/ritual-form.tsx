@@ -3,6 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Smile } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { safeError } from "@/lib/i18n/safe-error";
 import { useState, useTransition } from "react";
 import {
   Controller,
@@ -227,7 +229,7 @@ export function RitualForm({
           />
         </div>
         {errors.name?.message ? (
-          <p className="text-xs text-destructive">{t(`errors.${errors.name.message}`)}</p>
+          <p className="text-xs text-destructive">{safeError(t, errors.name.message)}</p>
         ) : null}
         {iconOpen ? (
           <EmojiGrid
@@ -416,7 +418,7 @@ export function RitualForm({
 
       {actionError ? (
         <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          {t(`errors.${actionError}`)}
+          {safeError(t, actionError)}
         </p>
       ) : null}
 

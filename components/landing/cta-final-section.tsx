@@ -29,7 +29,7 @@ export function CtaFinalSection({
           <Link
             href="https://github.com/luidgi-dev"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
           >
             Luidgi
