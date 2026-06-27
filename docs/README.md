@@ -11,6 +11,7 @@ Reference material for humans and agents working on Strive. Each doc has a singl
 | [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | Color tokens, spacing, typography — the visual contract |
 | [`UX_WRITING.md`](UX_WRITING.md) | Canonical terminology (Ritual, Momentum, Rhythm, The Arc…), tone, forbidden terms |
 | [`AI_SECURITY_CHECKLIST.md`](AI_SECURITY_CHECKLIST.md) | Security checklist for the AI features |
+| [`OBSERVABILITY.md`](OBSERVABILITY.md) | Sentry error monitoring — setup, config choices, source maps, Sentry→Linear triage |
 | [`assets/`](assets/) | Brand assets and visual references (manifesto, voice, color palette, app shots) |
 
 `docs/` holds **technical specs and rules** (read by anyone coding). UX artifacts — wireframes, flows, the AI-chat design rationale — live in [`../design/`](../design/). See [`../design/README.md`](../design/README.md) for the `docs/` vs `design/` split.

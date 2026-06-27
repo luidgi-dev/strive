@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 import { RouteError } from "@/components/ui/route-error";
@@ -16,6 +17,7 @@ export default function AppError({
   reset: () => void;
 }) {
   useEffect(() => {
+    Sentry.captureException(error);
     console.error("[protected/app] route error", error);
   }, [error]);
 

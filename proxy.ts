@@ -1,5 +1,7 @@
 //proxy.ts
+import * as Sentry from "@sentry/nextjs";
 import { createServerClient } from "@supabase/ssr";
+import type { User } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { defaultLocale, locales, type Locale } from "@/i18n";
@@ -76,10 +78,19 @@ export async function proxy(request: NextRequest) {
   );
 
   // Refresh the session on every request — must use getUser() (not getSession())
-  // to ensure the token is validated server-side and not just read from the cookie
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // to ensure the token is validated server-side and not just read from the cookie.
+  // Wrapped in try/catch + manual Sentry capture: Next.js 16 does not forward
+  // errors thrown inside proxy.ts to instrumentation's onRequestError
+  // (see vercel/next.js#85261), so an unhandled auth failure here would otherwise
+  // be invisible. On failure we degrade to an unauthenticated request (route
+  // protection still applies) rather than 500 every page.
+  let user: User | null = null;
+  try {
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch (error) {
+    Sentry.captureException(error);
+  }
 
   const isAuthPage = pathAfterLocale.startsWith("/auth");
   const isProtectedRoute = pathAfterLocale.startsWith("/protected");
