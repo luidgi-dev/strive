@@ -4,7 +4,9 @@
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "homeLabel": "Strive home",
+    "settingsLabel": "Settings"
   },
   "terminology": {
     "ritual": "Ritual",
@@ -51,12 +53,9 @@
       "languageEnglish": "English",
       "languageFrench": "Français",
       "smartReminders": "Smart reminders",
-      "smartRemindersHint": "Gentle nudges for your rituals and fresh insights.",
       "smartRemindersUnsupported": "Add Strive to your home screen to turn on reminders.",
       "smartRemindersDenied": "Reminders are blocked. Turn them on in your browser settings.",
-      "smartRemindersError": "Couldn't turn on reminders. Try again.",
-      "sendTest": "Send test",
-      "testSent": "Sent"
+      "smartRemindersError": "Couldn't turn on reminders. Try again."
     },
     "membership": {
       "label": "Membership",
@@ -73,19 +72,19 @@
     },
     "unlockSheet": {
       "title": "Strive plans",
-      "subtitle": "AI conversational logging stays behind Premium. The rest of Strive stays yours.",
+      "subtitle": "The whole app is yours on Lite. Premium adds always-on AI logging and your Insights.",
       "liteLabel": "Lite",
       "litePrice": "Free",
       "liteTagline": "To find your rhythm.",
       "liteBullet1": "Unlimited rituals",
-      "liteBullet2": "Classic Momentum",
+      "liteBullet2": "The Arc, Momentum, smart reminders",
       "liteBullet3": "5 AI logs / month",
       "premiumLabel": "Premium",
       "premiumPrice": "€2.99 / mo  ·  €24.99 / yr",
       "premiumTagline": "Intelligence, unfolded.",
-      "premiumBullet1": "AI conversational logging",
-      "premiumBullet2": "The Arc — 12 weeks",
-      "premiumBullet3": "Smart reminders",
+      "premiumBullet1": "AI logging, always on",
+      "premiumBullet2": "Personal Insights",
+      "premiumBullet3": "Everything in Lite",
       "lifetimeLabel": "Lifetime",
       "lifetimePrice": "€39.99 once",
       "lifetimeTagline": "Once, forever.",
@@ -100,7 +99,8 @@
       "deleteConfirmTitle": "Delete your account?",
       "deleteConfirmBody": "This permanently erases your profile, rituals and history. This cannot be undone.",
       "deleteCancel": "Keep my account",
-      "deleteConfirm": "Yes, delete"
+      "deleteConfirm": "Yes, delete",
+      "deleteError": "Couldn't delete your account. Try again."
     }
   },
   "home": {
@@ -229,7 +229,8 @@
   "navigation": {
     "flow": "Rhythm",
     "rituals": "Rituals",
-    "circles": "Circles"
+    "circles": "Circles",
+    "ariaLabel": "Main navigation"
   },
   "app": {
     "rituals": {
@@ -241,7 +242,7 @@
   },
   "circles": {
     "title": "Circles",
-    "newCircle": "New circle",
+    "newCircle": "Create",
     "demoDisabled": "Not available in demo mode.",
     "you": "you",
     "section": {
@@ -297,7 +298,7 @@
       "noLink": "No active invite link yet. Ask the circle owner to create one."
     },
     "join": {
-      "cta": "Join with a code",
+      "cta": "Join",
       "title": "Join a circle",
       "body": "Enter the invite code someone shared with you.",
       "label": "Invite code",

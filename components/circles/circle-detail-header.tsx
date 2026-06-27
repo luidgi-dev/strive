@@ -10,6 +10,8 @@ import {
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { safeError } from "@/lib/i18n/safe-error";
 import { useState, useTransition } from "react";
 
 import {
@@ -54,7 +56,7 @@ export function CircleDetailHeader({ circleId, circleName, isOwner }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const errorText = (code: string) => t(`errors.${code}`);
+  const errorText = (code: string) => safeError(t, code);
 
   const openRename = () => {
     setMenuOpen(false);

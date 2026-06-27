@@ -1,14 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 
+import { deleteAccount } from "@/app/[locale]/protected/(app)/settings/action";
 import { LogoutButton } from "@/components/forms/logout-button";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "@/lib/i18n/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
   const t = useTranslations("settings.danger");
+  const router = useRouter();
   const [confirming, setConfirming] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [done, setDone] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete() {
+    setFailed(false);
+    startTransition(async () => {
+      const res = await deleteAccount();
+      if (!res.ok) {
+        setFailed(true);
+        return;
+      }
+      // The account is gone; keep the controls disabled (the transition ends as
+      // soon as this callback returns, before navigation completes) and clear
+      // this device's session before returning to the landing page.
+      setDone(true);
+      await createClient().auth.signOut();
+      router.push("/");
+      router.refresh();
+    });
+  }
+
+  const busy = isPending || done;
 
   return (
     <section className="flex flex-col gap-3">
@@ -27,12 +54,19 @@ export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
               {t("deleteConfirmBody")}
             </p>
           </div>
+          {failed ? (
+            <p className="text-xs text-destructive">{t("deleteError")}</p>
+          ) : null}
           <div className="flex gap-2">
             <Button
               type="button"
               variant="ghost"
               className="h-10 flex-1"
-              onClick={() => setConfirming(false)}
+              disabled={busy}
+              onClick={() => {
+                setFailed(false);
+                setConfirming(false);
+              }}
             >
               {t("deleteCancel")}
             </Button>
@@ -40,13 +74,8 @@ export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
               type="button"
               variant="destructive"
               className="h-10 flex-1"
-              onClick={() => {
-                // TODO: wire delete-account server action
-                // - cascade-delete via FK from profiles.id
-                // - supabase.auth.admin.deleteUser(user.id) using a service-role client
-                // - sign out + redirect to /
-                setConfirming(false);
-              }}
+              disabled={busy}
+              onClick={handleDelete}
             >
               {t("deleteConfirm")}
             </Button>

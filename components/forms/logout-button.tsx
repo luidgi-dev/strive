@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/lib/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { type ComponentProps } from 'react'
@@ -13,8 +13,10 @@ export function LogoutButton({ children, className, ...props }: LogoutButtonProp
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
+    // Land on the marketing landing page (locale-aware router keeps the current
+    // locale) rather than the login screen, which is otherwise rarely seen.
+    router.push('/')
     router.refresh()
-    router.push('/auth/login')
   }
 
   return (

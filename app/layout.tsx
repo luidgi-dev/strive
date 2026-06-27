@@ -30,11 +30,10 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(process.env.STRIVE_LIVE_URL ?? "https://striveapp.cc"),
   title: "Strive",
   description: "Consistency over intensity.",
-  manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
     title: "Strive",
@@ -63,6 +62,17 @@ export const metadata: Metadata = {
     ],
   },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  // Locale-specific manifest so a PWA installed from /fr opens in French via its
+  // start_url instead of falling back to the default-locale home.
+  return {
+    ...baseMetadata,
+    manifest: locale === "fr" ? "/site.fr.webmanifest" : "/site.webmanifest",
+  };
+}
 
 // theme-color is intentionally not declared via the viewport export.
 // It's owned by DynamicThemeColor so the status bar follows the resolved

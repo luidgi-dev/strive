@@ -3,6 +3,8 @@
 import { Menu } from "@base-ui/react/menu";
 import { Archive, MoreHorizontal, Pencil, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { safeError } from "@/lib/i18n/safe-error";
 import { useState, useTransition } from "react";
 
 import { archiveCategory } from "@/app/[locale]/protected/(app)/rituals/actions";
@@ -106,7 +108,7 @@ export function CategoryActions({ category }: Props) {
           </p>
           {archiveError ? (
             <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {t(`category.manage.errors.${archiveError}`)}
+              {safeError(t, archiveError, "category.manage.errors")}
             </p>
           ) : null}
           <div className="mt-1 flex gap-2">

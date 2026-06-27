@@ -2,6 +2,8 @@
 
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { safeError } from "@/lib/i18n/safe-error";
 import { useState, useTransition } from "react";
 
 import {
@@ -110,7 +112,7 @@ export function CategoryFormSheet({
           />
           {error ? (
             <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {t(`category.manage.errors.${error}`)}
+              {safeError(t, error, "category.manage.errors")}
             </p>
           ) : null}
           <button
