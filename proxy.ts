@@ -143,7 +143,9 @@ export const config = {
   matcher: [
     // sw.js and site.webmanifest must be served from the root unprefixed —
     // without these exclusions the locale rewrite turns /sw.js into /en/sw.js
-    // (404), so the service worker can never register.
-    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|site\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // (404), so the service worker can never register. `_vercel` is excluded for
+    // the same reason: Vercel Web Analytics serves its script and beacons from
+    // /_vercel/insights/* and the locale rewrite would break them.
+    "/((?!_next/static|_next/image|_vercel|favicon.ico|sw\\.js|site\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
