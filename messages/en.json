@@ -40,7 +40,8 @@
       "usernameInvalid": "Use 3 to 30 letters, numbers, _ or -",
       "avatarTooLarge": "Image must be under 2 MB",
       "avatarWrongType": "Use a JPG, PNG or WebP image",
-      "uploadFailed": "Upload failed. Try again."
+      "uploadFailed": "Upload failed. Try again.",
+      "demo_restricted": "Profile editing isn't available in demo mode."
     },
     "preferences": {
       "label": "Preferences",
@@ -241,6 +242,7 @@
   "circles": {
     "title": "Circles",
     "newCircle": "New circle",
+    "demoDisabled": "Not available in demo mode.",
     "you": "you",
     "section": {
       "myCircles": "My circles"

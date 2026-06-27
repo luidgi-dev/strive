@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { LogoutButton } from "@/components/forms/logout-button";
 import { Button } from "@/components/ui/button";
 
-export function DangerZoneSection() {
+export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
   const t = useTranslations("settings.danger");
   const [confirming, setConfirming] = useState(false);
 
@@ -16,7 +16,8 @@ export function DangerZoneSection() {
         {t("logOut")}
       </LogoutButton>
 
-      {confirming ? (
+      {/* Account deletion is hidden entirely in demo mode. */}
+      {isDemo ? null : confirming ? (
         <div className="flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
           <div className="flex flex-col gap-1">
             <p className="text-sm font-medium text-foreground">

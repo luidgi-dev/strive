@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { isDemoUser } from "@/lib/demo";
 import { Link } from "@/lib/i18n/navigation";
 import type { InsightCadence } from "@/lib/insights/orchestrator";
 import { getMembership } from "@/lib/profile";
@@ -119,15 +120,22 @@ export default async function InsightsPage({ params }: Props) {
 
   // Premium gate: lite users never reach the page (the Settings link is hidden
   // for them too). This doubles as the access paywall, per the wireframe.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const membership = await getMembership();
-  if (!membership) redirect(`/${locale}/auth/login`);
-  if (membership.tier === "lite") redirect(`/${locale}/protected/settings`);
+  if (!user || !membership) redirect(`/${locale}/auth/login`);
+  // Insights is premium-gated, except for the demo account: it stays on the lite
+  // tier (so credits read cleanly as 5) but showcases Insights all the same.
+  if (membership.tier === "lite" && !isDemoUser(user.id)) {
+    redirect(`/${locale}/protected/settings`);
+  }
 
   const t = await getTranslations("insights");
   const tSettings = await getTranslations("settings");
 
   // Pure read of the cache. RLS scopes rows to the current user.
-  const supabase = await createClient();
   const { data } = await supabase
     .from("insights")
     .select(
