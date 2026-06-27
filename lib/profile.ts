@@ -1,5 +1,5 @@
 // lib/profile.ts
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 import { todayInTimeZone } from "@/lib/date";
 import type { Database } from "@/lib/supabase/database.types";
@@ -52,10 +52,22 @@ export async function ensureProfile(
   return true;
 }
 
-export async function getAuthenticatedProfile() {
-  const supabase = await createClient();
+export async function getAuthenticatedProfile(
+  client?: SupabaseClient<Database>,
+  knownUser?: User,
+) {
+  const supabase = client ?? (await createClient());
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Reuse the caller's already-validated user when provided (the protected
+  // layout validates once and passes it down) to skip a redundant getUser()
+  // round-trip to the auth server.
+  let user = knownUser ?? null;
+  if (!user) {
+    const {
+      data: { user: fetched },
+    } = await supabase.auth.getUser();
+    user = fetched;
+  }
   if (!user) return { user: null, profile: null };
 
   const { data: profile } = await supabase

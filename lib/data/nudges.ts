@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 import { startOfLocalDayIso } from "@/lib/date";
 import type { Database } from "@/lib/supabase/database.types";
@@ -21,11 +21,16 @@ export type UnseenNudge = {
  */
 export async function getUnseenNudges(
   client: SupabaseClient<Database>,
+  knownUser?: User,
 ): Promise<UnseenNudge[]> {
   try {
-    const {
-      data: { user },
-    } = await client.auth.getUser();
+    let user = knownUser ?? null;
+    if (!user) {
+      const {
+        data: { user: fetched },
+      } = await client.auth.getUser();
+      user = fetched;
+    }
     if (!user) return [];
 
     const { data, error } = await client
