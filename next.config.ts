@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
+    // Forward Sentry's trace headers to the client so App Router pageload
+    // transactions connect to the originating server trace (recommended for
+    // Next.js 15+ tracing).
+    clientTraceMetadata: ["sentry-trace", "baggage"],
   },
 };
 

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { getTranslations } from "next-intl/server";
 
 import { todayInTimeZone } from "@/lib/date";
@@ -38,6 +39,14 @@ const CHUNK_SIZE = 5;
 function parseCadence(value: string | null): InsightCadence {
   return value === "monthly" ? "monthly" : "weekly";
 }
+
+// Sentry cron monitors, one per cadence. The crontab values MUST mirror the
+// schedules in vercel.json (the source of truth) — Vercel runs crons in UTC.
+// A missed run or a thrown error/timeout marks the monitor failed in Sentry.
+const CRON_MONITORS = {
+  weekly: { slug: "insights-weekly", value: "0 6 * * 1" },
+  monthly: { slug: "insights-monthly", value: "0 7 1 * *" },
+} as const;
 
 type Translators = Record<Locale, Awaited<ReturnType<typeof getTranslations>>>;
 
@@ -101,54 +110,65 @@ export async function GET(req: Request) {
   // cards, on non-production deploys — lets us validate reception without
   // depending on real insight data.
   const force = url.searchParams.get("force") === "1" && isNonProductionEnv();
-  const supabase = createAdminClient();
 
-  const { data: users, error } = await supabase
-    .from("profiles")
-    .select("id, timezone, smart_reminders_enabled")
-    .in("tier", ["premium", "lifetime"])
-    .eq("is_active", true);
+  const monitor = CRON_MONITORS[cadence];
+  return Sentry.withMonitor(
+    monitor.slug,
+    async () => {
+      const supabase = createAdminClient();
 
-  if (error) {
-    console.error("[cron/insights] failed to list eligible users", error);
-    return new Response("Failed to list users", { status: 500 });
-  }
+      const { data: users, error } = await supabase
+        .from("profiles")
+        .select("id, timezone, smart_reminders_enabled")
+        .in("tier", ["premium", "lifetime"])
+        .eq("is_active", true);
 
-  const translators = {
-    en: await getTranslations({ locale: "en", namespace: "notifications.insightReady" }),
-    fr: await getTranslations({ locale: "fr", namespace: "notifications.insightReady" }),
-  } satisfies Translators;
-
-  let succeeded = 0;
-  let failed = 0;
-  let cards = 0;
-
-  // Fan out CHUNK_SIZE users at a time; chunks run one after another so the
-  // number of concurrent Gemini calls stays bounded.
-  for (const group of chunk(users ?? [], CHUNK_SIZE)) {
-    const results = await Promise.allSettled(
-      group.map((user) => processUser(supabase, user, cadence, translators, force)),
-    );
-    results.forEach((result, i) => {
-      if (result.status === "fulfilled") {
-        cards += result.value.generated;
-        succeeded += 1;
-      } else {
-        console.error(
-          "[cron/insights] generation failed for user",
-          group[i].id,
-          result.reason,
-        );
-        failed += 1;
+      if (error) {
+        console.error("[cron/insights] failed to list eligible users", error);
+        return new Response("Failed to list users", { status: 500 });
       }
-    });
-  }
 
-  return Response.json({
-    cadence,
-    users: users?.length ?? 0,
-    succeeded,
-    failed,
-    cards,
-  });
+      const translators = {
+        en: await getTranslations({ locale: "en", namespace: "notifications.insightReady" }),
+        fr: await getTranslations({ locale: "fr", namespace: "notifications.insightReady" }),
+      } satisfies Translators;
+
+      let succeeded = 0;
+      let failed = 0;
+      let cards = 0;
+
+      // Fan out CHUNK_SIZE users at a time; chunks run one after another so the
+      // number of concurrent Gemini calls stays bounded.
+      for (const group of chunk(users ?? [], CHUNK_SIZE)) {
+        const results = await Promise.allSettled(
+          group.map((user) => processUser(supabase, user, cadence, translators, force)),
+        );
+        results.forEach((result, i) => {
+          if (result.status === "fulfilled") {
+            cards += result.value.generated;
+            succeeded += 1;
+          } else {
+            console.error(
+              "[cron/insights] generation failed for user",
+              group[i].id,
+              result.reason,
+            );
+            failed += 1;
+          }
+        });
+      }
+
+      return Response.json({
+        cadence,
+        users: users?.length ?? 0,
+        succeeded,
+        failed,
+        cards,
+      });
+    },
+    {
+      schedule: { type: "crontab", value: monitor.value },
+      timezone: "UTC",
+    },
+  );
 }

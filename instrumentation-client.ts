@@ -12,10 +12,10 @@ Sentry.init({
   // for a preview/production split) and fall back to NODE_ENV locally.
   environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
 
-  // Errors are always captured at 100% — this only governs performance traces.
-  // Disabled for the errors-only setup; raise to ~0.2 to start sampling Web
-  // Vitals / route performance later.
-  tracesSampleRate: 0,
+  // Errors are always captured at 100%; this governs performance traces only.
+  // Sampled at 100% during the low-volume friends-and-family / perf-audit phase
+  // to get complete Web Vitals + route data — lower toward ~0.2 as traffic grows.
+  tracesSampleRate: 1,
 
   // Do not auto-attach PII (IP, headers, cookies) — GDPR-conscious default.
   // Attach a controlled user id explicitly via Sentry.setUser if a bug needs it.

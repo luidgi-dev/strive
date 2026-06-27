@@ -2,7 +2,7 @@
 
 Strive uses [Sentry](https://strive-vq.sentry.io) to capture runtime errors in production so bugs are detected proactively instead of through user reports. Org `strive-vq`, project `strive-app`, EU data region (`*.de.sentry.io`).
 
-The setup is deliberately **errors-only and privacy-conscious**: errors are captured at 100%, but performance tracing, Session Replay and PII collection are all off. Everything is reversible — see [Extending](#extending) to turn features on later.
+The setup is **privacy-conscious**: errors are captured at 100%, performance tracing is on (sampled), and cron jobs are monitored — but Session Replay and PII collection are off. Everything is reversible — see [Extending](#extending).
 
 ---
 
@@ -18,6 +18,7 @@ The setup is deliberately **errors-only and privacy-conscious**: errors are capt
 | `app/global-error.tsx` | Browser | Root-layout error boundary — calls `Sentry.captureException` |
 | `app/[locale]/protected/(app)/error.tsx` | Browser | App-section error boundary — calls `Sentry.captureException` |
 | `proxy.ts` | Server | Manual `try/catch` + `captureException` around the Supabase `getUser()` (see caveat below) |
+| `app/[locale]/api/cron/insights/route.ts` | Server | Cron handler wrapped in `Sentry.withMonitor` (see [Cron monitoring](#cron-monitoring)) |
 
 ### How capture works
 
@@ -32,7 +33,7 @@ Next.js 16 renamed `middleware.ts` to `proxy.ts` and **does not forward errors t
 
 ## Configuration choices
 
-- **`tracesSampleRate: 0`** — performance tracing off. Errors are unaffected (always 100%). Raise to `~0.2` to start sampling Web Vitals / route performance.
+- **`tracesSampleRate: 1`** — performance tracing on, sampled at 100% during the low-volume friends-and-family / perf-audit phase to get complete Web Vitals and slow-query data. Lower toward `~0.2` as traffic grows. Errors are unaffected (always 100%). `next.config.ts` also sets `experimental.clientTraceMetadata` so App Router pageload traces connect to their server trace.
 - **`sendDefaultPii: false`** — no automatic IP / headers / cookies. GDPR-conscious given the EU region and real users. Attach a controlled `user.id` explicitly via `Sentry.setUser` if a specific bug needs it.
 - **No Session Replay** — removed from the client config (bundle size + quota + privacy).
 - **`environment`** — events are tagged per environment so local dev noise stays separate from production:
@@ -54,6 +55,14 @@ The DSN is **not** a secret (it ships in the client bundle by design) and is har
 
 ---
 
+## Cron monitoring
+
+The scheduled Insights job (`app/[locale]/api/cron/insights/route.ts`) is wrapped in `Sentry.withMonitor`, with one monitor per cadence (`insights-weekly`, `insights-monthly`). Sentry flags a monitor as failed when a run is **missed**, **throws**, or **times out**. The monitors auto-create on first run from the `schedule` passed in code.
+
+The crontab values in the route **must mirror `vercel.json`** (the source of truth) — Vercel runs crons in UTC. `automaticVercelMonitors` is not used: it does not support App Router route handlers and has no effect under Turbopack.
+
+> A *handled* 500 (e.g. the user-list query fails and returns a `Response`) does not mark the monitor failed — only thrown errors, timeouts and missed runs do.
+
 ## Triage workflow — Sentry → Linear
 
 The Sentry ↔ Linear integration is configured in the Sentry dashboard (Settings → Integrations → Linear). From any Sentry issue you can **Create Linear issue**, pre-filled with the stack trace and context, so prod bugs become tracked work in one click. Currently used **manually**; a Sentry alert rule can automate "new issue → create Linear issue" later if needed (watch for noise).
@@ -70,6 +79,6 @@ There is no committed test page. To verify capture, temporarily add a route **un
 
 ## Extending
 
-- **Performance / Web Vitals** — bump `tracesSampleRate` to `~0.2` in the three config files.
+- **Tune trace sampling** — lower `tracesSampleRate` toward `~0.2` in the three config files once traffic grows.
 - **Session Replay** — re-add `Sentry.replayIntegration()` to `instrumentation-client.ts` (reassess PII first).
 - **Richer user context** — call `Sentry.setUser({ id })` after auth, keeping PII off.
