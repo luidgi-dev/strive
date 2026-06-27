@@ -277,7 +277,8 @@
         "unknown": "Something went wrong. Please try again.",
         "nameRequired": "Give your circle a name.",
         "nameTooLong": "That name is a bit too long.",
-        "noteTooLong": "That note is a bit too long."
+        "noteTooLong": "That note is a bit too long.",
+        "demo_restricted": "Creating circles isn't available in demo mode."
       }
     },
     "invite": {
@@ -310,7 +311,8 @@
         "unknown": "Something went wrong. Please try again.",
         "invalid": "This invite code is not valid.",
         "expired": "This invite link has expired. Ask for a new one.",
-        "full": "This circle is full (8 members)."
+        "full": "This circle is full (8 members).",
+        "demo_restricted": "Joining circles isn't available in demo mode."
       }
     },
     "detail": {
@@ -357,7 +359,8 @@
         "validationFailed": "Please check your input and try again.",
         "nameRequired": "Give your circle a name.",
         "nameTooLong": "That name is a bit too long.",
-        "ownerCannotLeave": "As the owner, delete the circle instead of leaving."
+        "ownerCannotLeave": "As the owner, delete the circle instead of leaving.",
+        "demo_restricted": "Circle management isn't available in demo mode."
       }
     }
   },

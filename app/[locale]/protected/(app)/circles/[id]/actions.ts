@@ -281,6 +281,7 @@ export async function generateInviteLink(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { data, error } = await supabase
     .from("circle_invites")

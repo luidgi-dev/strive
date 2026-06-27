@@ -23,8 +23,10 @@ const KNOWN_THEMES: ReadonlySet<ThemeMode> = new Set(["light", "dark", "system"]
 
 export function PreferencesSection({
   showRemindersTest = false,
+  isDemo = false,
 }: {
   showRemindersTest?: boolean;
+  isDemo?: boolean;
 }) {
   const t = useTranslations("settings");
   const tPref = useTranslations("settings.preferences");
@@ -111,7 +113,7 @@ export function PreferencesSection({
 
       <Divider />
 
-      <RemindersControl showRemindersTest={showRemindersTest} />
+      <RemindersControl showRemindersTest={showRemindersTest} isDemo={isDemo} />
     </section>
   );
 }
@@ -163,8 +165,10 @@ function Divider() {
 // test" affordance is exploration-only and only renders on dev/preview.
 function RemindersControl({
   showRemindersTest,
+  isDemo = false,
 }: {
   showRemindersTest: boolean;
+  isDemo?: boolean;
 }) {
   const tPref = useTranslations("settings.preferences");
   const locale = useLocale() as Locale;
@@ -183,7 +187,11 @@ function RemindersControl({
   // Can't toggle while loading, when the platform lacks support (e.g. iOS not
   // installed as a PWA), or when the user has hard-blocked notifications.
   const disabled =
-    busy || state === "loading" || state === "unsupported" || state === "denied";
+    isDemo ||
+    busy ||
+    state === "loading" ||
+    state === "unsupported" ||
+    state === "denied";
 
   async function toggle() {
     if (disabled) return;

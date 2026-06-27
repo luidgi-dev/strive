@@ -54,6 +54,7 @@ export default async function SettingsPage({ params }: Props) {
 
         <PreferencesSection
           showRemindersTest={process.env.VERCEL_ENV !== "production"}
+          isDemo={isDemo}
         />
 
         <MembershipSection
