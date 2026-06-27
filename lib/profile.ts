@@ -52,6 +52,14 @@ export async function ensureProfile(
   return true;
 }
 
+/**
+ * Returns the authenticated user and their `profiles` row (username, avatar).
+ *
+ * @param client - optional Supabase server client to reuse instead of creating one.
+ * @param knownUser - optional already-validated user. When provided, skips the
+ *   internal `getUser()` call — pass it from callers that have already validated
+ *   the session (e.g. the protected layout) to avoid a redundant auth round-trip.
+ */
 export async function getAuthenticatedProfile(
   client?: SupabaseClient<Database>,
   knownUser?: User,
