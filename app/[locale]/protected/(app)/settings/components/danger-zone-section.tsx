@@ -14,6 +14,7 @@ export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [done, setDone] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
@@ -24,12 +25,17 @@ export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
         setFailed(true);
         return;
       }
-      // The account is gone; clear this device's session and return to landing.
+      // The account is gone; keep the controls disabled (the transition ends as
+      // soon as this callback returns, before navigation completes) and clear
+      // this device's session before returning to the landing page.
+      setDone(true);
       await createClient().auth.signOut();
       router.push("/");
       router.refresh();
     });
   }
+
+  const busy = isPending || done;
 
   return (
     <section className="flex flex-col gap-3">
@@ -56,7 +62,7 @@ export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
               type="button"
               variant="ghost"
               className="h-10 flex-1"
-              disabled={isPending}
+              disabled={busy}
               onClick={() => {
                 setFailed(false);
                 setConfirming(false);
@@ -68,7 +74,7 @@ export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
               type="button"
               variant="destructive"
               className="h-10 flex-1"
-              disabled={isPending}
+              disabled={busy}
               onClick={handleDelete}
             >
               {t("deleteConfirm")}
