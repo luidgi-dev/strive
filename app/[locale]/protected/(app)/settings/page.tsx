@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { isDemoUser } from "@/lib/demo";
 import { Link } from "@/lib/i18n/navigation";
 import { getAuthenticatedProfile, getMembership } from "@/lib/profile";
 
@@ -23,6 +24,7 @@ export default async function SettingsPage({ params }: Props) {
   if (!user) redirect(`/${locale}/auth/login`);
 
   const t = await getTranslations("settings");
+  const isDemo = isDemoUser(user.id);
 
   const username = profile?.username ?? user.email?.split("@")[0] ?? "";
   const email = user.email ?? "";
@@ -47,10 +49,12 @@ export default async function SettingsPage({ params }: Props) {
           username={username}
           email={email}
           avatarUrl={profile?.avatar_url ?? null}
+          isDemo={isDemo}
         />
 
         <PreferencesSection
           showRemindersTest={process.env.VERCEL_ENV !== "production"}
+          isDemo={isDemo}
         />
 
         <MembershipSection
@@ -58,9 +62,10 @@ export default async function SettingsPage({ params }: Props) {
           quota={membership?.quota}
           balance={membership?.balance}
           resetAt={membership?.resetAt}
+          isDemo={isDemo}
         />
 
-        <DangerZoneSection />
+        <DangerZoneSection isDemo={isDemo} />
       </div>
     </div>
   );

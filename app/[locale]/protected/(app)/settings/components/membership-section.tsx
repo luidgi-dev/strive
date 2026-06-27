@@ -23,6 +23,8 @@ type Props = {
   balance?: number;
   quota?: number;
   resetAt?: string | Date | null;
+  /** Demo account: surface Insights even though it stays on the lite tier. */
+  isDemo?: boolean;
 };
 
 function nextResetFallback(): Date {
@@ -35,6 +37,7 @@ export function MembershipSection({
   balance = 5,
   quota = 5,
   resetAt,
+  isDemo = false,
 }: Props) {
   const t = useTranslations("settings.membership");
   const locale = useLocale();
@@ -86,8 +89,9 @@ export function MembershipSection({
         <span className="text-sm text-muted-foreground">{resetLabel}</span>
       </div>
 
-      {/* Insights is a premium surface: the link only appears for paid tiers. */}
-      {tier !== "lite" ? (
+      {/* Insights is a premium surface: the link only appears for paid tiers.
+          The demo account is an exception (it stays lite but showcases Insights). */}
+      {tier !== "lite" || isDemo ? (
         <>
           <div className="h-px bg-border" aria-hidden />
           <Link

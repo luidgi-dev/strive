@@ -15,6 +15,8 @@ type Props = {
   username: string;
   email: string;
   avatarUrl: string | null;
+  /** Demo account: profile editing is disabled (server also rejects it). */
+  isDemo?: boolean;
 };
 
 const KNOWN_PROFILE_ERRORS = new Set([
@@ -23,13 +25,19 @@ const KNOWN_PROFILE_ERRORS = new Set([
   "avatarTooLarge",
   "avatarWrongType",
   "uploadFailed",
+  "demo_restricted",
 ]);
 
 // Keep in sync with AVATAR_MAX_BYTES in ../action.ts. The client check fails fast
 // (no wasted upload of a too-large iPhone photo) before the server action runs.
 const CLIENT_AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 
-export function ProfileSection({ username, email, avatarUrl }: Props) {
+export function ProfileSection({
+  username,
+  email,
+  avatarUrl,
+  isDemo = false,
+}: Props) {
   const t = useTranslations("settings.profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,8 +124,9 @@ export function ProfileSection({ username, email, avatarUrl }: Props) {
         <button
           type="button"
           onClick={openFilePicker}
-          disabled={avatarPending}
+          disabled={avatarPending || isDemo}
           aria-label={t("editAvatar")}
+          title={isDemo ? t("demo_restricted") : undefined}
           className={cn(
             "absolute bottom-0 right-0 inline-flex size-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-colors",
             "hover:bg-muted hover:text-foreground",
@@ -193,14 +202,16 @@ export function ProfileSection({ username, email, avatarUrl }: Props) {
               <span className="font-heading text-xl font-semibold tracking-tight">
                 {username}
               </span>
-              <button
-                type="button"
-                onClick={startEdit}
-                aria-label={t("editUsername")}
-                className="absolute left-full top-1/2 ml-1 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground/60 transition-colors hover:bg-muted hover:text-muted-foreground"
-              >
-                <Pencil className="size-3.5" />
-              </button>
+              {isDemo ? null : (
+                <button
+                  type="button"
+                  onClick={startEdit}
+                  aria-label={t("editUsername")}
+                  className="absolute left-full top-1/2 ml-1 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground/60 transition-colors hover:bg-muted hover:text-muted-foreground"
+                >
+                  <Pencil className="size-3.5" />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -211,6 +222,10 @@ export function ProfileSection({ username, email, avatarUrl }: Props) {
       </div>
 
       <p className="text-sm text-muted-foreground">{email}</p>
+
+      {isDemo ? (
+        <p className="text-xs text-muted-foreground/70">{t("demo_restricted")}</p>
+      ) : null}
     </section>
   );
 }

@@ -40,7 +40,8 @@
       "usernameInvalid": "3 à 30 caractères : lettres, chiffres, _ ou -",
       "avatarTooLarge": "L'image doit faire moins de 2 Mo",
       "avatarWrongType": "Utilise une image JPG, PNG ou WebP",
-      "uploadFailed": "Échec de l'envoi. Réessaie."
+      "uploadFailed": "Échec de l'envoi. Réessaie.",
+      "demo_restricted": "L'édition du profil n'est pas disponible en mode démo."
     },
     "preferences": {
       "label": "Préférences",
@@ -241,6 +242,7 @@
   "circles": {
     "title": "Cercles",
     "newCircle": "Nouveau cercle",
+    "demoDisabled": "Indisponible en mode démo.",
     "you": "vous",
     "section": {
       "myCircles": "Mes cercles"
@@ -275,7 +277,8 @@
         "unknown": "Une erreur est survenue. Veuillez réessayer.",
         "nameRequired": "Donnez un nom à votre cercle.",
         "nameTooLong": "Ce nom est un peu trop long.",
-        "noteTooLong": "Cette note est un peu trop longue."
+        "noteTooLong": "Cette note est un peu trop longue.",
+        "demo_restricted": "La création de cercles n'est pas disponible en mode démo."
       }
     },
     "invite": {
@@ -308,7 +311,8 @@
         "unknown": "Une erreur est survenue. Veuillez réessayer.",
         "invalid": "Ce code d'invitation n'est pas valide.",
         "expired": "Ce lien d'invitation a expiré. Demandez-en un nouveau.",
-        "full": "Ce cercle est complet (8 membres)."
+        "full": "Ce cercle est complet (8 membres).",
+        "demo_restricted": "Rejoindre un cercle n'est pas disponible en mode démo."
       }
     },
     "detail": {
@@ -355,7 +359,8 @@
         "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
         "nameRequired": "Donnez un nom à votre cercle.",
         "nameTooLong": "Ce nom est un peu trop long.",
-        "ownerCannotLeave": "En tant que propriétaire, supprimez le cercle plutôt que de le quitter."
+        "ownerCannotLeave": "En tant que propriétaire, supprimez le cercle plutôt que de le quitter.",
+        "demo_restricted": "La gestion des cercles n'est pas disponible en mode démo."
       }
     }
   },

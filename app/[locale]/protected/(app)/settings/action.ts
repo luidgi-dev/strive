@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
+import { DEMO_RESTRICTED, isDemoUser } from "@/lib/demo";
 import { createClient } from "@/lib/supabase/server";
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;
@@ -40,6 +42,7 @@ export async function updateUsername(rawUsername: string): Promise<ActionResult>
   } = await supabase.auth.getUser();
 
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { error } = await supabase
     .from("profiles")
@@ -78,6 +81,7 @@ export async function updateAvatar(formData: FormData): Promise<ActionResult> {
   } = await supabase.auth.getUser();
 
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const filename = `${crypto.randomUUID()}.${ext}`;
   const path = `avatars/${user.id}/${filename}`;

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { DEMO_RESTRICTED, isDemoUser } from "@/lib/demo";
 import { locales, type Locale } from "@/lib/locales";
 import { createClient } from "@/lib/supabase/server";
 
@@ -98,6 +99,7 @@ export async function setSmartRemindersEnabled(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { error } = await supabase
     .from("profiles")
