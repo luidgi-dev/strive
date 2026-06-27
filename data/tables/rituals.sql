@@ -46,3 +46,7 @@ create policy "users can manage their own rituals"
     on rituals for all
     using (auth.uid() = user_id)
     with check (auth.uid() = user_id);
+
+-- indexes
+-- user_id: the RLS policy filters every query on auth.uid() = user_id
+create index rituals_user_id_idx on rituals (user_id);

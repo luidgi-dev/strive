@@ -4,7 +4,9 @@
     "loading": "Chargement...",
     "save": "Enregistrer",
     "cancel": "Annuler",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "homeLabel": "Accueil Strive",
+    "settingsLabel": "Paramètres"
   },
   "terminology": {
     "ritual": "Rituel",
@@ -40,7 +42,8 @@
       "usernameInvalid": "3 à 30 caractères : lettres, chiffres, _ ou -",
       "avatarTooLarge": "L'image doit faire moins de 2 Mo",
       "avatarWrongType": "Utilise une image JPG, PNG ou WebP",
-      "uploadFailed": "Échec de l'envoi. Réessaie."
+      "uploadFailed": "Échec de l'envoi. Réessaie.",
+      "demo_restricted": "L'édition du profil n'est pas disponible en mode démo."
     },
     "preferences": {
       "label": "Préférences",
@@ -50,12 +53,9 @@
       "languageEnglish": "English",
       "languageFrench": "Français",
       "smartReminders": "Rappels intelligents",
-      "smartRemindersHint": "De légers rappels pour tes rituels et tes nouveaux insights.",
       "smartRemindersUnsupported": "Ajoute Strive à ton écran d'accueil pour activer les rappels.",
       "smartRemindersDenied": "Les rappels sont bloqués. Active-les dans les réglages de ton navigateur.",
-      "smartRemindersError": "Impossible d'activer les rappels. Réessaie.",
-      "sendTest": "Envoyer un test",
-      "testSent": "Envoyé"
+      "smartRemindersError": "Impossible d'activer les rappels. Réessaie."
     },
     "membership": {
       "label": "Abonnement",
@@ -72,19 +72,19 @@
     },
     "unlockSheet": {
       "title": "Les formules Strive",
-      "subtitle": "Les logs IA conversationnels restent derrière Premium. Le reste de Strive reste à vous.",
+      "subtitle": "Toute l'app est à vous en Lite. Premium ajoute une IA toujours présente et vos Insights.",
       "liteLabel": "Lite",
       "litePrice": "Gratuit",
       "liteTagline": "Pour trouver son rythme.",
       "liteBullet1": "Rituels illimités",
-      "liteBullet2": "Momentum classique",
+      "liteBullet2": "The Arc, Momentum, rappels",
       "liteBullet3": "5 logs IA / mois",
       "premiumLabel": "Premium",
       "premiumPrice": "2,99 € / mois  ·  24,99 € / an",
       "premiumTagline": "L'intelligence, dépliée.",
-      "premiumBullet1": "Logs IA conversationnels",
-      "premiumBullet2": "The Arc — 12 semaines",
-      "premiumBullet3": "Rappels intelligents",
+      "premiumBullet1": "L'IA, toujours là",
+      "premiumBullet2": "Insights personnels",
+      "premiumBullet3": "Tout Lite",
       "lifetimeLabel": "À vie",
       "lifetimePrice": "39,99 € une fois",
       "lifetimeTagline": "Une fois, pour toujours.",
@@ -99,12 +99,13 @@
       "deleteConfirmTitle": "Supprimer votre compte ?",
       "deleteConfirmBody": "Cette action efface définitivement votre profil, vos rituels et votre historique. Elle ne peut pas être annulée.",
       "deleteCancel": "Garder mon compte",
-      "deleteConfirm": "Oui, supprimer"
+      "deleteConfirm": "Oui, supprimer",
+      "deleteError": "Impossible de supprimer votre compte. Réessayez."
     }
   },
   "home": {
     "tagline": "Une app pensée pour celles et ceux qui préfèrent",
-    "taglineEmphasis": "la régularité a l'intensité.",
+    "taglineEmphasis": "la régularité à l'intensité.",
     "cta": "Trouve ton rythme"
   },
   "landing": {
@@ -228,7 +229,8 @@
   "navigation": {
     "flow": "Rythme",
     "rituals": "Rituels",
-    "circles": "Cercles"
+    "circles": "Cercles",
+    "ariaLabel": "Navigation principale"
   },
   "app": {
     "rituals": {
@@ -240,7 +242,8 @@
   },
   "circles": {
     "title": "Cercles",
-    "newCircle": "Nouveau cercle",
+    "newCircle": "Créer",
+    "demoDisabled": "Indisponible en mode démo.",
     "you": "vous",
     "section": {
       "myCircles": "Mes cercles"
@@ -275,7 +278,8 @@
         "unknown": "Une erreur est survenue. Veuillez réessayer.",
         "nameRequired": "Donnez un nom à votre cercle.",
         "nameTooLong": "Ce nom est un peu trop long.",
-        "noteTooLong": "Cette note est un peu trop longue."
+        "noteTooLong": "Cette note est un peu trop longue.",
+        "demo_restricted": "La création de cercles n'est pas disponible en mode démo."
       }
     },
     "invite": {
@@ -294,7 +298,7 @@
       "noLink": "Aucun lien d'invitation actif. Demandez au propriétaire d'en créer un."
     },
     "join": {
-      "cta": "Rejoindre avec un code",
+      "cta": "Rejoindre",
       "title": "Rejoindre un cercle",
       "body": "Saisissez le code d'invitation qu'on vous a partagé.",
       "label": "Code d'invitation",
@@ -308,7 +312,8 @@
         "unknown": "Une erreur est survenue. Veuillez réessayer.",
         "invalid": "Ce code d'invitation n'est pas valide.",
         "expired": "Ce lien d'invitation a expiré. Demandez-en un nouveau.",
-        "full": "Ce cercle est complet (8 membres)."
+        "full": "Ce cercle est complet (8 membres).",
+        "demo_restricted": "Rejoindre un cercle n'est pas disponible en mode démo."
       }
     },
     "detail": {
@@ -355,7 +360,8 @@
         "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
         "nameRequired": "Donnez un nom à votre cercle.",
         "nameTooLong": "Ce nom est un peu trop long.",
-        "ownerCannotLeave": "En tant que propriétaire, supprimez le cercle plutôt que de le quitter."
+        "ownerCannotLeave": "En tant que propriétaire, supprimez le cercle plutôt que de le quitter.",
+        "demo_restricted": "La gestion des cercles n'est pas disponible en mode démo."
       }
     }
   },

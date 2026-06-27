@@ -22,3 +22,10 @@ create policy "users can manage their own ritual logs"
     on ritual_logs for all
     using (auth.uid() = user_id)
     with check (auth.uid() = user_id);
+
+-- indexes
+-- user_id: the RLS policy filters every query on auth.uid() = user_id
+create index ritual_logs_user_id_idx on ritual_logs (user_id);
+-- (ritual_id, logged_at): join key for the progress/summary/history views and
+-- the per-week date-range lookups (getWeekCompletedLogs)
+create index ritual_logs_ritual_id_logged_at_idx on ritual_logs (ritual_id, logged_at);

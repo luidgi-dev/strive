@@ -71,6 +71,7 @@ export default async function Home({ params }: HomePageProps) {
         }
         ctaLabel="Get early access"
         authHref={authHref}
+        demoCtaLabel="Try the demo"
       />
 
       <LandingDivider />

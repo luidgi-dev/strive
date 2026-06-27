@@ -6,6 +6,7 @@ import {
   circleCreateSchema,
   type CircleCreateValues,
 } from "@/lib/data/circles-schema";
+import { DEMO_RESTRICTED, isDemoUser } from "@/lib/demo";
 import { ensureProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
@@ -35,6 +36,7 @@ export async function createCircle(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   // Heal legacy accounts missing a profiles row, or the owner_id FK would fail.
   const healed = await ensureProfile(supabase, user);
@@ -72,6 +74,7 @@ export async function joinByCode(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { data, error } = await supabase.rpc("redeem_circle_invite", {
     p_code: code,

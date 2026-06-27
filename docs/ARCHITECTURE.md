@@ -32,7 +32,6 @@ Files use **kebab-case** (`login-form.tsx`); component identifiers stay **Pascal
 - `supabase/`
   - `client.ts` — Browser-safe Supabase client (publishable key)
   - `server.ts` — Server-side client with cookie-based session (`@supabase/ssr`)
-  - `middleware.ts` — Used by `proxy.ts` to refresh sessions on each request
 - `utils.ts` — Generic helpers (Tailwind class merging, etc.)
 
 ### `messages/` — i18n translations
@@ -92,7 +91,7 @@ See [`.github/WORKFLOWS.md`](../.github/WORKFLOWS.md).
 ## Data Flow
 
 1. **Request** hits a route under `app/[locale]/`.
-2. **Proxy** (`proxy.ts`) calls the Supabase middleware to refresh the session cookie and gate protected routes.
+2. **Proxy** (`proxy.ts`) refreshes the Supabase session cookie and gates protected routes.
 3. **Server Components** read data via `lib/supabase/server.ts` using the user's session.
 4. **Client Components** (only when interactivity is needed) read via `lib/supabase/client.ts`.
 5. **Database** enforces per-user isolation through RLS policies defined in `data/tables/*.sql`.

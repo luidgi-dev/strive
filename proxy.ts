@@ -1,5 +1,7 @@
 //proxy.ts
+import * as Sentry from "@sentry/nextjs";
 import { createServerClient } from "@supabase/ssr";
+import type { User } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { defaultLocale, locales, type Locale } from "@/i18n";
@@ -76,10 +78,19 @@ export async function proxy(request: NextRequest) {
   );
 
   // Refresh the session on every request — must use getUser() (not getSession())
-  // to ensure the token is validated server-side and not just read from the cookie
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // to ensure the token is validated server-side and not just read from the cookie.
+  // Wrapped in try/catch + manual Sentry capture: Next.js 16 does not forward
+  // errors thrown inside proxy.ts to instrumentation's onRequestError
+  // (see vercel/next.js#85261), so an unhandled auth failure here would otherwise
+  // be invisible. On failure we degrade to an unauthenticated request (route
+  // protection still applies) rather than 500 every page.
+  let user: User | null = null;
+  try {
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch (error) {
+    Sentry.captureException(error);
+  }
 
   const isAuthPage = pathAfterLocale.startsWith("/auth");
   const isProtectedRoute = pathAfterLocale.startsWith("/protected");
@@ -130,9 +141,12 @@ export async function proxy(request: NextRequest) {
  */
 export const config = {
   matcher: [
-    // sw.js and site.webmanifest must be served from the root unprefixed —
+    // sw.js and the web manifests must be served from the root unprefixed —
     // without these exclusions the locale rewrite turns /sw.js into /en/sw.js
-    // (404), so the service worker can never register.
-    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|site\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // (404), so the service worker can never register. The manifest pattern also
+    // covers the locale-specific variant (site.fr.webmanifest). `_vercel` is
+    // excluded for the same reason: Vercel Web Analytics serves its script and
+    // beacons from /_vercel/insights/* and the locale rewrite would break them.
+    "/((?!_next/static|_next/image|_vercel|favicon.ico|sw\\.js|site(?:\\.fr)?\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

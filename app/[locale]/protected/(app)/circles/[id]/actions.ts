@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { circleNameSchema } from "@/lib/data/circles-schema";
 import { startOfLocalDayIso } from "@/lib/date";
+import { DEMO_RESTRICTED, isDemoUser } from "@/lib/demo";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult<T = undefined> =
@@ -106,6 +107,7 @@ export async function renameCircle(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { data, error } = await supabase
     .from("circles")
@@ -187,6 +189,7 @@ export async function deleteCircle(circleId: string): Promise<ActionResult> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { data, error } = await supabase
     .from("circles")
@@ -278,6 +281,7 @@ export async function generateInviteLink(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { data, error } = await supabase
     .from("circle_invites")

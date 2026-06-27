@@ -1,6 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
+import { DEMO_RESTRICTED, isDemoUser } from "@/lib/demo";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;
@@ -40,6 +43,7 @@ export async function updateUsername(rawUsername: string): Promise<ActionResult>
   } = await supabase.auth.getUser();
 
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const { error } = await supabase
     .from("profiles")
@@ -78,6 +82,7 @@ export async function updateAvatar(formData: FormData): Promise<ActionResult> {
   } = await supabase.auth.getUser();
 
   if (!user) return { ok: false, error: "unauthorized" };
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
 
   const filename = `${crypto.randomUUID()}.${ext}`;
   const path = `avatars/${user.id}/${filename}`;
@@ -120,4 +125,42 @@ export async function updateAvatar(formData: FormData): Promise<ActionResult> {
     console.error("[updateAvatar] unexpected error", err);
     return { ok: false, error: "uploadFailed" };
   }
+}
+
+export async function deleteAccount(): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  // The shared demo account can never be deleted.
+  if (isDemoUser(user.id)) return { ok: false, error: DEMO_RESTRICTED };
+
+  const admin = createAdminClient();
+
+  // Best-effort: storage objects aren't covered by the DB FK cascade, so remove
+  // the user's avatar folder explicitly. A failure here must not block deletion.
+  try {
+    const { data: files } = await admin.storage
+      .from(AVATAR_BUCKET)
+      .list(`avatars/${user.id}`);
+    if (files && files.length > 0) {
+      await admin.storage
+        .from(AVATAR_BUCKET)
+        .remove(files.map((file) => `avatars/${user.id}/${file.name}`));
+    }
+  } catch (err) {
+    console.error("[deleteAccount] avatar cleanup failed", err);
+  }
+
+  // Deleting the auth user cascades through profiles (FK on delete cascade) to
+  // rituals, ritual_logs, circle memberships, etc.
+  const { error } = await admin.auth.admin.deleteUser(user.id);
+  if (error) {
+    console.error("[deleteAccount] deleteUser failed", error);
+    return { ok: false, error: "unknown" };
+  }
+
+  return { ok: true };
 }

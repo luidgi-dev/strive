@@ -47,7 +47,7 @@ export function LocaleSwitcher() {
         size="sm"
         variant={locale === "fr" ? "secondary" : "ghost"}
         onClick={() => router.push(toLocalePath(pathname, "fr"))}
-        aria-label={`${t("language")}: Francais`}
+        aria-label={`${t("language")}: Français`}
       >
         FR
       </Button>

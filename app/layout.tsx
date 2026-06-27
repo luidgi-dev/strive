@@ -1,4 +1,5 @@
 // app/layout.tsx
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { DM_Sans, Geist, Geist_Mono, Sora } from "next/font/google";
 import { getLocale } from "next-intl/server";
@@ -29,11 +30,10 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(process.env.STRIVE_LIVE_URL ?? "https://striveapp.cc"),
   title: "Strive",
   description: "Consistency over intensity.",
-  manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
     title: "Strive",
@@ -63,6 +63,17 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+
+  // Locale-specific manifest so a PWA installed from /fr opens in French via its
+  // start_url instead of falling back to the default-locale home.
+  return {
+    ...baseMetadata,
+    manifest: locale === "fr" ? "/site.fr.webmanifest" : "/site.webmanifest",
+  };
+}
+
 // theme-color is intentionally not declared via the viewport export.
 // It's owned by DynamicThemeColor so the status bar follows the resolved
 // app theme (system or user override), not just the OS media query.
@@ -90,6 +101,8 @@ export default async function RootLayout({
           <DynamicThemeColor />
           {children}
         </ThemeProvider>
+        {/* Cookieless, privacy-friendly usage analytics (visitors, page views). */}
+        <Analytics />
       </body>
     </html>
   );
