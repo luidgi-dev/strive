@@ -1,4 +1,5 @@
 // app/layout.tsx
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { DM_Sans, Geist, Geist_Mono, Sora } from "next/font/google";
 import { getLocale } from "next-intl/server";
@@ -90,6 +91,8 @@ export default async function RootLayout({
           <DynamicThemeColor />
           {children}
         </ThemeProvider>
+        {/* Cookieless, privacy-friendly usage analytics (visitors, page views). */}
+        <Analytics />
       </body>
     </html>
   );

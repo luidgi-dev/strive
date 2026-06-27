@@ -4,6 +4,8 @@ Strive uses [Sentry](https://strive-vq.sentry.io) to capture runtime errors in p
 
 The setup is **privacy-conscious**: errors are captured at 100%, performance tracing is on (sampled), and cron jobs are monitored — but Session Replay and PII collection are off. Everything is reversible — see [Extending](#extending).
 
+> **Stack boundary:** Sentry owns technical health (errors, performance/Web Vitals, cron monitoring). Product **usage** (visitors, page views, top pages) is owned by **Vercel Web Analytics** (`@vercel/analytics`, `<Analytics />` in `app/layout.tsx`) — cookieless and GDPR-friendly. `@vercel/speed-insights` is intentionally not used: Web Vitals already come from Sentry tracing.
+
 ---
 
 ## What is wired up
