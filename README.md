@@ -111,4 +111,17 @@ Reusable skill packs (e.g. Supabase Postgres best practices) live under `[.agent
 
 ## Documentation
 
-The full documentation index is `[docs/README.md](docs/README.md)`.
+The full documentation index is `[docs/README.md](docs/README.md)`. Highlights:
+
+- `[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)` — architecture & file structure
+- `[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)` — design tokens
+- `[docs/UX_WRITING.md](docs/UX_WRITING.md)` — terminology
+- `[docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)` — error monitoring & performance (Sentry)
+
+## Contributing
+
+See `[.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)`. In short: branch off `dev`, PRs target `dev`, keep TypeScript strict, and use design tokens + Strive terminology. Please also follow the `[Code of Conduct](.github/CODE_OF_CONDUCT.md)`; report vulnerabilities per the `[Security Policy](.github/SECURITY.md)`.
+
+## License
+
+`[PolyForm Noncommercial 1.0.0](LICENSE)` — © 2026 Luidgi. The source is available to read and learn from; commercial use is not permitted.
