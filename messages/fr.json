@@ -101,6 +101,26 @@
       "deleteCancel": "Garder mon compte",
       "deleteConfirm": "Oui, supprimer",
       "deleteError": "Impossible de supprimer votre compte. Réessayez."
+    },
+    "feedback": {
+      "label": "Aide",
+      "send": "Envoyer un retour",
+      "title": "Envoyer un retour",
+      "description": "Un bug repéré ou une idée ? Dites-nous tout.",
+      "close": "Fermer",
+      "tag_bug": "Bug",
+      "tag_suggestion": "Suggestion",
+      "tag_other": "Autre",
+      "titlePlaceholder": "Titre",
+      "bodyPlaceholder": "Décrivez le bug ou votre idée…",
+      "screenshot": "Ajouter une capture (optionnel)",
+      "screenshotRemove": "Retirer la capture",
+      "submit": "Envoyer le retour",
+      "success": "Retour bien reçu. Merci !",
+      "errorInvalid": "Écrivez un peu plus avant d'envoyer.",
+      "errorScreenshotTooLarge": "L'image doit faire moins de 5 Mo",
+      "errorScreenshotWrongType": "Utilisez une image JPG, PNG ou WebP",
+      "errorFailed": "Impossible d'envoyer le retour. Réessayez."
     }
   },
   "home": {
@@ -605,7 +625,7 @@
       "aiPaused": "Le moteur IA de Strive fait une courte pause. Ton accès standard reste ouvert. Les fonctionnalités IA reviendront sous 24h. Merci de ta patience.",
       "suggestions": {
         "momentum": "Où en est mon momentum cette semaine ?",
-        "log": "Enregistre ma course",
+        "create": "Crée-moi un rituel",
         "list": "Quels sont mes rituels ?"
       },
       "cards": {
