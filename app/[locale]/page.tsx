@@ -56,6 +56,8 @@ export default async function Home({ params }: HomePageProps) {
     locale === defaultLocale
       ? "/legal/privacy"
       : `/${locale}/legal/privacy`;
+  const termsHref =
+    locale === defaultLocale ? "/legal/terms" : `/${locale}/legal/terms`;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -114,6 +116,7 @@ export default async function Home({ params }: HomePageProps) {
         ctaLabel="Get early access"
         authHref={authHref}
         privacyHref={privacyHref}
+        termsHref={termsHref}
       />
     </main>
   );

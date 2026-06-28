@@ -168,6 +168,42 @@
       "changesBody": "We may update this policy as Strive evolves. Material changes will be reflected here with a new \"last updated\" date.",
       "contactTitle": "Contact",
       "contactBody": "For any privacy question or to exercise your rights, contact privacy@striveapp.cc."
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "lastUpdated": "Last updated: 28 June 2026",
+      "intro": "These Terms of Use (\"Terms\") govern your use of the Strive web application. By creating an account or using Strive, you agree to these Terms. If you do not agree, please do not use the app.",
+      "acceptanceTitle": "Acceptance",
+      "acceptanceBody": "Strive is an independent project operated by Luidgi. These Terms form an agreement between you and the operator, and work alongside our Privacy Policy, which explains how we handle your data.",
+      "accountTitle": "Your account",
+      "accountBody": "You are responsible for activity on your account and for keeping your credentials secure. Provide accurate information and tell us about any unauthorized use. You must be old enough to enter a binding agreement in your country to use Strive.",
+      "acceptableUseTitle": "Acceptable use",
+      "acceptableUseIntro": "When using Strive, you agree not to:",
+      "acceptableUseItems": [
+        "Use the app for any unlawful purpose or in breach of these Terms.",
+        "Disrupt, overload, or attempt to gain unauthorized access to the service or its systems.",
+        "Reverse-engineer, scrape, or copy the app except where the law expressly allows.",
+        "Misuse the AI assistant to generate harmful, abusive, or illegal content.",
+        "Resell, sublicense, or commercially exploit the service or its content."
+      ],
+      "aiTitle": "AI features",
+      "aiBody": "Strive includes AI-assisted features. Their output can be inaccurate or incomplete and is provided for convenience only — it is not professional, medical, or psychological advice. Use your own judgment before acting on it.",
+      "availabilityTitle": "Service availability",
+      "availabilityBody": "Strive is provided \"as is\" and \"as available\". This is an early-stage product: we make no service-level (SLA) commitment and may change, suspend, or discontinue features at any time.",
+      "ipTitle": "Intellectual property",
+      "ipBody": "The Strive app, its design, and its content are owned by the operator and protected by law (see our LICENSE). The content you create — your rituals, logs, and profile — remains yours; you grant us the limited rights needed to host and operate the service for you.",
+      "terminationTitle": "Termination",
+      "terminationBody": "You can stop using Strive and delete your account at any time from Settings → Delete account, which erases your data. We may suspend or end access if you breach these Terms or to protect the service and its users.",
+      "liabilityTitle": "Disclaimer & liability",
+      "liabilityBody": "To the extent permitted by law, Strive is provided without warranties of any kind, and the operator is not liable for indirect or consequential damages arising from your use of the app. Nothing here limits rights that cannot be limited under applicable law.",
+      "internationalTitle": "International users",
+      "internationalBody": "Strive is operated from the European Union and is primarily intended for users there. You may use it from other countries, but you do so on your own initiative and are responsible for complying with your local laws. Wherever you are, your data is processed in the EU (see our Privacy Policy).",
+      "changesTitle": "Changes to these Terms",
+      "changesBody": "We may update these Terms as Strive evolves. Material changes will be reflected here with a new \"last updated\" date; continued use after a change means you accept it.",
+      "lawTitle": "Governing law",
+      "lawBody": "These Terms are governed by French law. Mandatory consumer-protection rules of your country of residence still apply.",
+      "contactTitle": "Contact",
+      "contactBody": "Questions about these Terms? Contact contact@striveapp.cc. See also our Privacy Policy."
     }
   },
   "home": {

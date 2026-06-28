@@ -168,6 +168,42 @@
       "changesBody": "Nous pouvons mettre à jour cette politique à mesure que Strive évolue. Les changements importants seront reflétés ici avec une nouvelle date de « dernière mise à jour ».",
       "contactTitle": "Contact",
       "contactBody": "Pour toute question relative à la confidentialité ou pour exercer vos droits, écrivez à privacy@striveapp.cc."
+    },
+    "terms": {
+      "title": "Conditions d'utilisation",
+      "lastUpdated": "Dernière mise à jour : 28 juin 2026",
+      "intro": "Ces conditions d'utilisation (« Conditions ») régissent votre utilisation de l'application web Strive. En créant un compte ou en utilisant Strive, vous acceptez ces Conditions. Si vous ne les acceptez pas, n'utilisez pas l'application.",
+      "acceptanceTitle": "Acceptation",
+      "acceptanceBody": "Strive est un projet indépendant opéré par Luidgi. Ces Conditions forment un accord entre vous et l'opérateur, et s'appliquent conjointement à notre politique de confidentialité, qui explique comment nous traitons vos données.",
+      "accountTitle": "Votre compte",
+      "accountBody": "Vous êtes responsable de l'activité sur votre compte et de la sécurité de vos identifiants. Fournissez des informations exactes et signalez-nous toute utilisation non autorisée. Vous devez avoir l'âge requis pour conclure un contrat dans votre pays pour utiliser Strive.",
+      "acceptableUseTitle": "Usage acceptable",
+      "acceptableUseIntro": "En utilisant Strive, vous vous engagez à ne pas :",
+      "acceptableUseItems": [
+        "Utiliser l'application à des fins illégales ou en violation de ces Conditions.",
+        "Perturber, surcharger ou tenter d'accéder sans autorisation au service ou à ses systèmes.",
+        "Faire de l'ingénierie inverse, extraire (scraper) ou copier l'application, sauf lorsque la loi l'autorise expressément.",
+        "Détourner l'assistant IA pour générer du contenu nuisible, abusif ou illégal.",
+        "Revendre, sous-licencier ou exploiter commercialement le service ou son contenu."
+      ],
+      "aiTitle": "Fonctionnalités d'IA",
+      "aiBody": "Strive intègre des fonctionnalités assistées par IA. Leurs résultats peuvent être inexacts ou incomplets et sont fournis à titre indicatif uniquement — ce ne sont pas des conseils professionnels, médicaux ou psychologiques. Faites preuve de discernement avant d'agir sur cette base.",
+      "availabilityTitle": "Disponibilité du service",
+      "availabilityBody": "Strive est fourni « en l'état » et « selon disponibilité ». C'est un produit à un stade précoce : nous ne prenons aucun engagement de niveau de service (SLA) et pouvons modifier, suspendre ou interrompre des fonctionnalités à tout moment.",
+      "ipTitle": "Propriété intellectuelle",
+      "ipBody": "L'application Strive, son design et son contenu appartiennent à l'opérateur et sont protégés par la loi (voir notre LICENSE). Le contenu que vous créez — vos rituels, journaux et profil — reste le vôtre ; vous nous accordez les droits limités nécessaires pour héberger et faire fonctionner le service pour vous.",
+      "terminationTitle": "Résiliation",
+      "terminationBody": "Vous pouvez cesser d'utiliser Strive et supprimer votre compte à tout moment depuis Réglages → Supprimer le compte, ce qui efface vos données. Nous pouvons suspendre ou mettre fin à l'accès en cas de violation de ces Conditions ou pour protéger le service et ses utilisateurs.",
+      "liabilityTitle": "Avertissement et responsabilité",
+      "liabilityBody": "Dans la mesure permise par la loi, Strive est fourni sans aucune garantie, et l'opérateur n'est pas responsable des dommages indirects ou consécutifs découlant de votre utilisation de l'application. Rien ici ne limite les droits qui ne peuvent l'être en vertu de la loi applicable.",
+      "internationalTitle": "Utilisateurs internationaux",
+      "internationalBody": "Strive est opéré depuis l'Union européenne et destiné principalement aux utilisateurs qui s'y trouvent. Vous pouvez l'utiliser depuis d'autres pays, mais à votre propre initiative et sous votre responsabilité quant au respect de vos lois locales. Où que vous soyez, vos données sont traitées dans l'UE (voir notre politique de confidentialité).",
+      "changesTitle": "Modifications de ces Conditions",
+      "changesBody": "Nous pouvons mettre à jour ces Conditions à mesure que Strive évolue. Les changements importants seront reflétés ici avec une nouvelle date de « dernière mise à jour » ; continuer à utiliser l'app après un changement vaut acceptation.",
+      "lawTitle": "Droit applicable",
+      "lawBody": "Ces Conditions sont régies par le droit français. Les règles impératives de protection des consommateurs de votre pays de résidence restent applicables.",
+      "contactTitle": "Contact",
+      "contactBody": "Des questions sur ces Conditions ? Écrivez à contact@striveapp.cc. Voir aussi notre politique de confidentialité."
     }
   },
   "home": {

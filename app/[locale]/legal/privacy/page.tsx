@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { Link } from "@/lib/i18n/navigation";
+import { LegalList, LegalSection, LegalShell } from "@/components/legal/legal-prose";
 import { locales } from "@/lib/locales";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -26,98 +26,59 @@ export default async function PrivacyPage({ params }: Props) {
   const processorsItems = tp.raw("processorsItems") as string[];
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto w-full max-w-2xl px-6 py-16">
-        <Link
-          href="/"
-          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          {t("backHome")}
-        </Link>
+    <LegalShell
+      backLabel={t("backHome")}
+      title={tp("title")}
+      lastUpdated={tp("lastUpdated")}
+    >
+      <p>{tp("intro")}</p>
 
-        <h1 className="mt-6 font-heading text-3xl font-bold tracking-tight">
-          {tp("title")}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">{tp("lastUpdated")}</p>
+      <LegalSection title={tp("controllerTitle")}>
+        <p>{tp("controllerBody")}</p>
+      </LegalSection>
 
-        <div className="mt-8 flex flex-col gap-8 text-sm leading-relaxed">
-          <p>{tp("intro")}</p>
+      <LegalSection title={tp("dataTitle")}>
+        <p>{tp("dataIntro")}</p>
+        <LegalList items={dataItems} />
+      </LegalSection>
 
-          <Section title={tp("controllerTitle")}>
-            <p>{tp("controllerBody")}</p>
-          </Section>
+      <LegalSection title={tp("useTitle")}>
+        <p>{tp("useBody")}</p>
+      </LegalSection>
 
-          <Section title={tp("dataTitle")}>
-            <p>{tp("dataIntro")}</p>
-            <List items={dataItems} />
-          </Section>
+      <LegalSection title={tp("legalBasisTitle")}>
+        <p>{tp("legalBasisBody")}</p>
+      </LegalSection>
 
-          <Section title={tp("useTitle")}>
-            <p>{tp("useBody")}</p>
-          </Section>
+      <LegalSection title={tp("retentionTitle")}>
+        <p>{tp("retentionBody")}</p>
+      </LegalSection>
 
-          <Section title={tp("legalBasisTitle")}>
-            <p>{tp("legalBasisBody")}</p>
-          </Section>
+      <LegalSection title={tp("rightsTitle")}>
+        <p>{tp("rightsBody")}</p>
+      </LegalSection>
 
-          <Section title={tp("retentionTitle")}>
-            <p>{tp("retentionBody")}</p>
-          </Section>
+      <LegalSection title={tp("processorsTitle")}>
+        <p>{tp("processorsIntro")}</p>
+        <LegalList items={processorsItems} />
+        <p className="text-muted-foreground">{tp("processorsOutro")}</p>
+      </LegalSection>
 
-          <Section title={tp("rightsTitle")}>
-            <p>{tp("rightsBody")}</p>
-          </Section>
+      <LegalSection title={tp("cookiesTitle")}>
+        <p>{tp("cookiesBody")}</p>
+      </LegalSection>
 
-          <Section title={tp("processorsTitle")}>
-            <p>{tp("processorsIntro")}</p>
-            <List items={processorsItems} />
-            <p className="text-muted-foreground">{tp("processorsOutro")}</p>
-          </Section>
+      <LegalSection title={tp("deletionTitle")}>
+        <p>{tp("deletionBody")}</p>
+      </LegalSection>
 
-          <Section title={tp("cookiesTitle")}>
-            <p>{tp("cookiesBody")}</p>
-          </Section>
+      <LegalSection title={tp("changesTitle")}>
+        <p>{tp("changesBody")}</p>
+      </LegalSection>
 
-          <Section title={tp("deletionTitle")}>
-            <p>{tp("deletionBody")}</p>
-          </Section>
-
-          <Section title={tp("changesTitle")}>
-            <p>{tp("changesBody")}</p>
-          </Section>
-
-          <Section title={tp("contactTitle")}>
-            <p>{tp("contactBody")}</p>
-          </Section>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="flex flex-col gap-2">
-      <h2 className="font-heading text-lg font-semibold tracking-tight">
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
-
-function List({ items }: { items: string[] }) {
-  return (
-    <ul className="flex list-disc flex-col gap-1.5 pl-5 text-muted-foreground">
-      {items.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
+      <LegalSection title={tp("contactTitle")}>
+        <p>{tp("contactBody")}</p>
+      </LegalSection>
+    </LegalShell>
   );
 }

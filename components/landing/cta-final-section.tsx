@@ -6,6 +6,7 @@ type CtaFinalSectionProps = {
   ctaLabel: string;
   authHref: string;
   privacyHref: string;
+  termsHref: string;
 };
 
 export function CtaFinalSection({
@@ -13,6 +14,7 @@ export function CtaFinalSection({
   ctaLabel,
   authHref,
   privacyHref,
+  termsHref,
 }: CtaFinalSectionProps) {
   return (
     <>
@@ -42,6 +44,13 @@ export function CtaFinalSection({
             className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
           >
             Privacy
+          </Link>
+          {" · "}
+          <Link
+            href={termsHref}
+            className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
+          >
+            Terms
           </Link>
         </span>
       </footer>
