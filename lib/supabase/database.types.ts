@@ -186,6 +186,50 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          linear_issue_id: string | null
+          linear_issue_url: string | null
+          screenshot_url: string | null
+          tag: string
+          title: string | null
+          user_id: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          linear_issue_id?: string | null
+          linear_issue_url?: string | null
+          screenshot_url?: string | null
+          tag: string
+          title?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          linear_issue_id?: string | null
+          linear_issue_url?: string | null
+          screenshot_url?: string | null
+          tag?: string
+          title?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insights: {
         Row: {
           basis_label: string
