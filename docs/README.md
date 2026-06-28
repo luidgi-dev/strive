@@ -8,6 +8,8 @@ Reference material for humans and agents working on Strive. Each doc has a singl
 |---|---|
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Folder map, file conventions, where to put new code |
 | [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md) | Product overview, screens, features, behavior rules |
+| [`PITCH.md`](PITCH.md) | Presentation kit: one-liner, 30s and 2-3 min scripts (EN + FR), slide outline, deck prompt |
+| [`DEEP_DIVE.md`](DEEP_DIVE.md) | Technical deep dive: architecture diagrams, schema and momentum rationale, RLS, AI design, trade-offs |
 | [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | Color tokens, spacing, typography — the visual contract |
 | [`UX_WRITING.md`](UX_WRITING.md) | Canonical terminology (Ritual, Momentum, Rhythm, The Arc…), tone, forbidden terms |
 | [`AI_SECURITY_CHECKLIST.md`](AI_SECURITY_CHECKLIST.md) | Security checklist for the AI features |
