@@ -101,6 +101,26 @@
       "deleteCancel": "Keep my account",
       "deleteConfirm": "Yes, delete",
       "deleteError": "Couldn't delete your account. Try again."
+    },
+    "feedback": {
+      "label": "Help",
+      "send": "Send feedback",
+      "title": "Send feedback",
+      "description": "Spotted a bug or have an idea? Tell us.",
+      "close": "Close",
+      "tag_bug": "Bug",
+      "tag_suggestion": "Suggestion",
+      "tag_other": "Other",
+      "titlePlaceholder": "Title",
+      "bodyPlaceholder": "Describe the bug or your idea…",
+      "screenshot": "Add screenshot (optional)",
+      "screenshotRemove": "Remove screenshot",
+      "submit": "Send feedback",
+      "success": "Feedback received. Thanks.",
+      "errorInvalid": "Please write a bit more before sending.",
+      "errorScreenshotTooLarge": "Image must be under 5 MB",
+      "errorScreenshotWrongType": "Use a JPG, PNG or WebP image",
+      "errorFailed": "Couldn't send feedback. Try again."
     }
   },
   "home": {
@@ -605,7 +625,7 @@
       "aiPaused": "Strive's AI engine is taking a short pause. Your standard access remains open. AI features will return within 24h. Thank you for your patience.",
       "suggestions": {
         "momentum": "How am I doing this week?",
-        "log": "Log my run",
+        "create": "Create a new ritual",
         "list": "What rituals do I have?"
       },
       "cards": {
