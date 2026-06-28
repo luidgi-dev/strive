@@ -273,6 +273,12 @@ Paste the block below into Gamma.app (or Claude/Lovable) for a first draft, then
 refine for quiet-luxury polish. Angle: investor. Store the exported PDF in
 [`docs/assets/`](assets/).
 
+> For a deck that actually looks like Strive (the prompt alone tends to come out
+> too colorful), paste the self-contained **[`assets/strive-design-kit.md`](assets/strive-design-kit.md)**
+> instead, then attach the logo and screenshots it lists. It carries the full
+> brand: OLED near-monochrome palette, type, layout rules, slide content, and a
+> ready-to-paste instruction. Best for Claude design / Figma AI.
+
 ```text
 Create a minimal, "quiet luxury" pitch deck for a product called Strive, an
 AI-first habit tracker. 8 slides max. Aesthetic: OLED-dark background, lots of
