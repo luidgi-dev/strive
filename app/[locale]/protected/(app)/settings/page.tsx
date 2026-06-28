@@ -7,6 +7,7 @@ import { Link } from "@/lib/i18n/navigation";
 import { getAuthenticatedProfile, getMembership } from "@/lib/profile";
 
 import { DangerZoneSection } from "./components/danger-zone-section";
+import { FeedbackSection } from "./components/feedback-section";
 import { MembershipSection } from "./components/membership-section";
 import { PreferencesSection } from "./components/preferences-section";
 import { ProfileSection } from "./components/profile-section";
@@ -61,6 +62,8 @@ export default async function SettingsPage({ params }: Props) {
           resetAt={membership?.resetAt}
           isDemo={isDemo}
         />
+
+        <FeedbackSection isDemo={isDemo} />
 
         <DangerZoneSection isDemo={isDemo} />
       </div>
