@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
@@ -96,9 +96,10 @@ export function MembershipSection({
           <div className="h-px bg-border" aria-hidden />
           <Link
             href="/protected/settings/insights"
-            className="flex min-h-[44px] items-center justify-between gap-3 text-sm text-foreground transition-colors hover:text-muted-foreground"
+            className="flex min-h-[44px] items-center gap-3 text-sm text-foreground transition-colors hover:text-muted-foreground"
           >
-            <span>{t("myInsights")}</span>
+            <Sparkles className="size-4 text-muted-foreground" />
+            <span className="flex-1">{t("myInsights")}</span>
             <ChevronRight className="size-4 text-muted-foreground" />
           </Link>
         </>
@@ -118,10 +119,9 @@ function PlansLink({ currentTier }: { currentTier: Tier }) {
         render={
           <button
             type="button"
-            className="mt-2 inline-flex h-11 items-center justify-center gap-1 self-center px-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="mt-2 inline-flex h-11 items-center justify-center self-center px-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             {t("viewPlans")}
-            <ChevronRight className="size-3.5" />
           </button>
         }
       />
