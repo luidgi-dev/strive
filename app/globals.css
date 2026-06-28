@@ -173,3 +173,12 @@
     animation: none;
   }
 }
+
+/* While typing in the AI chat (data-chat-typing set on focus of its input), slide
+   the bottom nav off-screen so it isn't wedged between the chat input and the
+   on-screen keyboard. Restored on blur. */
+html[data-chat-typing] [data-slot="bottom-nav"] {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
