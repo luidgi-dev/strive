@@ -5,12 +5,14 @@ type CtaFinalSectionProps = {
   headline: string;
   ctaLabel: string;
   authHref: string;
+  privacyHref: string;
 };
 
 export function CtaFinalSection({
   headline,
   ctaLabel,
   authHref,
+  privacyHref,
 }: CtaFinalSectionProps) {
   return (
     <>
@@ -33,6 +35,13 @@ export function CtaFinalSection({
             className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
           >
             Luidgi
+          </Link>
+          {" · "}
+          <Link
+            href={privacyHref}
+            className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
+          >
+            Privacy
           </Link>
         </span>
       </footer>

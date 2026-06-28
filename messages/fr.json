@@ -123,6 +123,53 @@
       "errorFailed": "Impossible d'envoyer le retour. Réessayez."
     }
   },
+  "legal": {
+    "backHome": "← Retour à Strive",
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "lastUpdated": "Dernière mise à jour : 28 juin 2026",
+      "intro": "Cette politique de confidentialité explique quelles données personnelles Strive (« nous ») collecte, pourquoi, et quels sont vos droits. Elle s'applique à l'application web Strive.",
+      "controllerTitle": "Qui sommes-nous",
+      "controllerBody": "Strive est un projet indépendant opéré par Luidgi. Pour toute question relative à la confidentialité, écrivez-nous à privacy@striveapp.cc.",
+      "dataTitle": "Données que nous collectons",
+      "dataIntro": "Nous ne collectons que ce dont Strive a besoin pour fonctionner :",
+      "dataItems": [
+        "Compte — votre adresse e-mail, utilisée pour l'authentification.",
+        "Profil — votre nom d'utilisateur et, si vous en ajoutez une, une image d'avatar.",
+        "Données de rituels — les rituels que vous créez, vos journaux et les insights qui en découlent.",
+        "Usage — statistiques anonymes et sans cookies (pages vues, visites) pour comprendre l'utilisation du produit.",
+        "Technique — rapports d'erreurs et traces de performance, pour corriger les bugs et fiabiliser l'app.",
+        "Retours — tout ce que vous envoyez via le formulaire de feedback intégré, y compris une capture d'écran facultative."
+      ],
+      "useTitle": "Comment nous utilisons vos données",
+      "useBody": "Nous utilisons vos données pour fournir et sécuriser le service, générer vos fonctionnalités d'IA et vos insights, envoyer les notifications auxquelles vous consentez, corriger les bugs et améliorer Strive. Nous ne vendons jamais vos données.",
+      "legalBasisTitle": "Base légale",
+      "legalBasisBody": "Nous traitons vos données pour exécuter notre contrat avec vous (fourniture de l'app), sur la base de notre intérêt légitime (sécurité, débogage, amélioration du produit) et de votre consentement lorsque requis (par exemple, les notifications).",
+      "retentionTitle": "Conservation des données",
+      "retentionBody": "Nous conservons vos données tant que votre compte est actif. Lorsque vous supprimez votre compte, vos données personnelles sont effacées de nos systèmes (voir ci-dessous). Les statistiques anonymes et agrégées peuvent être conservées.",
+      "rightsTitle": "Vos droits",
+      "rightsBody": "Conformément au RGPD, vous pouvez accéder à vos données, les rectifier, les exporter (portabilité) ou les supprimer, vous opposer à certains traitements ou les limiter, et retirer votre consentement à tout moment. Pour exercer ces droits, utilisez les options de l'app ou contactez-nous. Vous avez aussi le droit d'introduire une réclamation auprès de votre autorité de protection des données (en France, la CNIL).",
+      "processorsTitle": "Sous-traitants tiers",
+      "processorsIntro": "Nous partageons des données avec ces sous-traitants uniquement pour faire fonctionner le service :",
+      "processorsItems": [
+        "Supabase — base de données, authentification et stockage de fichiers (hébergé dans l'UE).",
+        "Vercel — hébergement de l'application et statistiques sans cookies.",
+        "Google (Gemini) — propulse l'assistant IA ; les messages que vous lui envoyez sont traités pour générer les réponses.",
+        "Resend — envoi d'e-mails transactionnels.",
+        "Sentry — surveillance des erreurs et performance (région UE).",
+        "Stripe — traitement des paiements (uniquement si et quand des offres payantes sont activées)."
+      ],
+      "processorsOutro": "Chacun agit en tant que sous-traitant dans le cadre de son propre accord de traitement des données (DPA).",
+      "cookiesTitle": "Cookies",
+      "cookiesBody": "Strive n'utilise que des cookies strictement nécessaires — un cookie de session sécurisé pour vous garder connecté. Nos statistiques sont sans cookies et nous n'utilisons aucun cookie publicitaire ou de suivi : aucune bannière de consentement n'est donc requise.",
+      "deletionTitle": "Suppression de votre compte",
+      "deletionBody": "Vous pouvez supprimer votre compte à tout moment depuis Réglages → Supprimer le compte. Cela efface définitivement votre profil, vos rituels, vos journaux et les données associées de notre base, et retire les images téléversées du stockage.",
+      "changesTitle": "Modifications de cette politique",
+      "changesBody": "Nous pouvons mettre à jour cette politique à mesure que Strive évolue. Les changements importants seront reflétés ici avec une nouvelle date de « dernière mise à jour ».",
+      "contactTitle": "Contact",
+      "contactBody": "Pour toute question relative à la confidentialité ou pour exercer vos droits, écrivez à privacy@striveapp.cc."
+    }
+  },
   "home": {
     "tagline": "Une app pensée pour celles et ceux qui préfèrent",
     "taglineEmphasis": "la régularité à l'intensité.",

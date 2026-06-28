@@ -123,6 +123,53 @@
       "errorFailed": "Couldn't send feedback. Try again."
     }
   },
+  "legal": {
+    "backHome": "← Back to Strive",
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: 28 June 2026",
+      "intro": "This Privacy Policy explains what personal data Strive (\"we\", \"us\") collects, why, and what rights you have. It applies to the Strive web application.",
+      "controllerTitle": "Who we are",
+      "controllerBody": "Strive is an independent project operated by Luidgi. For any privacy question, contact us at privacy@striveapp.cc.",
+      "dataTitle": "Data we collect",
+      "dataIntro": "We collect only what Strive needs to work:",
+      "dataItems": [
+        "Account — your email address, used for authentication.",
+        "Profile — your username and, if you add one, an avatar image.",
+        "Ritual data — the rituals you create, your logs, and the insights generated from them.",
+        "Usage — anonymous, cookieless analytics (page views, visits) to understand product usage.",
+        "Technical — error reports and performance traces, used to fix bugs and keep the app reliable.",
+        "Feedback — anything you send through the in-app feedback form, including an optional screenshot."
+      ],
+      "useTitle": "How we use your data",
+      "useBody": "We use your data to provide and secure the service, generate your AI features and insights, send notifications you opt into, fix bugs, and improve Strive. We never sell your data.",
+      "legalBasisTitle": "Legal basis",
+      "legalBasisBody": "We process your data to perform our contract with you (providing the app), on the basis of our legitimate interest (security, debugging, product improvement), and on your consent where required (for example, notifications).",
+      "retentionTitle": "Data retention",
+      "retentionBody": "We keep your data for as long as your account is active. When you delete your account, your personal data is erased from our systems (see below). Anonymous, aggregated analytics may be retained.",
+      "rightsTitle": "Your rights",
+      "rightsBody": "Under the GDPR you can access, correct, export (portability), or delete your data, object to or restrict certain processing, and withdraw consent at any time. To exercise these rights, use the in-app controls or contact us. You also have the right to lodge a complaint with your local data protection authority (in France, the CNIL).",
+      "processorsTitle": "Third-party processors",
+      "processorsIntro": "We share data with these processors only to run the service:",
+      "processorsItems": [
+        "Supabase — database, authentication and file storage (hosted in the EU).",
+        "Vercel — application hosting and cookieless analytics.",
+        "Google (Gemini) — powers the AI assistant; messages you send to the assistant are processed to generate responses.",
+        "Resend — transactional email delivery.",
+        "Sentry — error monitoring and performance (EU region).",
+        "Stripe — payment processing (only if and when paid plans are enabled)."
+      ],
+      "processorsOutro": "Each acts as a data processor under its own Data Processing Agreement (DPA).",
+      "cookiesTitle": "Cookies",
+      "cookiesBody": "Strive uses only strictly necessary cookies — a secure session cookie to keep you signed in. Our analytics are cookieless, and we use no advertising or tracking cookies, so no cookie consent banner is required.",
+      "deletionTitle": "Deleting your account",
+      "deletionBody": "You can delete your account at any time from Settings → Delete account. This permanently erases your profile, rituals, logs and related data from our database, and removes uploaded images from storage.",
+      "changesTitle": "Changes to this policy",
+      "changesBody": "We may update this policy as Strive evolves. Material changes will be reflected here with a new \"last updated\" date.",
+      "contactTitle": "Contact",
+      "contactBody": "For any privacy question or to exercise your rights, contact privacy@striveapp.cc."
+    }
+  },
   "home": {
     "tagline": "An app designed for those who prefer",
     "taglineEmphasis": "consistency over intensity.",
