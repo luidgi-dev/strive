@@ -333,11 +333,11 @@ the prompt so the deck comes out on-brand instead of generic.
    landing uses: `rhythm-dark.png`, `the-arc-dark.png`, `ai-chat-v2-dark.png`
    (light variants too). Drop them into slides 3 and 4 as Rhythm (quick glance of
    the day), The Arc (12-week consistency), and AI chat (logging in plain
-   language). These are design mockups, not live captures; for maximum
-   credibility, swap in real screenshots from the demo account later. Any other
-   screen can be exported from its source in
-   [`../design/wireframes/`](../design/wireframes/) (21 screens; only those three
-   are pre-rendered as PNG).
+   language). A fourth export, `circle-detail-{light,dark}.png`, is available for
+   an optional "support" slide (the Circles pillar). These are design mockups,
+   not live captures; for maximum credibility, swap in real screenshots from the
+   demo account later. Any other screen can be exported from its source in
+   [`../design/wireframes/`](../design/wireframes/) (21 screens).
 5. **Tool-specific tip.**
    - **Gamma:** build a custom Theme first (logo + the colors and fonts above),
      then run the prompt so every slide inherits the brand.
