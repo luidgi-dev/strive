@@ -11,7 +11,7 @@ import { Greeting } from "./greeting";
 import { TypingIndicator } from "./typing-indicator";
 import { useVoiceRecorder } from "./use-voice-recorder";
 
-const SUGGESTION_KEYS = ["momentum", "log", "list"] as const;
+const SUGGESTION_KEYS = ["momentum", "create", "list"] as const;
 
 // Cap the auto-growing input at roughly five lines, then it scrolls internally.
 const MAX_INPUT_HEIGHT = 132;
@@ -122,6 +122,12 @@ export function StriveChat() {
     const node = scrollRef.current;
     if (node) node.scrollTo({ top: node.scrollHeight, behavior: "smooth" });
   }, [messages, isStreaming]);
+
+  // Safety net: if the chat unmounts while the input is still focused (e.g.
+  // dismissed mid-typing), clear the flag that hides the bottom nav.
+  useEffect(() => {
+    return () => document.documentElement.removeAttribute("data-chat-typing");
+  }, []);
 
   // Grow the textarea with its content (long messages stay fully visible)
   // up to MAX_INPUT_HEIGHT, after which it scrolls. Runs on every edit and
@@ -273,6 +279,14 @@ export function StriveChat() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKeyDown}
+              // Hide the bottom nav while typing so it isn't wedged between the
+              // input and the keyboard (see globals.css [data-chat-typing]).
+              onFocus={() =>
+                document.documentElement.setAttribute("data-chat-typing", "")
+              }
+              onBlur={() =>
+                document.documentElement.removeAttribute("data-chat-typing")
+              }
               placeholder={t("placeholder")}
               aria-label={t("placeholder")}
               disabled={isStreaming || isBlocked}

@@ -51,8 +51,8 @@ export function CircleCreateFlow({ onClose }: Props) {
   if (created) {
     return (
       <div className="flex flex-col gap-4">
-        <span className="mx-auto inline-flex size-12 items-center justify-center rounded-full bg-momentum/15 text-momentum">
-          <Check aria-hidden className="size-6" strokeWidth={2.5} />
+        <span className="mx-auto inline-flex size-12 items-center justify-center rounded-full bg-momentum/10 text-momentum">
+          <Check aria-hidden className="size-5" strokeWidth={2} />
         </span>
         <div className="flex flex-col gap-1 text-center">
           <SheetTitle>{t("success.title", { name: name.trim() })}</SheetTitle>
