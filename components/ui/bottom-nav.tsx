@@ -23,7 +23,8 @@ export function BottomNav() {
   return (
     <nav
       aria-label={t("ariaLabel")}
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/80 backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.75rem)]"
+      data-slot="bottom-nav"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/80 backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.75rem)] transition-[transform,opacity] duration-200"
     >
       <div className="flex h-16 items-center justify-around">
         {navItems.map((item) => {

@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Check, ImagePlus, Loader2, MessageSquare, X } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  ImagePlus,
+  Loader2,
+  MessageSquare,
+  X,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
@@ -62,10 +69,11 @@ export function FeedbackSection({ isDemo = false }: { isDemo?: boolean }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
+        className="flex min-h-[44px] w-full items-center gap-3 text-sm text-foreground transition-colors hover:text-muted-foreground"
       >
-        <MessageSquare className="size-5 text-muted-foreground" />
-        <span className="text-sm font-medium text-foreground">{t("send")}</span>
+        <MessageSquare className="size-4 text-muted-foreground" />
+        <span className="flex-1 text-left">{t("send")}</span>
+        <ChevronRight className="size-4 text-muted-foreground" />
       </button>
 
       <FeedbackSheet
