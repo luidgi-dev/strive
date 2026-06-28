@@ -11,7 +11,7 @@ import { Greeting } from "./greeting";
 import { TypingIndicator } from "./typing-indicator";
 import { useVoiceRecorder } from "./use-voice-recorder";
 
-const SUGGESTION_KEYS = ["momentum", "log", "list"] as const;
+const SUGGESTION_KEYS = ["momentum", "create", "list"] as const;
 
 // Cap the auto-growing input at roughly five lines, then it scrolls internally.
 const MAX_INPUT_HEIGHT = 132;
