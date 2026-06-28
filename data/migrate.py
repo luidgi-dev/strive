@@ -33,6 +33,7 @@ TABLES = [
     'circle_invites.sql',
     'nudges.sql',
     'circle_rituals.sql',
+    'feedback.sql',
 ]
 
 FUNCTIONS = [
