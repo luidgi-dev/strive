@@ -11,8 +11,10 @@
 -- reset follows that pattern (see design/push-notifications.md).
 --
 -- Requires the pg_cron and pg_net extensions, and a Vault secret named
--- 'cron_secret' holding `Bearer <CRON_SECRET>`'s value (the same one the reminders
--- cron uses). Enable extensions once under Database > Extensions on Supabase.
+-- 'cron_secret' holding the raw CRON_SECRET value (the same one the reminders cron
+-- uses). The 'Bearer ' prefix is prepended below, matching the reminders cron, so
+-- the route's `Authorization: Bearer <CRON_SECRET>` check passes. Enable extensions
+-- once under Database > Extensions on Supabase.
 --
 -- Apply this on its own (SQL Editor / psql -f). Replace <APP_URL> with the live
 -- origin (https://striveapp.cc) if it differs. Idempotent: re-running re-creates
@@ -33,9 +35,13 @@ select cron.schedule(
         url     := 'https://striveapp.cc/api/cron/demo-reset',
         headers := jsonb_build_object(
             'Authorization',
-            (select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret'),
+            'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret'),
             'Content-Type', 'application/json'
-        )
+        ),
+        -- The route does several delete+insert round-trips; give it well above the
+        -- 5 s pg_net default (which already timed out on the reminders cron) so the
+        -- reset completes server-side before pg_net abandons the request.
+        timeout_milliseconds := 30000
     );
     $$
 );
