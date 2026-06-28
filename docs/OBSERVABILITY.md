@@ -14,8 +14,8 @@ The setup is **privacy-conscious**: errors are captured at 100%, performance tra
 |---|---|---|
 | `instrumentation-client.ts` | Browser | `Sentry.init` for client errors; also exports `onRouterTransitionStart` |
 | `instrumentation.ts` | Server/Edge | `register()` loads the server/edge config; exports `onRequestError` (captures Server Components, route handlers, Server Actions) |
-| `sentry.server.config.ts` | Node | `Sentry.init` for the Node server runtime |
-| `sentry.edge.config.ts` | Edge | `Sentry.init` for the edge runtime |
+| `config/sentry.server.config.ts` | Node | `Sentry.init` for the Node server runtime |
+| `config/sentry.edge.config.ts` | Edge | `Sentry.init` for the edge runtime |
 | `next.config.ts` | Build | Wrapped with `withSentryConfig(...)` for source-map upload |
 | `app/global-error.tsx` | Browser | Root-layout error boundary — calls `Sentry.captureException` |
 | `app/[locale]/protected/(app)/error.tsx` | Browser | App-section error boundary — calls `Sentry.captureException` |
@@ -48,7 +48,7 @@ Next.js 16 renamed `middleware.ts` to `proxy.ts` and **does not forward errors t
 
 `withSentryConfig` uploads source maps at build time so stack traces point to the original TypeScript, not minified output. This requires `SENTRY_AUTH_TOKEN`:
 
-- **Local** — stored in `.env.sentry-build-plugin` (gitignored, created by the Sentry wizard). Only needed to test source-map upload locally; not needed for `next dev`.
+- **Local** — stored in `.env.local` as `SENTRY_AUTH_TOKEN` (gitignored). Only needed to test source-map upload locally; not needed for `next dev`.
 - **Vercel** — provided by the official [Vercel ↔ Sentry integration](https://vercel.com/integrations/sentry), which injects the token into builds and links releases to deployments.
 
 The DSN is **not** a secret (it ships in the client bundle by design) and is hardcoded in the init files — no env var needed for capture to work.

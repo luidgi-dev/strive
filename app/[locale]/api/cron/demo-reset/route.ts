@@ -8,7 +8,10 @@ import {
   DEMO_TODAY_PENDING,
 } from "@/lib/demo-data";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { TablesInsert } from "@/lib/supabase/database.types";
+import type {
+  TablesInsert,
+  TablesUpdate,
+} from "@/lib/supabase/database.types";
 
 // Runs under the service role (no user session). Force the Node runtime to match
 // the other cron routes and keep parity with their tooling.
@@ -23,9 +26,10 @@ export const maxDuration = 60;
 // Lives under `[locale]/` because proxy.ts rewrites every non-static request with
 // a locale prefix; pg_cron still calls the unprefixed `/api/cron/demo-reset`.
 //
-// Only the demo user's CURRENT-WEEK logs, AI credits and insights are reset. The
-// rituals themselves and the older log history (which feeds The Arc and the
-// frozen insights) are never touched.
+// Resets the demo user's rituals (back to the DEMO_RITUALS definition, e.g.
+// un-archived), their CURRENT-WEEK logs, AI credits and insights. The older log
+// history (which feeds The Arc and the frozen insights) and each ritual's
+// started_at anchor are left untouched.
 async function handle(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
@@ -56,8 +60,10 @@ async function handle(req: Request) {
     return new Response("Failed to clear logs", { status: 500 });
   }
 
-  // 2. Re-insert realistic current-week logs (Mon..today) from the shared
-  //    pattern. Resolve ritual ids by name so we never hardcode seeded UUIDs.
+  // 2. Resolve the demo rituals by name (so we never hardcode seeded UUIDs) and
+  //    re-flatten them to the DEMO_RITUALS definition. Visitors can archive or
+  //    edit rituals (those actions carry no demo guard) and nothing else restores
+  //    them, so the nightly reset is what keeps the showcase consistent.
   const { data: rituals, error: ritualsError } = await supabase
     .from("rituals")
     .select("id, name")
@@ -68,6 +74,54 @@ async function handle(req: Request) {
   }
   const ritualIdByName = new Map((rituals ?? []).map((r) => [r.name, r.id]));
 
+  // System ritual categories are global (user_id is null); resolve slug -> id so
+  // the reset can restore each ritual's category alongside the rest of its shape.
+  const { data: categories, error: categoriesError } = await supabase
+    .from("ritual_categories")
+    .select("id, slug")
+    .is("user_id", null);
+  if (categoriesError) {
+    console.error("[cron/demo-reset] load categories failed", categoriesError);
+    return new Response("Failed to load categories", { status: 500 });
+  }
+  const categoryIdBySlug = new Map(
+    (categories ?? []).map((c) => [c.slug, c.id]),
+  );
+
+  // Reset the editable fields to the canonical definition: un-archive, re-activate
+  // and restore category/icon/frequency/schedule. started_at is intentionally left
+  // alone so the seeded history (The Arc) keeps its anchor.
+  let ritualsReset = 0;
+  for (const def of DEMO_RITUALS) {
+    const ritualId = ritualIdByName.get(def.name);
+    if (!ritualId) continue;
+    const patch: TablesUpdate<"rituals"> = {
+      category_id: categoryIdBySlug.get(def.categorySlug) ?? null,
+      ritual_type: "recurring",
+      icon: def.icon,
+      frequency_unit: def.frequencyUnit,
+      frequency_value: def.frequencyValue,
+      scheduled_days: def.days,
+      is_active: true,
+      archived_at: null,
+      updated_at: new Date().toISOString(),
+    };
+    const { error: resetRitualError } = await supabase
+      .from("rituals")
+      .update(patch)
+      .eq("id", ritualId);
+    if (resetRitualError) {
+      console.error(
+        "[cron/demo-reset] reset ritual failed",
+        def.name,
+        resetRitualError,
+      );
+      return new Response("Failed to reset rituals", { status: 500 });
+    }
+    ritualsReset += 1;
+  }
+
+  // 3. Re-insert realistic current-week logs (Mon..today) from the shared pattern.
   const logRows: TablesInsert<"ritual_logs">[] = [];
   for (const def of DEMO_RITUALS) {
     const ritualId = ritualIdByName.get(def.name);
@@ -94,7 +148,7 @@ async function handle(req: Request) {
     }
   }
 
-  // 3. Reset AI credits to the daily demo cap. reset_at is set to tomorrow so the
+  // 4. Reset AI credits to the daily demo cap. reset_at is set to tomorrow so the
   //    Settings "resets on" label reflects the daily cadence. Note: the generic
   //    monthly reset_ai_credits() is harmless here, the lite quota is also 5.
   const { error: creditsError } = await supabase.from("user_credits").upsert(
@@ -112,7 +166,7 @@ async function handle(req: Request) {
     return new Response("Failed to reset credits", { status: 500 });
   }
 
-  // 4. Re-seed the frozen Insight Cards. Full reset (delete + insert) so a visitor
+  // 5. Re-seed the frozen Insight Cards. Full reset (delete + insert) so a visitor
   //    dismissing a card doesn't make it vanish until the next deploy. Skipped
   //    while DEMO_INSIGHTS is empty (before the one-off generation has run).
   let insightsInserted = 0;
@@ -173,6 +227,7 @@ async function handle(req: Request) {
 
   return Response.json({
     weekStart,
+    ritualsReset,
     logs: logRows.length,
     credits: 5,
     insights: insightsInserted,
