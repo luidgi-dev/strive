@@ -39,11 +39,16 @@ export function DangerZoneSection({ isDemo = false }: { isDemo?: boolean }) {
 
   return (
     <section className="flex flex-col gap-3">
+      {/* Log out is a neutral action and sits above the danger zone. */}
       <LogoutButton variant="secondary" size="lg" className="h-11 w-full">
         {t("logOut")}
       </LogoutButton>
 
-      {/* Account deletion is hidden entirely in demo mode. */}
+      {/* Danger zone: a quiet separator sets the irreversible delete apart (no
+          heavy label — the destructive styling carries the meaning). Both the
+          separator and the delete action are hidden in demo mode. */}
+      {isDemo ? null : <div className="my-2 h-px bg-border" aria-hidden />}
+
       {isDemo ? null : confirming ? (
         <div className="flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
           <div className="flex flex-col gap-1">
