@@ -11,6 +11,11 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : "";
 const supabaseWs = supabaseOrigin.replace(/^https:/, "wss:");
 
+// React + Turbopack use eval() in dev only (source maps, HMR); production React
+// never does. Allow 'unsafe-eval' in development so the CSP doesn't break the
+// dev server, while keeping the production policy free of it.
+const isDev = process.env.NODE_ENV !== "production";
+
 // Pragmatic, statically-servable CSP. 'unsafe-inline' on script-src is required
 // because Next injects inline hydration/bootstrap scripts; a strict nonce would
 // force per-request dynamic rendering (and thread through proxy.ts). The app has
@@ -20,7 +25,7 @@ const supabaseWs = supabaseOrigin.replace(/^https:/, "wss:");
 // the only cross-origin endpoints; Vercel Analytics and /api/* are same-origin.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob:${supabaseOrigin ? ` ${supabaseOrigin}` : ""}`,
   "font-src 'self'",
