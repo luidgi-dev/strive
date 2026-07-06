@@ -4,7 +4,57 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n.ts");
 
+// Supabase origin (REST/Auth/Realtime) whitelisted in the CSP. Derived from the
+// public URL so a project change only touches env, never this file. Realtime
+// needs the same host over wss://; avatars are served from its Storage domain.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : "";
+const supabaseWs = supabaseOrigin.replace(/^https:/, "wss:");
+
+// Pragmatic, statically-servable CSP. 'unsafe-inline' on script-src is required
+// because Next injects inline hydration/bootstrap scripts; a strict nonce would
+// force per-request dynamic rendering (and thread through proxy.ts). The app has
+// no user-controlled HTML (its only inline script is a static JSON-LD data
+// block, which browsers never execute), so the residual XSS risk is low.
+// Sentry (EU ingest) and Supabase are
+// the only cross-origin endpoints; Vercel Analytics and /api/* are same-origin.
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob:${supabaseOrigin ? ` ${supabaseOrigin}` : ""}`,
+  "font-src 'self'",
+  `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin} ${supabaseWs}` : ""} https://*.ingest.de.sentry.io https://*.sentry.io`,
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "upgrade-insecure-requests",
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+  },
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+];
+
 const nextConfig: NextConfig = {
+  // Drop the framework-revealing `x-powered-by: Next.js` response header.
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/(.*)", headers: securityHeaders }];
+  },
   experimental: {
     // Allow image uploads (avatar) larger than the 1 MB Server Action default.
     // iPhone photos are routinely 3-8 MB. App-level cap is 5 MB; the 10 MB
