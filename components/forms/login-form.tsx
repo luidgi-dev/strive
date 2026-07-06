@@ -45,11 +45,20 @@ export function LoginForm({
         password,
       })
       if (error) throw error
-      
+
       // Force a full navigation so the server reads fresh auth cookies immediately.
       window.location.assign(target)
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+    } catch (err: unknown) {
+      // A network/CORS failure throws a TypeError (e.g. "Failed to fetch") before
+      // Supabase can return a structured auth error. Show a human message instead
+      // of the raw fetch error, which also leaks the backend host.
+      if (err instanceof TypeError) {
+        setError("Can't reach the server right now. Check your connection and try again.")
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
     } finally {
       setIsLoading(false)
     }

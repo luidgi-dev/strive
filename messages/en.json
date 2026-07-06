@@ -104,6 +104,9 @@
       "deleteConfirm": "Yes, delete",
       "deleteError": "Couldn't delete your account. Try again."
     },
+    "help": {
+      "link": "How Strive works"
+    },
     "feedback": {
       "label": "Help",
       "send": "Send feedback",
@@ -345,6 +348,75 @@
           "answer": "Yes. Every core feature (unlimited rituals, momentum, and the twelve-week Arc) is free. The optional AI coach is the only premium addition."
         }
       ]
+    }
+  },
+  "help": {
+    "meta": {
+      "title": "How Strive works: rituals, momentum, and AI logging",
+      "description": "How to use Strive: create rituals and targets, understand momentum instead of streaks, log with the AI chat, use Circles, and install the app on iOS and Android."
+    },
+    "eyebrow": "Help",
+    "title": "How Strive works",
+    "lede": "A calm two minute tour: what you see each day, how to add rituals, how momentum works, and how to log without friction. Skim it, or jump straight to a section.",
+    "tocLabel": "On this page",
+    "rhythm": {
+      "title": "Rhythm, your day at a glance",
+      "p": [
+        "Rhythm is your home screen. It lists only the rituals due today, so you can log them in a few taps instead of scrolling your whole collection in Rituals.",
+        "As you log, each ritual slips into Done today, a quiet group at the bottom that keeps the active list short. Nothing is lost: open Done today to undo a log, or to log the same ritual again.",
+        "And yes, you can log a ritual more than once in a day. If you read twice, or trained morning and evening, log it twice. Every log counts toward that ritual's target."
+      ]
+    },
+    "rituals": {
+      "title": "Creating a ritual and setting a target",
+      "p": [
+        "A ritual is any recurring practice you want to keep: read, train, meditate, call a friend.",
+        "Create one with the Define a ritual button, from either Rituals or Rhythm. Rituals is the full library where you organise everything; Rhythm is just today's slice of it.",
+        "Give it a target that fits real life: a number of times per week or per day, not an all or nothing rule. A target of four times a week leaves room to rest without breaking anything.",
+        "Rituals sit in categories so both screens stay calm and readable. Edit or archive a ritual anytime from its card. Nothing is ever locked in."
+      ]
+    },
+    "momentum": {
+      "title": "Momentum, not streaks",
+      "p": [
+        "Momentum is Strive's measure of consistency. It builds as you log and eases down gently when you rest. It never resets to zero after a single missed day.",
+        "That is the whole difference from a streak app: one off day does not erase your progress. What counts is the overall rhythm across the week and the month.",
+        "Open any ritual to see The Arc: twelve weeks of consistency at a glance, so you read the trend instead of chasing a number."
+      ]
+    },
+    "logging": {
+      "title": "Logging with the AI chat",
+      "intro": "The fastest way to log is to say what you did, in your own words. You can also ask about your week. Open the chat and type or dictate naturally.",
+      "examples": [
+        "Logged reading and meditation",
+        "What have I done this week?",
+        "What's left to log today?"
+      ],
+      "after": "Strive logs the right rituals, marks a rest day as rest rather than a miss, and answers questions about your progress. You can always log in one tap from a ritual's card too; the chat is there for the days when a sentence is quicker.",
+      "note": "Creating and tracking rituals is always free. AI logging beyond the free monthly quota is part of Premium."
+    },
+    "circles": {
+      "title": "Circles",
+      "p": [
+        "Circles are small groups, up to eight people, where you share the rituals you choose and see each other's momentum for the week.",
+        "Create a circle from the Circles tab and share the invite link, or join one with a code. You decide which rituals are visible; nothing is shared by default.",
+        "Send a nudge to encourage someone. It is the only notification a circle sends. No pressure, no leaderboards."
+      ]
+    },
+    "install": {
+      "title": "Installing Strive on your phone",
+      "intro": "Strive is a PWA, so it installs like a native app straight from the browser, with no app store. Once installed it opens full screen and can send reminders.",
+      "steps": [
+        {
+          "label": "iOS · Safari",
+          "text": "Tap Share, then Add to Home Screen, then Add."
+        },
+        {
+          "label": "Android · Chrome",
+          "text": "Tap the menu (three dots), then Add to Home Screen or Install app, then confirm."
+        }
+      ],
+      "after": "You can also reach these steps anytime from the install button in the app."
     }
   },
   "auth": {

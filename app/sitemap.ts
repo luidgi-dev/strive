@@ -4,8 +4,8 @@ import { locales } from "@/lib/locales";
 import { localeAlternates, localizedUrl } from "@/lib/seo";
 
 // Public, indexable routes (locale-agnostic paths). Auth/protected/api are
-// excluded via robots.ts. `/help` lands in Lot 3.
-const publicPaths = ["", "/legal/privacy", "/legal/terms"] as const;
+// excluded via robots.ts.
+const publicPaths = ["", "/help", "/legal/privacy", "/legal/terms"] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return publicPaths.flatMap((path) => {
