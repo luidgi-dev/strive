@@ -43,7 +43,7 @@ export function CategorySection({ title, count, category, children }: Props) {
               )}
             />
             {!open ? (
-              <span className="font-medium tracking-normal tabular-nums text-muted-foreground/70">
+              <span className="font-medium tracking-normal tabular-nums text-muted-foreground">
                 {count}
               </span>
             ) : null}

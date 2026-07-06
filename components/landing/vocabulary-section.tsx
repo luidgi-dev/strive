@@ -23,7 +23,7 @@ export function VocabularySection({
       <div className="space-y-6">
         {items.map((item) => (
           <div key={item.to} className="group flex items-start gap-6">
-            <span className="min-w-[120px] pt-0.5 text-right font-sans text-sm text-muted-foreground/60 line-through">
+            <span className="min-w-[120px] pt-0.5 text-right font-sans text-sm text-muted-foreground line-through">
               {item.from}
             </span>
             <div>

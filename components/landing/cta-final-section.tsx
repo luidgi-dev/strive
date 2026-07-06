@@ -23,7 +23,9 @@ export function CtaFinalSection({
           {headline}
         </h2>
         <Button className="h-14 rounded-full px-10 text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]">
-          <Link href={authHref}>{ctaLabel}</Link>
+          <Link href={authHref} prefetch={false}>
+            {ctaLabel}
+          </Link>
         </Button>
       </section>
 

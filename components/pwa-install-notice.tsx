@@ -2,11 +2,13 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { Download, MoreVertical, SquarePlus, Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetDescription,
   SheetTitle,
@@ -36,6 +38,7 @@ const getPlatformSnapshot = (): Platform =>
 const getPlatformServerSnapshot = (): Platform => "ios";
 
 export function PwaInstallNotice() {
+  const tCommon = useTranslations("common");
   const isStandalone = useSyncExternalStore(
     subscribeStandalone,
     getStandaloneSnapshot,
@@ -89,7 +92,10 @@ export function PwaInstallNotice() {
       />
       <SheetContent>
         <div className="mx-auto w-full max-w-md space-y-4">
-          <SheetTitle>Install Strive on your phone</SheetTitle>
+          <header className="flex items-center justify-between gap-3">
+            <SheetTitle>Install Strive on your phone</SheetTitle>
+            <SheetCloseButton label={tCommon("close")} className="shrink-0" />
+          </header>
           <SheetDescription>
             Get the full app experience. No browser chrome.
           </SheetDescription>

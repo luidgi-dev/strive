@@ -91,6 +91,15 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
 
+  // Session Replay is never configured (see instrumentation-client.ts), yet the
+  // default client SDK still bundles its runtime. Tree-shake it out to trim the
+  // client bundle that loads on every page, including the marketing landing.
+  bundleSizeOptimizations: {
+    excludeReplayShadowDom: true,
+    excludeReplayIframe: true,
+    excludeReplayWorker: true,
+  },
+
   // No tunnelRoute: it would need a non-locale-prefixed path that our proxy.ts
   // rewrites (e.g. /monitoring -> /en/monitoring), which breaks client error
   // reporting. Revisit (and exclude the route from the proxy matcher) only if

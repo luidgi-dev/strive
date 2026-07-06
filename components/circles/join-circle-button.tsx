@@ -1,6 +1,5 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { safeError } from "@/lib/i18n/safe-error";
@@ -10,7 +9,7 @@ import { joinByCode } from "@/app/[locale]/protected/(app)/circles/actions";
 import { Input } from "@/components/ui/input";
 import {
   Sheet,
-  SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -72,12 +71,7 @@ export function JoinCircleButton({ variant }: Props) {
         <SheetContent>
           <header className="flex items-center justify-between gap-3 pb-1">
             <SheetTitle>{t("title")}</SheetTitle>
-            <SheetClose
-              aria-label={t("close")}
-              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <X aria-hidden className="size-4" />
-            </SheetClose>
+            <SheetCloseButton label={t("close")} />
           </header>
           <p className="text-sm text-muted-foreground">{t("body")}</p>
           <Input

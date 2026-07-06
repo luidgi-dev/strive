@@ -7,7 +7,6 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
-  X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -20,7 +19,7 @@ import {
   renameCircle,
 } from "@/app/[locale]/protected/(app)/circles/[id]/actions";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetCloseButton, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Link, useRouter } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -144,12 +143,7 @@ export function CircleDetailHeader({ circleId, circleName, isOwner }: Props) {
         <SheetContent>
           <header className="flex items-center justify-between gap-3 pb-1">
             <SheetTitle>{t("rename.title")}</SheetTitle>
-            <SheetClose
-              aria-label={t("rename.cancel")}
-              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <X aria-hidden className="size-4" />
-            </SheetClose>
+            <SheetCloseButton label={t("rename.cancel")} />
           </header>
           <Input
             value={name}
@@ -192,12 +186,7 @@ export function CircleDetailHeader({ circleId, circleName, isOwner }: Props) {
                 ? t("confirm.deleteTitle")
                 : t("confirm.leaveTitle")}
             </SheetTitle>
-            <SheetClose
-              aria-label={t("confirm.cancel")}
-              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <X aria-hidden className="size-4" />
-            </SheetClose>
+            <SheetCloseButton label={t("confirm.cancel")} />
           </header>
           <p className="text-sm text-muted-foreground">
             {confirm === "delete"

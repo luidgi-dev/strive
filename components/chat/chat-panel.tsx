@@ -70,7 +70,7 @@ export function ChatPanel() {
             </DialogPrimitive.Title>
             <DialogPrimitive.Close
               aria-label={t("closeLabel")}
-              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="relative flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors after:absolute after:-inset-1.5 after:content-[''] hover:bg-accent hover:text-foreground"
             >
               <X aria-hidden className="size-[18px]" strokeWidth={1.75} />
             </DialogPrimitive.Close>

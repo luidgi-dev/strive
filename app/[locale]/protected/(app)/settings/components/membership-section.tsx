@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
+  SheetCloseButton,
   SheetContent,
   SheetDescription,
   SheetTitle,
@@ -166,9 +167,12 @@ function UnlockSheetBody({ currentTier }: { currentTier: Tier }) {
 
   return (
     <SheetContent>
-      <div className="flex flex-col gap-1.5">
-        <SheetTitle>{t("title")}</SheetTitle>
-        <SheetDescription>{t("subtitle")}</SheetDescription>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-1.5">
+          <SheetTitle>{t("title")}</SheetTitle>
+          <SheetDescription>{t("subtitle")}</SheetDescription>
+        </div>
+        <SheetCloseButton label={t("close")} className="mt-0.5 shrink-0" />
       </div>
 
       <div className="flex flex-col gap-2">

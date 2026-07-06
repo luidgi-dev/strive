@@ -7,13 +7,12 @@ import {
   ImagePlus,
   Loader2,
   MessageSquare,
-  X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
   Sheet,
-  SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetDescription,
   SheetTitle,
@@ -207,12 +206,7 @@ function FeedbackSheet({
             <SheetTitle>{t("title")}</SheetTitle>
             <SheetDescription>{t("description")}</SheetDescription>
           </div>
-          <SheetClose
-            aria-label={t("close")}
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <X aria-hidden className="size-4" />
-          </SheetClose>
+          <SheetCloseButton label={t("close")} className="shrink-0" />
         </header>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

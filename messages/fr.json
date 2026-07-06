@@ -4,6 +4,7 @@
     "loading": "Chargement...",
     "save": "Enregistrer",
     "cancel": "Annuler",
+    "close": "Fermer",
     "delete": "Supprimer",
     "homeLabel": "Accueil Strive",
     "settingsLabel": "Paramètres"
@@ -73,6 +74,7 @@
     "unlockSheet": {
       "title": "Les formules Strive",
       "subtitle": "Toute l'app est à vous en Lite. Premium ajoute une IA toujours présente et vos Insights.",
+      "close": "Fermer",
       "liteLabel": "Lite",
       "litePrice": "Gratuit",
       "liteTagline": "Pour trouver son rythme.",
@@ -214,8 +216,8 @@
   "landing": {
     "meta": {
       "logoAlt": "Logo Strive",
-      "title": "Strive : suivi d'habitudes et de rituels, en souplesse",
-      "description": "Strive est un suivi d'habitudes et de rituels apaisé, fondé sur le momentum plutôt que sur les séries. Notez vos rituels en langage naturel, un coach IA entretient votre régularité.",
+      "title": "Strive : suivi d'habitudes flexible, propulsé par l'IA",
+      "description": "Strive est un suivi d'habitudes apaisé et flexible, fondé sur le momentum plutôt que sur les séries. Notez vos rituels en langage naturel, un coach IA entretient votre régularité.",
       "keywords": [
         "suivi d'habitudes",
         "suivi de rituels",
@@ -458,6 +460,11 @@
       },
       "weekOf": "Semaine du {date}",
       "feedEmpty": "Aucun rituel partagé pour l'instant. Activez-en un ci-dessous pour partager votre rythme avec le cercle.",
+      "feedStatus": {
+        "on_track": "Sur la lancée",
+        "steady": "Régulier",
+        "resting": "En repos"
+      },
       "mySharedRituals": "Mes rituels partagés",
       "sharedPrivacy": "Visible de vous seul. Le cercle ne voit que ce que vous activez.",
       "noRituals": "Vous n'avez pas encore de rituel actif à partager.",

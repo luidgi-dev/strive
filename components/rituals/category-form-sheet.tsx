@@ -1,6 +1,5 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { safeError } from "@/lib/i18n/safe-error";
@@ -12,7 +11,7 @@ import {
 } from "@/app/[locale]/protected/(app)/rituals/actions";
 import {
   Sheet,
-  SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -83,12 +82,7 @@ export function CategoryFormSheet({
       <SheetContent>
         <header className="flex items-center justify-between gap-3 pb-1">
           <SheetTitle>{title}</SheetTitle>
-          <SheetClose
-            aria-label={t("form.actions.close")}
-            className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <X aria-hidden className="size-4" />
-          </SheetClose>
+          <SheetCloseButton label={t("form.actions.close")} />
         </header>
         <form
           onSubmit={(e) => {

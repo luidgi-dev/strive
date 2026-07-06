@@ -52,13 +52,15 @@ export function HeroSection({
         {tagline}
       </p>
       {subline ? (
-        <p className="mt-4 max-w-md font-sans text-sm text-muted-foreground/70">
+        <p className="mt-4 max-w-md font-sans text-sm text-muted-foreground">
           {subline}
         </p>
       ) : null}
       <div className="mt-12 flex flex-col items-center gap-5">
         <Button className="h-14 rounded-full px-10 text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]">
-          <Link href={authHref}>{ctaLabel}</Link>
+          <Link href={authHref} prefetch={false}>
+            {ctaLabel}
+          </Link>
         </Button>
         {demoCtaLabel ? (
           <form action={signInAsDemo}>

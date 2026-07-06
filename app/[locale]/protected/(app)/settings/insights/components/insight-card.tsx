@@ -53,7 +53,7 @@ export function InsightCard({
       </p>
 
       <div className="flex items-center justify-between gap-3 pt-1">
-        <span className="text-[10.5px] font-semibold uppercase tracking-[0.04em] text-muted-foreground/80">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.04em] text-muted-foreground">
           {t("basis.lastNWeeks", { count: card.basisWeeks })}
         </span>
         <button

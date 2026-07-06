@@ -22,7 +22,7 @@ export function AiConversationSection({
     <LandingSection>
       <LandingEyebrow>{eyebrow}</LandingEyebrow>
       <LandingSectionTitle>{title}</LandingSectionTitle>
-      <div className="mb-12 space-y-5 font-sans text-base leading-relaxed text-foreground/80 md:text-lg">
+      <div className="mb-12 space-y-5 font-sans text-base leading-relaxed text-foreground/85 md:text-lg">
         {paragraphs.map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
         ))}

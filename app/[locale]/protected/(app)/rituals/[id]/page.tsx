@@ -154,12 +154,12 @@ export default async function RitualDetailPage({ params, searchParams }: Props) 
             {subtitle}
           </span>
           {ritual.description ? (
-            <p className="text-[13px] leading-snug text-muted-foreground/80">
+            <p className="text-[13px] leading-snug text-muted-foreground">
               {ritual.description}
             </p>
           ) : null}
           {archivedLabel ? (
-            <span className="text-[12px] font-medium leading-snug text-muted-foreground/70">
+            <span className="text-[12px] font-medium leading-snug text-muted-foreground">
               {archivedLabel}
             </span>
           ) : null}

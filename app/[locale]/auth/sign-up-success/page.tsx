@@ -45,7 +45,7 @@ export default async function SignUpSuccessPage({ params }: SignUpSuccessPagePro
             </p>
 
             <div className="pt-2">
-              <p className="font-dm-sans text-xs text-muted-foreground/60 italic">
+              <p className="font-dm-sans text-xs text-muted-foreground italic">
                 {t("signupSuccessHint")}
               </p>
             </div>
