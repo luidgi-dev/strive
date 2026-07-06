@@ -124,13 +124,20 @@ export async function CircleWeeklyFeed({
                         </span>
                       </span>
                     ) : null}
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "size-1.5 shrink-0 rounded-full",
-                        STATUS_DOT[ritual.status],
-                      )}
-                    />
+                    <span className="flex shrink-0 items-center">
+                      {/* Status is conveyed by dot color; expose it to assistive
+                          tech so it is not color-only (RGAA 3.1 / WCAG 1.4.1). */}
+                      <span className="sr-only">
+                        {tDetail(`feedStatus.${ritual.status}`)}
+                      </span>
+                      <span
+                        aria-hidden
+                        className={cn(
+                          "size-1.5 rounded-full",
+                          STATUS_DOT[ritual.status],
+                        )}
+                      />
+                    </span>
                   </li>
                 ))}
               </ul>

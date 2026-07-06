@@ -203,7 +203,7 @@ function DayCell({ day, letter }: { day: ArcDay; letter: string }) {
           day.status === "logged" || day.isToday
             ? "text-foreground"
             : day.status === "future"
-              ? "text-muted-foreground/55"
+              ? "text-muted-foreground"
               : "text-muted-foreground",
         )}
       >

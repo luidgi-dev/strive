@@ -78,6 +78,7 @@ export function ScreenshotsSection({
                       src={preview.light}
                       alt={alt}
                       fill
+                      quality={70}
                       sizes="(min-width: 768px) 33vw, 256px"
                       className="object-contain dark:hidden"
                     />
@@ -85,6 +86,7 @@ export function ScreenshotsSection({
                       src={preview.dark}
                       alt={alt}
                       fill
+                      quality={70}
                       sizes="(min-width: 768px) 33vw, 256px"
                       className="hidden object-contain dark:block"
                     />
@@ -93,7 +95,7 @@ export function ScreenshotsSection({
               ) : (
                 <div className="flex h-full items-center justify-center">
                   <Icon className="size-14 text-muted-foreground/40" />
-                  <span className="absolute bottom-4 font-sans text-[10px] uppercase tracking-widest text-muted-foreground/50">
+                  <span className="absolute bottom-4 font-sans text-[10px] uppercase tracking-widest text-muted-foreground">
                     placeholder
                   </span>
                 </div>

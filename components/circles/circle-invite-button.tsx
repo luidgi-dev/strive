@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { safeError } from "@/lib/i18n/safe-error";
@@ -9,7 +9,7 @@ import { useState, useTransition } from "react";
 import { generateInviteLink } from "@/app/[locale]/protected/(app)/circles/[id]/actions";
 import {
   Sheet,
-  SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -65,12 +65,7 @@ export function CircleInviteButton({ circleId, isOwner, activeCode }: Props) {
         <SheetContent>
           <header className="flex items-center justify-between gap-3 pb-1">
             <SheetTitle>{tInvite("sheetTitle")}</SheetTitle>
-            <SheetClose
-              aria-label={tInvite("close")}
-              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <X aria-hidden className="size-4" />
-            </SheetClose>
+            <SheetCloseButton label={tInvite("close")} />
           </header>
           <p className="text-sm text-muted-foreground">{tInvite("sheetBody")}</p>
 

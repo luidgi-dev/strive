@@ -4,6 +4,7 @@
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "delete": "Delete",
     "homeLabel": "Strive home",
     "settingsLabel": "Settings"
@@ -73,6 +74,7 @@
     "unlockSheet": {
       "title": "Strive plans",
       "subtitle": "The whole app is yours on Lite. Premium adds always-on AI logging and your Insights.",
+      "close": "Close",
       "liteLabel": "Lite",
       "litePrice": "Free",
       "liteTagline": "To find your rhythm.",
@@ -214,8 +216,8 @@
   "landing": {
     "meta": {
       "logoAlt": "Strive logo",
-      "title": "Strive: Flexible Habit & Ritual Tracker",
-      "description": "Strive is a calm, flexible habit and ritual tracker built on momentum, not streaks. Log your rituals in plain words and let an AI coach keep your consistency going.",
+      "title": "Strive: Flexible AI Habit Tracker",
+      "description": "Strive is a calm, flexible habit tracker built on momentum, not streaks. Log your rituals in plain words and let an AI coach keep your consistency going.",
       "keywords": [
         "habit tracker",
         "ritual tracker",
@@ -458,6 +460,11 @@
       },
       "weekOf": "Week of {date}",
       "feedEmpty": "No shared rituals yet. Toggle one below to share your rhythm with the circle.",
+      "feedStatus": {
+        "on_track": "On track",
+        "steady": "Steady",
+        "resting": "Resting"
+      },
       "mySharedRituals": "My shared rituals",
       "sharedPrivacy": "Visible to you only. The circle sees only what you turn on.",
       "noRituals": "You have no active rituals to share yet.",

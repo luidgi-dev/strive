@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu } from "@base-ui/react/menu";
-import { Archive, MoreHorizontal, Pencil, X } from "lucide-react";
+import { Archive, MoreHorizontal, Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { safeError } from "@/lib/i18n/safe-error";
@@ -11,7 +11,7 @@ import { archiveRitual } from "@/app/[locale]/protected/(app)/rituals/actions";
 import { useRouter } from "@/lib/i18n/navigation";
 import {
   Sheet,
-  SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -129,12 +129,7 @@ export function RitualCardActions({
         <SheetContent>
           <header className="flex items-center justify-between gap-3 pb-1">
             <SheetTitle>{t("actions.archiveConfirmTitle")}</SheetTitle>
-            <SheetClose
-              aria-label={t("form.actions.close")}
-              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <X aria-hidden className="size-4" />
-            </SheetClose>
+            <SheetCloseButton label={t("form.actions.close")} />
           </header>
           <p className="text-sm text-muted-foreground">
             {t("actions.archiveConfirmBody")}
