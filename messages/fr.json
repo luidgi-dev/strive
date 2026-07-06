@@ -104,6 +104,9 @@
       "deleteConfirm": "Oui, supprimer",
       "deleteError": "Impossible de supprimer votre compte. Réessayez."
     },
+    "help": {
+      "link": "Comment fonctionne Strive"
+    },
     "feedback": {
       "label": "Aide",
       "send": "Envoyer un retour",
@@ -345,6 +348,75 @@
           "answer": "Oui. Toutes les fonctions essentielles (rituels illimités, momentum et l'Arc sur douze semaines) sont gratuites. Le coach IA optionnel est le seul ajout premium."
         }
       ]
+    }
+  },
+  "help": {
+    "meta": {
+      "title": "Comment fonctionne Strive : rituels, momentum et logging par IA",
+      "description": "Comment utiliser Strive : créer des rituels et des objectifs, comprendre le momentum plutôt que les séries, logger avec le chat IA, utiliser les Cercles, et installer l'app sur iOS et Android."
+    },
+    "eyebrow": "Aide",
+    "title": "Comment fonctionne Strive",
+    "lede": "Un tour d'horizon calme en deux minutes : ce que vous voyez chaque jour, comment ajouter des rituels, comment marche le momentum, et comment logger sans friction. Parcourez, ou allez droit à une section.",
+    "tocLabel": "Sur cette page",
+    "rhythm": {
+      "title": "Rythme, votre journée en un coup d'œil",
+      "p": [
+        "Rythme est votre écran d'accueil. Il liste seulement les rituels du jour, pour les logger en quelques taps au lieu de faire défiler toute votre collection dans Rituels.",
+        "À mesure que vous loggez, chaque rituel glisse dans Fait aujourd'hui, un groupe discret en bas qui garde la liste active courte. Rien n'est perdu : ouvrez Fait aujourd'hui pour annuler un log, ou pour logger à nouveau le même rituel.",
+        "Et oui, vous pouvez logger un rituel plusieurs fois dans la journée. Si vous avez lu deux fois, ou fait du sport matin et soir, loggez-le deux fois. Chaque log compte pour l'objectif du rituel."
+      ]
+    },
+    "rituals": {
+      "title": "Créer un rituel et définir un objectif",
+      "p": [
+        "Un rituel est toute pratique récurrente que vous voulez garder : lire, vous entraîner, méditer, appeler un proche.",
+        "Créez-en un avec le bouton Définir un rituel, depuis Rituels ou Rythme. Rituels est la bibliothèque complète où vous organisez tout ; Rythme n'en est que la tranche du jour.",
+        "Donnez-lui un objectif réaliste : un nombre de fois par semaine ou par jour, pas une règle du tout ou rien. Un objectif de quatre fois par semaine laisse de la place au repos sans rien casser.",
+        "Les rituels sont rangés en catégories pour que les deux écrans restent calmes et lisibles. Modifiez ou archivez un rituel à tout moment depuis sa carte. Rien n'est jamais figé."
+      ]
+    },
+    "momentum": {
+      "title": "Le momentum, pas les séries",
+      "p": [
+        "Le momentum est la mesure de constance de Strive. Il monte quand vous loggez et redescend doucement quand vous vous reposez. Il ne retombe jamais à zéro après un seul jour manqué.",
+        "C'est toute la différence avec une appli de séries : un jour de creux n'efface pas vos progrès. Ce qui compte, c'est le rythme d'ensemble sur la semaine et le mois.",
+        "Ouvrez un rituel pour voir The Arc : douze semaines de constance d'un coup d'œil, pour lire la tendance au lieu de courir après un chiffre."
+      ]
+    },
+    "logging": {
+      "title": "Logger avec le chat IA",
+      "intro": "Le plus rapide pour logger, c'est de dire ce que vous avez fait, avec vos mots. Vous pouvez aussi poser des questions sur votre semaine. Ouvrez le chat et écrivez ou dictez naturellement.",
+      "examples": [
+        "J'ai loggé lecture et méditation",
+        "Qu'est-ce que j'ai fait cette semaine ?",
+        "Qu'est-ce qu'il me reste à logger aujourd'hui ?"
+      ],
+      "after": "Strive logge les bons rituels, note un jour de repos comme repos plutôt que comme manqué, et répond à vos questions sur votre progression. Vous pouvez aussi toujours logger en un tap depuis la carte d'un rituel ; le chat est là pour les jours où une phrase va plus vite.",
+      "note": "Créer et suivre vos rituels est toujours gratuit. Le logging par IA au-delà du quota mensuel gratuit fait partie de Premium."
+    },
+    "circles": {
+      "title": "Les Cercles",
+      "p": [
+        "Les Cercles sont de petits groupes, jusqu'à huit personnes, où vous partagez les rituels de votre choix et voyez le momentum de chacun pour la semaine.",
+        "Créez un cercle depuis l'onglet Cercles et partagez le lien d'invitation, ou rejoignez-en un avec un code. Vous décidez quels rituels sont visibles ; rien n'est partagé par défaut.",
+        "Envoyez un encouragement pour soutenir quelqu'un. C'est la seule notification qu'un cercle envoie. Aucune pression, aucun classement."
+      ]
+    },
+    "install": {
+      "title": "Installer Strive sur votre téléphone",
+      "intro": "Strive est une PWA : elle s'installe comme une app native, directement depuis le navigateur, sans store. Une fois installée, elle s'ouvre en plein écran et peut envoyer des rappels.",
+      "steps": [
+        {
+          "label": "iOS · Safari",
+          "text": "Touchez Partager, puis Sur l'écran d'accueil, puis Ajouter."
+        },
+        {
+          "label": "Android · Chrome",
+          "text": "Touchez le menu (trois points), puis Ajouter à l'écran d'accueil ou Installer l'application, puis confirmez."
+        }
+      ],
+      "after": "Vous pouvez aussi retrouver ces étapes à tout moment via le bouton d'installation dans l'app."
     }
   },
   "auth": {

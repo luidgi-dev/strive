@@ -57,6 +57,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Drop the framework-revealing `x-powered-by: Next.js` response header.
   poweredByHeader: false,
+  // Next 16 requires non-default image qualities to be whitelisted. The landing
+  // wireframes are served at 70; 75 is Next's default, kept for everything else.
+  images: {
+    qualities: [70, 75],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

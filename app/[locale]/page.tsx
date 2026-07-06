@@ -118,6 +118,7 @@ export default async function Home({ params }: HomePageProps) {
       : `/${locale}/legal/privacy`;
   const termsHref =
     locale === defaultLocale ? "/legal/terms" : `/${locale}/legal/terms`;
+  const helpHref = locale === defaultLocale ? "/help" : `/${locale}/help`;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -188,6 +189,7 @@ export default async function Home({ params }: HomePageProps) {
         headline="Find your rhythm."
         ctaLabel="Get early access"
         authHref={authHref}
+        helpHref={helpHref}
         privacyHref={privacyHref}
         termsHref={termsHref}
       />

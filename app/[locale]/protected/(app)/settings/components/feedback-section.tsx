@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import {
+  BookOpen,
   Check,
   ChevronRight,
   ImagePlus,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { Link } from "@/lib/i18n/navigation";
 import {
   Sheet,
   SheetCloseButton,
@@ -52,12 +54,9 @@ const SUCCESS_TOAST_MS = 5000;
 
 export function FeedbackSection({ isDemo = false }: { isDemo?: boolean }) {
   const t = useTranslations("settings.feedback");
+  const tHelp = useTranslations("settings.help");
   const [open, setOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  // The shared demo account can't submit feedback (server rejects it too); hide
-  // the entry point entirely rather than show a dead control.
-  if (isDemo) return null;
 
   return (
     <section className="flex flex-col gap-3">
@@ -65,31 +64,48 @@ export function FeedbackSection({ isDemo = false }: { isDemo?: boolean }) {
         {t("label")}
       </h2>
 
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
+      <Link
+        href="/help"
+        target="_blank"
+        rel="noopener noreferrer"
         className="flex min-h-[44px] w-full items-center gap-3 text-sm text-foreground transition-colors hover:text-muted-foreground"
       >
-        <MessageSquare className="size-4 text-muted-foreground" />
-        <span className="flex-1 text-left">{t("send")}</span>
+        <BookOpen className="size-4 text-muted-foreground" />
+        <span className="flex-1 text-left">{tHelp("link")}</span>
         <ChevronRight className="size-4 text-muted-foreground" />
-      </button>
+      </Link>
 
-      <FeedbackSheet
-        open={open}
-        onOpenChange={setOpen}
-        onSuccess={() => {
-          setOpen(false);
-          setShowSuccess(true);
-        }}
-      />
+      {/* The shared demo account can't submit feedback (server rejects it too);
+          hide the feedback control for it, but keep the help link above. */}
+      {!isDemo ? (
+        <>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="flex min-h-[44px] w-full items-center gap-3 text-sm text-foreground transition-colors hover:text-muted-foreground"
+          >
+            <MessageSquare className="size-4 text-muted-foreground" />
+            <span className="flex-1 text-left">{t("send")}</span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </button>
 
-      {showSuccess ? (
-        <FeedbackSuccessToast
-          message={t("success")}
-          dismissLabel={t("close")}
-          onDone={() => setShowSuccess(false)}
-        />
+          <FeedbackSheet
+            open={open}
+            onOpenChange={setOpen}
+            onSuccess={() => {
+              setOpen(false);
+              setShowSuccess(true);
+            }}
+          />
+
+          {showSuccess ? (
+            <FeedbackSuccessToast
+              message={t("success")}
+              dismissLabel={t("close")}
+              onDone={() => setShowSuccess(false)}
+            />
+          ) : null}
+        </>
       ) : null}
     </section>
   );
