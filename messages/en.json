@@ -213,7 +213,18 @@
   },
   "landing": {
     "meta": {
-      "logoAlt": "Strive logo"
+      "logoAlt": "Strive logo",
+      "title": "Strive: Flexible Habit & Ritual Tracker",
+      "description": "Strive is a calm, flexible habit and ritual tracker built on momentum, not streaks. Log your rituals in plain words and let an AI coach keep your consistency going.",
+      "keywords": [
+        "habit tracker",
+        "ritual tracker",
+        "flexible habit tracker",
+        "momentum tracker",
+        "consistency over streaks",
+        "AI habit coach",
+        "habit tracker without streaks"
+      ]
     },
     "hero": {
       "title": "Strive",
@@ -314,6 +325,24 @@
     "footer": {
       "thanks": "Thank you for your time, the application is coming soon.",
       "cta": "Sign Out"
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Before you start.",
+      "items": [
+        {
+          "question": "How does AI-powered habit tracking work in Strive?",
+          "answer": "Creating and tracking rituals is completely free. Premium adds an AI coach that reads your trends and nudges you to keep your momentum, never to shame a missed day."
+        },
+        {
+          "question": "How is Strive different from a streak tracker?",
+          "answer": "Classic streak apps reset your score to zero the moment you miss once. Strive uses a momentum algorithm that values your overall consistency, so one softer day never erases your progress."
+        },
+        {
+          "question": "Is Strive free?",
+          "answer": "Yes. Every core feature (unlimited rituals, momentum, and the twelve-week Arc) is free. The optional AI coach is the only premium addition."
+        }
+      ]
     }
   },
   "auth": {

@@ -213,7 +213,18 @@
   },
   "landing": {
     "meta": {
-      "logoAlt": "Logo Strive"
+      "logoAlt": "Logo Strive",
+      "title": "Strive : suivi d'habitudes et de rituels, en souplesse",
+      "description": "Strive est un suivi d'habitudes et de rituels apaisé, fondé sur le momentum plutôt que sur les séries. Notez vos rituels en langage naturel, un coach IA entretient votre régularité.",
+      "keywords": [
+        "suivi d'habitudes",
+        "suivi de rituels",
+        "habitudes flexibles",
+        "momentum",
+        "régularité sans série",
+        "coach IA habitudes",
+        "sans streak"
+      ]
     },
     "hero": {
       "title": "Strive",
@@ -314,6 +325,24 @@
     "footer": {
       "thanks": "Merci d'avoir pris le temps de lire notre vision. L'application arrive très bientôt.",
       "cta": "Se déconnecter"
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Avant de commencer.",
+      "items": [
+        {
+          "question": "Comment fonctionne le suivi d'habitudes par IA dans Strive ?",
+          "answer": "Créer et suivre vos rituels est entièrement gratuit. L'offre premium ajoute un coach IA qui lit vos tendances et vous encourage à garder votre momentum, jamais à culpabiliser un jour manqué."
+        },
+        {
+          "question": "En quoi Strive diffère d'un tracker de séries ?",
+          "answer": "Les applis de séries remettent votre score à zéro dès le premier jour manqué. Strive s'appuie sur un algorithme de momentum qui valorise votre régularité d'ensemble : un jour plus doux n'efface jamais vos progrès."
+        },
+        {
+          "question": "Strive est-il gratuit ?",
+          "answer": "Oui. Toutes les fonctions essentielles (rituels illimités, momentum et l'Arc sur douze semaines) sont gratuites. Le coach IA optionnel est le seul ajout premium."
+        }
+      ]
     }
   },
   "auth": {

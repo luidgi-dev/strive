@@ -8,6 +8,8 @@ type HeroSectionProps = {
   logoAlt: string;
   title: string;
   tagline: React.ReactNode;
+  /** Muted keyword line under the tagline (SEO intent). Omit to hide. */
+  subline?: React.ReactNode;
   ctaLabel: string;
   authHref: string;
   /** Secondary "Try the demo" CTA. Omit to hide the demo entry point entirely. */
@@ -18,6 +20,7 @@ export function HeroSection({
   logoAlt,
   title,
   tagline,
+  subline,
   ctaLabel,
   authHref,
   demoCtaLabel,
@@ -48,6 +51,11 @@ export function HeroSection({
       <p className="max-w-md font-sans text-lg leading-relaxed text-muted-foreground md:text-xl">
         {tagline}
       </p>
+      {subline ? (
+        <p className="mt-4 max-w-md font-sans text-sm text-muted-foreground/70">
+          {subline}
+        </p>
+      ) : null}
       <div className="mt-12 flex flex-col items-center gap-5">
         <Button className="h-14 rounded-full px-10 text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]">
           <Link href={authHref}>{ctaLabel}</Link>

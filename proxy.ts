@@ -147,6 +147,9 @@ export const config = {
     // covers the locale-specific variant (site.fr.webmanifest). `_vercel` is
     // excluded for the same reason: Vercel Web Analytics serves its script and
     // beacons from /_vercel/insights/* and the locale rewrite would break them.
-    "/((?!_next/static|_next/image|_vercel|favicon.ico|sw\\.js|site(?:\\.fr)?\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // robots.txt, sitemap.xml and opengraph-image are root-level, locale-agnostic
+    // metadata routes: the rewrite would prepend /en and 404 them, so crawlers
+    // would see the not-found page instead of the real file.
+    "/((?!_next/static|_next/image|_vercel|favicon.ico|sw\\.js|robots\\.txt|sitemap\\.xml|opengraph-image|site(?:\\.fr)?\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
