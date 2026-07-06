@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,32 @@ function SheetTrigger(props: DialogPrimitive.Trigger.Props) {
 
 function SheetClose(props: DialogPrimitive.Close.Props) {
   return <DialogPrimitive.Close {...props} />;
+}
+
+/**
+ * Standard top-right close (X) for sheets. Renders a 32px visual target with an
+ * invisible expansion to a 44px hit area (WCAG 2.5.5 / RGAA). `label` is the
+ * required, localized accessible name ("Close" / "Fermer").
+ */
+function SheetCloseButton({
+  label,
+  className,
+  ...props
+}: DialogPrimitive.Close.Props & { label: string }) {
+  return (
+    <DialogPrimitive.Close
+      data-slot="sheet-close-button"
+      aria-label={label}
+      className={cn(
+        "relative flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+        "after:absolute after:-inset-1.5 after:content-['']",
+        className,
+      )}
+      {...props}
+    >
+      <X aria-hidden className="size-4" />
+    </DialogPrimitive.Close>
+  );
 }
 
 function SheetBackdrop({ className, ...props }: DialogPrimitive.Backdrop.Props) {
@@ -92,6 +119,7 @@ export {
   Sheet,
   SheetTrigger,
   SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetTitle,
   SheetDescription,

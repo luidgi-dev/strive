@@ -95,7 +95,15 @@ export function SignUpForm({
 
       router.push('/auth/sign-up-success')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred during sign up')
+      // Network failures throw a TypeError before Supabase returns a structured
+      // error; show a human message rather than the raw fetch error.
+      if (err instanceof TypeError) {
+        setError("Can't reach the server right now. Check your connection and try again.")
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('An error occurred during sign up')
+      }
     } finally {
       setIsLoading(false)
     }

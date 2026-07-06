@@ -207,7 +207,7 @@ export function ProfileSection({
                   type="button"
                   onClick={startEdit}
                   aria-label={t("editUsername")}
-                  className="absolute left-full top-1/2 ml-1 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground/60 transition-colors hover:bg-muted hover:text-muted-foreground"
+                  className="absolute left-full top-1/2 ml-1 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
                 >
                   <Pencil className="size-3.5" />
                 </button>
@@ -224,7 +224,7 @@ export function ProfileSection({
       <p className="text-sm text-muted-foreground">{email}</p>
 
       {isDemo ? (
-        <p className="text-xs text-muted-foreground/70">{t("demo_restricted")}</p>
+        <p className="text-xs text-muted-foreground">{t("demo_restricted")}</p>
       ) : null}
     </section>
   );

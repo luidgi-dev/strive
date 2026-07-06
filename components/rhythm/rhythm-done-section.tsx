@@ -40,7 +40,7 @@ export function RhythmDoneSection({ count, children }: Props) {
                 !open && "-rotate-90",
               )}
             />
-            <span className="font-medium tracking-normal tabular-nums text-muted-foreground/70">
+            <span className="font-medium tracking-normal tabular-nums text-muted-foreground">
               {count}
             </span>
           </Collapsible.Trigger>

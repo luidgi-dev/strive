@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Plus, X } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { safeError } from "@/lib/i18n/safe-error";
@@ -8,7 +8,7 @@ import { useState, useTransition } from "react";
 
 import { createCircle } from "@/app/[locale]/protected/(app)/circles/actions";
 import { Input } from "@/components/ui/input";
-import { SheetClose, SheetTitle } from "@/components/ui/sheet";
+import { SheetCloseButton, SheetTitle } from "@/components/ui/sheet";
 import { useRouter } from "@/lib/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +51,9 @@ export function CircleCreateFlow({ onClose }: Props) {
   if (created) {
     return (
       <div className="flex flex-col gap-4">
+        <div className="flex justify-end">
+          <SheetCloseButton label={t("cancel")} />
+        </div>
         <span className="mx-auto inline-flex size-12 items-center justify-center rounded-full bg-momentum/10 text-momentum">
           <Check aria-hidden className="size-5" strokeWidth={2} />
         </span>
@@ -79,12 +82,7 @@ export function CircleCreateFlow({ onClose }: Props) {
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between gap-3 pb-1">
         <SheetTitle>{t("title")}</SheetTitle>
-        <SheetClose
-          aria-label={t("cancel")}
-          className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-        >
-          <X aria-hidden className="size-4" />
-        </SheetClose>
+        <SheetCloseButton label={t("cancel")} />
       </header>
 
       <div className="flex flex-col gap-2">

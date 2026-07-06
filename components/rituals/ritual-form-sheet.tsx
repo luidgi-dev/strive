@@ -1,11 +1,10 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
   Sheet,
-  SheetClose,
+  SheetCloseButton,
   SheetContent,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -42,12 +41,7 @@ export function RitualFormSheet({
       <SheetContent>
         <header className="flex items-center justify-between gap-3 pb-1">
           <SheetTitle>{title}</SheetTitle>
-          <SheetClose
-            aria-label={t("form.actions.close")}
-            className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <X aria-hidden className="size-4" />
-          </SheetClose>
+          <SheetCloseButton label={t("form.actions.close")} />
         </header>
         <RitualForm
           mode={mode}

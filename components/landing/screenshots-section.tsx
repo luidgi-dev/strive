@@ -37,6 +37,8 @@ const screenshotConfigs: ScreenshotConfig[] = [
 type ScreenshotItem = {
   title: string;
   caption: string;
+  /** Descriptive alt text for the preview image (accessibility + image SEO). */
+  alt: string;
 };
 
 type ScreenshotsSectionProps = {
@@ -59,7 +61,7 @@ export function ScreenshotsSection({
 
       <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0">
         {screenshotConfigs.map(({ icon: Icon, preview }, index) => {
-          const { title: itemTitle, caption } = items[index];
+          const { title: itemTitle, caption, alt } = items[index];
           return (
           <figure
             key={itemTitle}
@@ -74,15 +76,17 @@ export function ScreenshotsSection({
                   <div className="absolute inset-2 overflow-hidden rounded-2xl bg-background">
                     <Image
                       src={preview.light}
-                      alt={`${itemTitle} preview`}
+                      alt={alt}
                       fill
+                      quality={70}
                       sizes="(min-width: 768px) 33vw, 256px"
                       className="object-contain dark:hidden"
                     />
                     <Image
                       src={preview.dark}
-                      alt={`${itemTitle} preview`}
+                      alt={alt}
                       fill
+                      quality={70}
                       sizes="(min-width: 768px) 33vw, 256px"
                       className="hidden object-contain dark:block"
                     />
@@ -91,7 +95,7 @@ export function ScreenshotsSection({
               ) : (
                 <div className="flex h-full items-center justify-center">
                   <Icon className="size-14 text-muted-foreground/40" />
-                  <span className="absolute bottom-4 font-sans text-[10px] uppercase tracking-widest text-muted-foreground/50">
+                  <span className="absolute bottom-4 font-sans text-[10px] uppercase tracking-widest text-muted-foreground">
                     placeholder
                   </span>
                 </div>

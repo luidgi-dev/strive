@@ -69,7 +69,7 @@ export async function RitualsList({
           }
         >
           {section.rituals.length === 0 ? (
-            <p className="px-1 text-xs text-muted-foreground/70">
+            <p className="px-1 text-xs text-muted-foreground">
               {t("category.manage.empty")}
             </p>
           ) : (

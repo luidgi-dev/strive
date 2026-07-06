@@ -5,6 +5,7 @@ type CtaFinalSectionProps = {
   headline: string;
   ctaLabel: string;
   authHref: string;
+  helpHref: string;
   privacyHref: string;
   termsHref: string;
 };
@@ -13,6 +14,7 @@ export function CtaFinalSection({
   headline,
   ctaLabel,
   authHref,
+  helpHref,
   privacyHref,
   termsHref,
 }: CtaFinalSectionProps) {
@@ -23,7 +25,9 @@ export function CtaFinalSection({
           {headline}
         </h2>
         <Button className="h-14 rounded-full px-10 text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]">
-          <Link href={authHref}>{ctaLabel}</Link>
+          <Link href={authHref} prefetch={false}>
+            {ctaLabel}
+          </Link>
         </Button>
       </section>
 
@@ -51,6 +55,13 @@ export function CtaFinalSection({
             className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
           >
             Terms
+          </Link>
+          {" · "}
+          <Link
+            href={helpHref}
+            className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
+          >
+            Help
           </Link>
         </span>
       </footer>

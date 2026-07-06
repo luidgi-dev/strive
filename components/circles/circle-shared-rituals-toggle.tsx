@@ -67,7 +67,7 @@ export function CircleSharedRitualsToggle({ circleId, rituals }: Props) {
       </div>
 
       <Collapsible.Panel className="flex flex-col gap-2.5">
-        <p className="px-1 text-[11.5px] leading-snug text-muted-foreground/80">
+        <p className="px-1 text-[11.5px] leading-snug text-muted-foreground">
           {t("sharedPrivacy")}
         </p>
         {rituals.length === 0 ? (

@@ -35,8 +35,16 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
       
       router.push('/protected')
       router.refresh()
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+    } catch (err: unknown) {
+      // Network failures throw a TypeError before Supabase returns a structured
+      // error; show a human message rather than the raw fetch error.
+      if (err instanceof TypeError) {
+        setError("Can't reach the server right now. Check your connection and try again.")
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('An error occurred')
+      }
     } finally {
       setIsLoading(false)
     }
