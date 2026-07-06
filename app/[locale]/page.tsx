@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+
 import {
   CtaFinalSection,
+  FaqSection,
   HeroSection,
   LandingDivider,
   PhilosophySection,
@@ -8,11 +12,67 @@ import {
   VocabularySection,
 } from "@/components/landing";
 import { PwaInstallNotice } from "@/components/pwa-install-notice";
-import { defaultLocale } from "@/lib/locales";
+import { defaultLocale, locales, type Locale } from "@/lib/locales";
+import { localeAlternates, localizedUrl } from "@/lib/seo";
 
 type HomePageProps = {
   params: Promise<{ locale: string }>;
 };
+
+// OpenGraph locale tags want the `xx_XX` form, not the bare BCP-47 code.
+const ogLocales: Record<Locale, string> = {
+  en: "en_US",
+  fr: "fr_FR",
+};
+
+// The site-wide generated card (app/opengraph-image.tsx). Referenced explicitly
+// because a page-level `openGraph` override otherwise drops the file-convention
+// image. URL is resolved against `metadataBase` from the root layout.
+const ogImage = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: "Strive, a calm habit tracker",
+};
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: HomePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing.meta" });
+  const title = t("title");
+  const description = t("description");
+  const url = localizedUrl(locale as Locale);
+
+  return {
+    title,
+    description,
+    keywords: t.raw("keywords") as string[],
+    alternates: {
+      canonical: url,
+      languages: localeAlternates(),
+    },
+    openGraph: {
+      type: "website",
+      siteName: "Strive",
+      locale: ogLocales[locale as Locale] ?? ogLocales.en,
+      url,
+      title,
+      description,
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage.url],
+    },
+  };
+}
 
 const philosophyParagraphs = [
   "We do not worship hustle. We do not celebrate grind. Strive comes from one simple belief: lasting progress grows from calm, not pressure.",
@@ -75,6 +135,7 @@ export default async function Home({ params }: HomePageProps) {
             .
           </>
         }
+        subline="A calm habit tracker built on momentum, not streaks."
         ctaLabel="Get early access"
         authHref={authHref}
         demoCtaLabel="Try the demo"
@@ -85,12 +146,21 @@ export default async function Home({ params }: HomePageProps) {
         eyebrow="See it in action"
         title="A calm dashboard for your week."
         items={[
-          { title: "Rhythm", caption: "Today's rituals at a glance." },
+          {
+            title: "Rhythm",
+            caption: "Today's rituals at a glance.",
+            alt: "Strive Rhythm screen showing today's rituals at a glance",
+          },
           {
             title: "The Arc",
             caption: "Twelve weeks of consistency, visualized.",
+            alt: "Strive Arc visualizing twelve weeks of consistency",
           },
-          { title: "AI chat", caption: "Log a ritual in your own words." },
+          {
+            title: "AI chat",
+            caption: "Log a ritual in your own words.",
+            alt: "Strive AI chat logging a ritual in natural language",
+          },
         ]}
       />
 
@@ -110,6 +180,9 @@ export default async function Home({ params }: HomePageProps) {
         title="Words matter."
         items={vocabularyItems}
       />
+
+      <LandingDivider />
+      <FaqSection />
 
       <CtaFinalSection
         headline="Find your rhythm."

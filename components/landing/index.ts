@@ -1,5 +1,6 @@
 export { AiConversationSection } from "@/components/landing/ai-conversation-section";
 export { CtaFinalSection } from "@/components/landing/cta-final-section";
+export { FaqSection } from "@/components/landing/faq-section";
 export { HeroSection } from "@/components/landing/hero-section";
 export {
   LandingDivider,
