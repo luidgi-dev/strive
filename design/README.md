@@ -19,11 +19,14 @@ Rule of thumb: if a file tells you *how the product should be built or what the 
 design/
   README.md          # this file
   wireframes/        # self-contained HTML wireframes, one per surface
+  research/          # user research: protocols, findings, raw evidence — one folder per study
   ux-flow.md         # global navigation: screens, transitions, entry points
   chat-design.md     # "My Strive" AI chat — tools, cards, voice, guardrails
   insights-page.md   # Insights — hybrid intelligence, confidence, cadence, gating
   push-notifications.md  # Notifications — rules (opt-in, triggers, anti-spam) + Web Push stack
 ```
+
+[`research/`](research/) holds the evidence behind UX decisions: what was tested, with whom, what came out of it, and which Linear issue it became. See [`research/README.md`](research/README.md) for the study format and the severity scale.
 
 The rendered PNG exports shown on the landing page live in [`public/wireframes/`](../public/wireframes/) (served as static assets), not here — `design/wireframes/` holds the **editable HTML sources**.
 
