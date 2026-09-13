@@ -672,7 +672,8 @@
       }
     },
     "create": {
-      "title": "Define a ritual"
+      "title": "Define a ritual",
+      "saved": "Ritual defined · {name}"
     },
     "edit": {
       "title": "Edit ritual"

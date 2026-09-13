@@ -672,7 +672,8 @@
       }
     },
     "create": {
-      "title": "Définir un rituel"
+      "title": "Définir un rituel",
+      "saved": "Rituel défini · {name}"
     },
     "edit": {
       "title": "Modifier le rituel"
