@@ -1,9 +1,10 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { useToast } from "@/components/ui/toast-provider";
 import type { RitualCategoryRow } from "@/lib/data/rituals";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ type Props = {
 export function DefineRitualButton({ variant, categories, label }: Props) {
   const t = useTranslations("rituals");
   const [open, setOpen] = useState(false);
+  const toast = useToast();
 
   const triggerLabel = label ?? (variant === "cta" ? t("defineFirst") : t("defineCta"));
 
@@ -55,6 +57,12 @@ export function DefineRitualButton({ variant, categories, label }: Props) {
         onOpenChange={setOpen}
         mode="create"
         categories={categories}
+        onSaved={(values) =>
+          toast.show({
+            icon: <Check className="size-[18px]" />,
+            message: t("create.saved", { name: values.name }),
+          })
+        }
       />
     </>
   );
