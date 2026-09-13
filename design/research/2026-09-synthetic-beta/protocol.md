@@ -6,11 +6,11 @@ Results live in [`findings.md`](findings.md); raw evidence in [`raw/`](raw/).
 | | |
 |---|---|
 | **Study ID** | `2026-09-synthetic-beta` |
-| **Run** | September 2026 |
+| **Run** | 30 July 2026 (all three sessions) |
 | **Method** | Moderated task-based usability test, AI-simulated participants |
 | **Platform** | UXia (free tier) |
 | **Participants** | 3 synthetic personas, English, unmoderated single session each |
-| **Build under test** | Live preview deployment, release `9bedeea` |
+| **Build under test** | Production, `striveapp.cc`, commit `9bedeea` (no commits between 6 July and the run) |
 | **Linear** | [LUI-109](https://linear.app/issue/LUI-109) (test plan) · [LUI-142](https://linear.app/issue/LUI-142) (results) |
 
 > **On the status of this document.** The mission, stop condition, scenario, participant set and question list below are reproduced **verbatim from the study configuration**, which was defined before the sessions ran (LUI-109). The objectives and success criteria in §1 and §6 are made explicit here for the first time: they were the intent behind the study design, but were not written down as formal, pre-registered criteria before the runs. That distinction is recorded rather than smoothed over, and §7 treats it as a limitation.
@@ -184,6 +184,6 @@ Recorded so that no finding in [`findings.md`](findings.md) is read as stronger 
 
 ## 8. Open items
 
-- [ ] Confirm the exact deployment URL and commit tested, and pin it here.
+- [x] Deployment URL and commit tested: `striveapp.cc` (per the platform's frame captures), `9bedeea`.
 - [ ] Confirm which demographic parameters were set manually vs generated (§3 provenance note).
-- [ ] Confirm session dates for each participant.
+- [x] Session dates: 30 July 2026 for all three (per the platform's insight view).
