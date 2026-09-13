@@ -41,7 +41,7 @@ type Props = {
   mode: Mode;
   categories: RitualCategoryRow[];
   initialValues?: RitualFormInitialValues;
-  onSuccess: () => void;
+  onSuccess: (values: RitualFormValues) => void;
 };
 
 const DEFAULT_CREATE_VALUES: RitualFormValues = {
@@ -172,7 +172,7 @@ export function RitualForm({
         setActionError(result.error);
         return;
       }
-      onSuccess();
+      onSuccess(values);
     });
   };
 

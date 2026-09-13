@@ -6,6 +6,7 @@ import { getUnseenNudges } from "@/lib/data/nudges";
 import { createClient } from "@/lib/supabase/server";
 import { ProtectedHeader } from "@/components/layout/protected-header";
 import { NudgeToaster } from "@/components/nudges/nudge-toaster";
+import { ToastProvider } from "@/components/ui/toast-provider";
 
 export default async function ProtectedBaseLayout({
   children,
@@ -40,7 +41,9 @@ export default async function ProtectedBaseLayout({
         avatarUrl={profile?.avatar_url ?? null}
         displayName={profile?.username ?? user.email ?? null}
       />
-      <main className="flex flex-1 flex-col">{children}</main>
+      <ToastProvider>
+        <main className="flex flex-1 flex-col">{children}</main>
+      </ToastProvider>
       {nudges.length > 0 ? <NudgeToaster nudges={nudges} /> : null}
     </div>
   );

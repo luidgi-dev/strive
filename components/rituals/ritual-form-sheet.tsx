@@ -9,6 +9,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { RitualCategoryRow } from "@/lib/data/rituals";
+import type { RitualFormValues } from "@/lib/data/rituals-schema";
 
 import {
   RitualForm,
@@ -23,6 +24,8 @@ type Props = {
   mode: Mode;
   categories: RitualCategoryRow[];
   initialValues?: RitualFormInitialValues;
+  /** Called after a successful save, once the sheet has closed. */
+  onSaved?: (values: RitualFormValues) => void;
 };
 
 export function RitualFormSheet({
@@ -31,6 +34,7 @@ export function RitualFormSheet({
   mode,
   categories,
   initialValues,
+  onSaved,
 }: Props) {
   const t = useTranslations("rituals");
 
@@ -47,7 +51,10 @@ export function RitualFormSheet({
           mode={mode}
           categories={categories}
           initialValues={initialValues}
-          onSuccess={() => onOpenChange(false)}
+          onSuccess={(values) => {
+            onOpenChange(false);
+            onSaved?.(values);
+          }}
         />
       </SheetContent>
     </Sheet>

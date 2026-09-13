@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import {
   BookOpen,
   Check,
@@ -22,7 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/toast-provider";
 import {
   FEEDBACK_BODY_MAX,
   FEEDBACK_SCREENSHOT_MAX_BYTES,
@@ -50,13 +50,11 @@ const ERROR_TO_KEY: Record<string, string> = {
   failed: "errorFailed",
 };
 
-const SUCCESS_TOAST_MS = 5000;
-
 export function FeedbackSection({ isDemo = false }: { isDemo?: boolean }) {
   const t = useTranslations("settings.feedback");
   const tHelp = useTranslations("settings.help");
   const [open, setOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const toast = useToast();
 
   return (
     <section className="flex flex-col gap-3">
@@ -94,51 +92,15 @@ export function FeedbackSection({ isDemo = false }: { isDemo?: boolean }) {
             onOpenChange={setOpen}
             onSuccess={() => {
               setOpen(false);
-              setShowSuccess(true);
+              toast.show({
+                icon: <Check className="size-[18px]" />,
+                message: t("success"),
+              });
             }}
           />
-
-          {showSuccess ? (
-            <FeedbackSuccessToast
-              message={t("success")}
-              dismissLabel={t("close")}
-              onDone={() => setShowSuccess(false)}
-            />
-          ) : null}
         </>
       ) : null}
     </section>
-  );
-}
-
-function FeedbackSuccessToast({
-  message,
-  dismissLabel,
-  onDone,
-}: {
-  message: string;
-  dismissLabel: string;
-  onDone: () => void;
-}) {
-  // Keep the latest onDone without resetting the auto-dismiss timer on re-render.
-  const onDoneRef = useRef(onDone);
-  useEffect(() => {
-    onDoneRef.current = onDone;
-  });
-
-  useEffect(() => {
-    const timer = setTimeout(() => onDoneRef.current(), SUCCESS_TOAST_MS);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <Toast
-      icon={<Check className="size-[18px]" />}
-      onDismiss={() => onDoneRef.current()}
-      dismissLabel={dismissLabel}
-    >
-      {message}
-    </Toast>
   );
 }
 
