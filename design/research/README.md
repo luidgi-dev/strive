@@ -6,7 +6,7 @@ Where Strive's **evidence about users** lives: what was tested, with whom, what 
 
 | Study | When | Participants | Method | Status |
 |---|---|---|---|---|
-| [`2026-09-synthetic-beta/`](2026-09-synthetic-beta/) | Sept 2026 | 3 synthetic | Moderated task-based, AI-simulated (UXia) | Findings in progress |
+| [`2026-09-synthetic-beta/`](2026-09-synthetic-beta/) | July 2026 | 3 synthetic | Moderated task-based, AI-simulated (UXia) | Findings in progress |
 
 ## How a study is packaged
 
