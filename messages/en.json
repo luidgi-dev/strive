@@ -839,6 +839,10 @@
       "greeting": "I'm your Strive AI. I help you log rituals, track your momentum, and keep your rhythm. What can I help with?"
     }
   },
+  "welcome": {
+    "firstLogin": "Welcome, {username}. Let's define your first ritual.",
+    "demo": "Demo account. Explore freely, everything resets each night."
+  },
   "rhythm": {
     "today": "Today",
     "coach": {
