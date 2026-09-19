@@ -3,6 +3,7 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { useId, useState } from "react";
 
+import { parseIsoDateUtc } from "@/lib/date";
 import { buildArcGeometry, type ArcDay, type ArcModel } from "@/lib/rituals/arc";
 import { cn } from "@/lib/utils";
 
@@ -13,11 +14,6 @@ type Props = {
 const CHART_WIDTH = 330;
 const CHART_HEIGHT = 96;
 
-// Parse a YYYY-MM-DD string into a local Date for display formatting only.
-function toLocalDate(value: string): Date {
-  return new Date(`${value}T00:00:00`);
-}
-
 export function TheArc({ model }: Props) {
   const t = useTranslations("rituals.detail.arc");
   const format = useFormatter();
@@ -26,10 +22,20 @@ export function TheArc({ model }: Props) {
   const { weeks, weeklyTarget, totalLogs } = model;
   const [selectedWeek, setSelectedWeek] = useState(weeks.length - 1);
 
+  // The Arc's dates are calendar days, parsed and formatted in UTC so the day
+  // letters never shift with the viewer's zone (next-intl otherwise formats in
+  // the server's zone, one day off every browser east of it).
   const formatShortDate = (value: string) =>
-    format.dateTime(toLocalDate(value), { month: "short", day: "numeric" });
+    format.dateTime(parseIsoDateUtc(value), {
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
   const formatDayLetter = (value: string) =>
-    format.dateTime(toLocalDate(value), { weekday: "short" });
+    format.dateTime(parseIsoDateUtc(value), {
+      weekday: "short",
+      timeZone: "UTC",
+    });
 
   if (totalLogs === 0) {
     return (
