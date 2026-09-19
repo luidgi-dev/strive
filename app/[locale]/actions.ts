@@ -27,5 +27,7 @@ export async function signInAsDemo() {
 
   if (error) redirect("/auth/login");
 
-  redirect("/protected/flow");
+  // The demo is one shared account, so its welcome cannot be tracked per user.
+  // The flag rides on the entry URL instead and the toast strips it on display.
+  redirect("/protected/flow?welcome=demo");
 }
