@@ -839,6 +839,10 @@
       "greeting": "Je suis ton IA Strive. Je t'aide à enregistrer tes rituels, suivre ton momentum et garder ton rythme. Sur quoi puis-je t'aider ?"
     }
   },
+  "welcome": {
+    "firstLogin": "Bienvenue, {username}. Définissons votre premier rituel.",
+    "demo": "Compte démo. Explorez librement, tout est réinitialisé chaque nuit."
+  },
   "rhythm": {
     "today": "Aujourd'hui",
     "coach": {
