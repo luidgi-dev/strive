@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 
+import { parseIsoDateUtc } from "@/lib/date";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -35,7 +36,10 @@ export async function OneTimeStatus({ dueDate, completedAt, today }: Props) {
 
   const now = new Date();
   const fmtDate = (date: string) =>
-    format.dateTime(new Date(`${date}T00:00:00`), { dateStyle: "medium" });
+    format.dateTime(parseIsoDateUtc(date), {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    });
   const relDays = (date: string) =>
     format.relativeTime(new Date(`${date}T12:00:00`), { now, unit: "day" });
 
