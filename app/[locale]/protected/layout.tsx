@@ -1,11 +1,13 @@
 // app/[locale]/protected/layout.tsx
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getAuthenticatedProfile } from "@/lib/profile";
 import { getUnseenNudges } from "@/lib/data/nudges";
+import { isDemoUser } from "@/lib/demo";
 import { createClient } from "@/lib/supabase/server";
 import { ProtectedHeader } from "@/components/layout/protected-header";
 import { NudgeToaster } from "@/components/nudges/nudge-toaster";
+import { WelcomeToaster } from "@/components/welcome/welcome-toaster";
 import { ToastProvider } from "@/components/ui/toast-provider";
 
 export default async function ProtectedBaseLayout({
@@ -35,6 +37,12 @@ export default async function ProtectedBaseLayout({
     getUnseenNudges(supabase, user),
   ]);
 
+  // The welcome toast is shown once per account, tracked in the auth
+  // user_metadata rather than in our schema. The demo account is shared, so it
+  // is greeted from its entry URL instead (see WelcomeToaster).
+  const showFirstLogin =
+    !user.user_metadata?.welcomed_at && !isDemoUser(user.id);
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <ProtectedHeader
@@ -42,6 +50,12 @@ export default async function ProtectedBaseLayout({
         displayName={profile?.username ?? user.email ?? null}
       />
       <ToastProvider>
+        <Suspense fallback={null}>
+          <WelcomeToaster
+            username={profile?.username ?? user.email ?? null}
+            showFirstLogin={showFirstLogin}
+          />
+        </Suspense>
         <main className="flex flex-1 flex-col">{children}</main>
       </ToastProvider>
       {nudges.length > 0 ? <NudgeToaster nudges={nudges} /> : null}
