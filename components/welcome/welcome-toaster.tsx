@@ -1,6 +1,6 @@
 "use client";
 
-import { AudioWaveform, Compass } from "lucide-react";
+import { Compass, Hand } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -50,14 +50,22 @@ export function WelcomeToaster({ username, showFirstLogin }: Props) {
       });
       // Drop the flag from the address without a server round-trip, so a reload
       // (or an iOS standalone relaunch restoring the last URL) stays silent.
-      window.history.replaceState(null, "", window.location.pathname);
+      // Only our own param goes: anything else on the URL is left untouched.
+      const params = new URLSearchParams(window.location.search);
+      params.delete(WELCOME_PARAM);
+      const query = params.toString();
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`,
+      );
       return;
     }
 
     if (showFirstLogin) {
       fired.current = true;
       toast.show({
-        icon: <AudioWaveform className="size-[18px]" />,
+        icon: <Hand className="size-[18px]" />,
         message: t("firstLogin", { username: username ?? "" }),
       });
       void markWelcomed();
