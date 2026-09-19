@@ -98,11 +98,11 @@ Strive uses **Supabase (PostgreSQL)** as its database. Row Level Security (RLS) 
 ### Views
 
 
-| View                   | Description                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------ |
-| `v_ritual_progress`    | One row per active ritual with current period progression and completion rate. |
-| `v_daily_summary`      | Daily snapshot: total rituals, logged today, remaining today.                  |
-| `v_ritual_log_history` | Full log history per ritual, used for heatmap and arc visualization.           |
+| View                 | Description                                                                    |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `ritual_progress`    | One row per active ritual with current period progression and completion rate. |
+| `daily_summary`      | Daily snapshot: total rituals, logged today, remaining today.                  |
+| `ritual_log_history` | Full log history per ritual, used for heatmap and arc visualization.           |
 
 
 ### What is not a table
