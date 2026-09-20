@@ -153,7 +153,7 @@ Supabase Storage buckets and their RLS policies live in [`storage/`](./storage/)
 pip install psycopg2-binary python-dotenv
 ```
 
-Create a `.env` file at the project root (or in `data/`):
+The runner loads `.env.local` from the repository root. Make sure it contains:
 
 ```env
 DATABASE_URL=postgresql://postgres:<password>@<host>:5432/postgres
