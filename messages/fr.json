@@ -233,8 +233,7 @@
     },
     "hero": {
       "title": "Strive",
-      "description": "Une application pour celles et ceux qui préfèrent la constance à l'intensité.",
-      "cta": "Bientôt disponible"
+      "description": "Une application pour celles et ceux qui préfèrent la constance à l'intensité."
     },
     "philosophy": {
       "eyebrow": "Philosophie",
@@ -326,10 +325,6 @@
           { "shortLabel": "D", "state": "empty" }
         ]
       }
-    },
-    "footer": {
-      "thanks": "Merci d'avoir pris le temps de lire notre vision. L'application arrive très bientôt.",
-      "cta": "Se déconnecter"
     },
     "faq": {
       "eyebrow": "Questions",

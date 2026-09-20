@@ -233,8 +233,7 @@
     },
     "hero": {
       "title": "Strive",
-      "description": "An app designed for those who prefer consistency over intensity.",
-      "cta": "Available soon"
+      "description": "An app designed for those who prefer consistency over intensity."
     },
     "philosophy": {
       "eyebrow": "Philosophy",
@@ -326,10 +325,6 @@
           { "shortLabel": "Su", "state": "empty" }
         ]
       }
-    },
-    "footer": {
-      "thanks": "Thank you for your time, the application is coming soon.",
-      "cta": "Sign Out"
     },
     "faq": {
       "eyebrow": "Questions",
