@@ -3,6 +3,8 @@
   <img alt="Strive. Find your rhythm." src="public/readme-banner-light.png">
 </picture>
 
+# Strive
+
 [![CI](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml)
 
 Strive (live at [striveapp.cc](https://www.striveapp.cc)) is a minimalist, AI-first ritual tracker PWA. It replaces the anxiety of daily streaks with a flexible system grounded in weekly and monthly **consistency**: momentum that decays slowly, never resets to zero, and treats rest days as part of the practice.
