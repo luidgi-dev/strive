@@ -5,7 +5,9 @@
 
 # Strive
 
-[![CI](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml)
+[![CI](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml)&nbsp;[![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial-4a8577)](LICENSE)
+
+[Live app](https://www.striveapp.cc) &nbsp;·&nbsp; [Technical deep dive](docs/DEEP_DIVE.md) &nbsp;·&nbsp; [Documentation](docs/README.md)
 
 Strive (live at [striveapp.cc](https://www.striveapp.cc)) is a minimalist, AI-first ritual tracker PWA. It replaces the anxiety of daily streaks with a flexible system grounded in weekly and monthly **consistency**: momentum that decays slowly, never resets to zero, and treats rest days as part of the practice.
 
