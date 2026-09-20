@@ -10,6 +10,7 @@ Reference material for humans and agents working on Strive. Each doc has a singl
 | [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md) | Product overview, screens, features, behavior rules |
 | [`PITCH.md`](PITCH.md) | Presentation kit: one-liner, 30s and 2-3 min scripts (EN + FR), slide outline, deck prompt |
 | [`DEEP_DIVE.md`](DEEP_DIVE.md) | Technical deep dive: architecture diagrams, schema and momentum rationale, RLS, AI design, trade-offs |
+| [`BUILD_LOG.md`](BUILD_LOG.md) | Build log: how it was built, the decisions behind the decisions, what I would do differently |
 | [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | Color tokens, spacing, typography — the visual contract |
 | [`UX_WRITING.md`](UX_WRITING.md) | Canonical terminology (Ritual, Momentum, Rhythm, The Arc…), tone, forbidden terms |
 | [`AI_SECURITY_CHECKLIST.md`](AI_SECURITY_CHECKLIST.md) | Security checklist for the AI features |
