@@ -8,7 +8,6 @@ export {
   LandingSection,
   LandingSectionTitle,
 } from "@/components/landing/landing-shell";
-export { LandingFooter } from "@/components/landing/landing-footer";
 export { PhilosophySection } from "@/components/landing/philosophy-section";
 export { PillarsSection } from "@/components/landing/pillars-section";
 export { RitualVisualizationSection } from "@/components/landing/ritual-visualization-section";
