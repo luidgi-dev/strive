@@ -36,6 +36,17 @@ export function hourInTimeZone(timeZone: string, now: Date = new Date()): number
   }
 }
 
+/**
+ * Parse a `YYYY-MM-DD` calendar date as a UTC instant, for display formatting.
+ * A calendar date carries no time of day, so `new Date("2026-09-14T00:00:00")`
+ * would be read in the runtime's own zone — the browser's in a Client Component.
+ * Pinning it to UTC, and formatting it with `timeZone: "UTC"`, keeps the rendered
+ * weekday identical whatever zone the viewer or the server happens to be in.
+ */
+export function parseIsoDateUtc(isoDate: string): Date {
+  return new Date(`${isoDate}T00:00:00Z`);
+}
+
 /** ISO weekday for a `YYYY-MM-DD` date: 1 = Monday … 7 = Sunday. */
 export function isoWeekday(isoDate: string): number {
   // Parse at midnight UTC to avoid local-offset drift on the date part.

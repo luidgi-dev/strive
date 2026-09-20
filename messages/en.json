@@ -233,8 +233,7 @@
     },
     "hero": {
       "title": "Strive",
-      "description": "An app designed for those who prefer consistency over intensity.",
-      "cta": "Available soon"
+      "description": "An app designed for those who prefer consistency over intensity."
     },
     "philosophy": {
       "eyebrow": "Philosophy",
@@ -326,10 +325,6 @@
           { "shortLabel": "Su", "state": "empty" }
         ]
       }
-    },
-    "footer": {
-      "thanks": "Thank you for your time, the application is coming soon.",
-      "cta": "Sign Out"
     },
     "faq": {
       "eyebrow": "Questions",
@@ -672,7 +667,8 @@
       }
     },
     "create": {
-      "title": "Define a ritual"
+      "title": "Define a ritual",
+      "saved": "Ritual defined · {name}"
     },
     "edit": {
       "title": "Edit ritual"
@@ -837,6 +833,10 @@
       },
       "greeting": "I'm your Strive AI. I help you log rituals, track your momentum, and keep your rhythm. What can I help with?"
     }
+  },
+  "welcome": {
+    "firstLogin": "Welcome, {username}. Let's define your first ritual.",
+    "demo": "Demo account. Explore freely, everything resets each night."
   },
   "rhythm": {
     "today": "Today",

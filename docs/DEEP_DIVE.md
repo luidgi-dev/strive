@@ -246,6 +246,7 @@ intensity.
 ## Links
 
 - **Pitch kit:** [`PITCH.md`](PITCH.md)
+- **Build log (how it was built):** [`BUILD_LOG.md`](BUILD_LOG.md)
 - **Architecture map:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
 - **Database guide:** [`../data/README.md`](../data/README.md)
 - **Product spec:** [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md)

@@ -137,7 +137,7 @@ export default async function Home({ params }: HomePageProps) {
           </>
         }
         subline="A calm habit tracker built on momentum, not streaks."
-        ctaLabel="Get early access"
+        ctaLabel="Create your account"
         authHref={authHref}
         demoCtaLabel="Try the demo"
       />
@@ -187,7 +187,7 @@ export default async function Home({ params }: HomePageProps) {
 
       <CtaFinalSection
         headline="Find your rhythm."
-        ctaLabel="Get early access"
+        ctaLabel="Create your account"
         authHref={authHref}
         helpHref={helpHref}
         privacyHref={privacyHref}

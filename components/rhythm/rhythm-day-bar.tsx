@@ -1,5 +1,6 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 
+import { parseIsoDateUtc } from "@/lib/date";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -25,10 +26,11 @@ export async function RhythmDayBar({ today, total, logged }: Props) {
           {t("today")}
         </h1>
         <span className="text-xs tracking-wide text-muted-foreground">
-          {format.dateTime(new Date(`${today}T00:00:00`), {
+          {format.dateTime(parseIsoDateUtc(today), {
             weekday: "short",
             month: "short",
             day: "numeric",
+            timeZone: "UTC",
           })}
         </span>
       </div>

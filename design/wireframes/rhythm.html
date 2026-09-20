@@ -1,4 +1,20 @@
 <!doctype html>
+<!--
+  Capture recipe (for the landing's screenshots-section, aspect-[7/12] + object-contain):
+  - `clean` hides the theme switcher AND pins the frame to a fixed 420x720 anchored
+    top-left, so a 420-wide window crops to exactly the frame.
+  - `theme` forces light or dark. Do not rely on prefers-color-scheme: a headless
+    browser follows the host OS, so the wrong variant can be exported silently.
+  - --force-device-scale-factor=2 is required, otherwise the export is 1x and looks
+    soft on any retina screen. Output is 840x1440, matching ai-chat-v2.
+  Example:
+    CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    F="file://$PWD/design/wireframes/rhythm.html"
+    "$CHROME" --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=420,720 \
+      --screenshot=public/wireframes/rhythm-light.png "$F?clean&theme=light"
+    "$CHROME" --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=420,720 \
+      --screenshot=public/wireframes/rhythm-dark.png  "$F?clean&theme=dark"
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -436,6 +452,21 @@
   /* Hide wireframe-only chrome when embedded in an iframe (landing preview) */
   .embedded .wf-controls { display: none; }
 
+  /* In capture/embed mode the frame is a fixed 420x720 (7:12) anchored top-left,
+     so a screenshot in a 420-wide window crops to exactly the frame. Mirrors
+     ai-chat-v2.html so the three landing screenshots share one scale. */
+  .embedded body { justify-content: flex-start; }
+  .embedded .frame {
+    width: 420px;
+    max-width: 420px;
+    height: 720px;
+    min-height: 720px;
+    margin: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+
   /* Bottom nav */
   .bottom-nav {
     position: absolute;
@@ -695,8 +726,16 @@
   const root = document.documentElement;
   const isEmbedded = window.parent !== window;
   const isClean = new URLSearchParams(window.location.search).has("clean");
-  if (isEmbedded || isClean) root.classList.add("embedded");
-  const initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  if (isEmbedded || isClean) {
+    root.classList.add("embedded");
+    // Captures must mirror the in-app default (collapsed), while the wireframe
+    // itself stays open so the grouping reads at a glance when reviewing it.
+    document.querySelectorAll("details.done-section").forEach((d) => { d.open = false; });
+  }
+  const requested = new URLSearchParams(window.location.search).get("theme");
+  const initial = requested === "light" || requested === "dark"
+    ? requested
+    : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   root.dataset.theme = initial;
   document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
     btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");

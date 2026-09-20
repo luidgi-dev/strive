@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   daysInMonth,
   isoWeekday,
+  parseIsoDateUtc,
   startOfLocalDayIso,
   startOfWeek,
   todayInTimeZone,
@@ -13,6 +14,26 @@ describe("isoWeekday", () => {
     expect(isoWeekday("2026-05-18")).toBe(1); // Monday
     expect(isoWeekday("2026-05-20")).toBe(3); // Wednesday
     expect(isoWeekday("2026-05-24")).toBe(7); // Sunday
+  });
+});
+
+describe("parseIsoDateUtc", () => {
+  it("lands on midnight UTC, whatever zone the test machine runs in", () => {
+    expect(parseIsoDateUtc("2026-09-14").toISOString()).toBe(
+      "2026-09-14T00:00:00.000Z",
+    );
+  });
+
+  it("keeps the weekday of a calendar date intact", () => {
+    // 2026-09-14 is a Monday. Formatting the parsed instant in UTC is exactly
+    // what The Arc does, so this is the regression guard for the day letters
+    // rendering one day early (LUI-149).
+    const weekday = new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      timeZone: "UTC",
+    }).format(parseIsoDateUtc("2026-09-14"));
+    expect(weekday).toBe("Mon");
+    expect(parseIsoDateUtc("2026-09-14").getUTCDay()).toBe(1);
   });
 });
 
