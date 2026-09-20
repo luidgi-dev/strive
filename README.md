@@ -1,6 +1,9 @@
 # Strive
 
-> Find your rhythm.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="public/readme-banner-dark.png">
+  <img alt="Strive. Find your rhythm." src="public/readme-banner-light.png">
+</picture>
 
 [![CI](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/luidgi-dev/strive/actions/workflows/ci.yml)
 
@@ -9,6 +12,14 @@ Strive (live at [striveapp.cc](https://www.striveapp.cc)) is a minimalist, AI-fi
 **Try it without signing up.** The landing page has a *Try the demo* button that opens a populated account, resets nightly. No credentials needed.
 
 **Status:** live, feature complete for the first release. Built solo. Maintained rather than actively expanded.
+
+<p>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/rhythm-dark.png"><img alt="Rhythm: today's rituals at a glance" src="public/wireframes/rhythm-light.png" width="240"></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/the-arc-dark.png"><img alt="The Arc: twelve weeks of consistency" src="public/wireframes/the-arc-light.png" width="240"></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/ai-chat-v2-dark.png"><img alt="My Strive: logging a ritual in plain language" src="public/wireframes/ai-chat-v2-light.png" width="240"></picture>
+</p>
+
+<sub>Rhythm, today at a glance &nbsp;·&nbsp; The Arc, twelve weeks of consistency &nbsp;·&nbsp; My Strive, logging in plain language</sub>
 
 ## What is Strive
 
