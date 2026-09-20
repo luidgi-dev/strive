@@ -375,6 +375,7 @@ with nightly reset; credentials kept out of the repo, ask Luidgi).
 ## 7. Links
 
 - **Technical deep dive:** [`DEEP_DIVE.md`](DEEP_DIVE.md)
+- **Build log (how it was built):** [`BUILD_LOG.md`](BUILD_LOG.md)
 - **Architecture:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
 - **Product spec:** [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md)
 - **Voice & terminology:** [`UX_WRITING.md`](UX_WRITING.md)
