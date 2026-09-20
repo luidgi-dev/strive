@@ -1,0 +1,154 @@
+<!doctype html>
+<!--
+  README banner. Source for public/readme-banner-{dark,light}.png
+
+  Capture recipe (800x250 logical, exported at 2x -> 1600x500):
+    CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    F="file://$PWD/design/wireframes/readme-banner.html"
+    "$CHROME" --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=800,250 \
+      --screenshot=public/readme-banner-dark.png  "$F?clean&theme=dark"
+    "$CHROME" --headless=new --hide-scrollbars --force-device-scale-factor=2 --window-size=800,250 \
+      --screenshot=public/readme-banner-light.png "$F?clean&theme=light"
+
+  `clean` hides the theme switcher and pins the frame to exactly 800x250, anchored top-left.
+  `theme` forces light or dark (headless Chrome reports light, so this must be explicit).
+  Tokens mirror app/globals.css via the other wireframes, so the banner sits on the same
+  surface as the screenshots placed under it in the README.
+  The logo mark is inlined from public/strive-app-dark.svg with its background rect removed,
+  so it keeps the brand gold on any surface.
+
+  Alternate taglines, swap the .tagline text:
+    Find your rhythm.
+    Consistency over intensity.
+    Momentum, not streaks.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>README banner — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --background: oklch(0.98 0.004 200);
+    --foreground: oklch(0.28 0.005 200);
+    --muted-foreground: oklch(0.55 0.01 200);
+    --border: oklch(0.92 0.002 200);
+    --mark: #8f7c55;
+    --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --background: oklch(0.18 0.006 200);
+    --foreground: oklch(0.86 0.006 200);
+    --muted-foreground: oklch(0.62 0.01 200);
+    --border: oklch(1 0 0 / 0.07);
+    --mark: #cab695;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .banner {
+    position: relative;
+    width: 800px;
+    height: 250px;
+    background: var(--background);
+    display: flex;
+    align-items: center;
+    padding: 0 72px;
+    gap: 34px;
+    overflow: hidden;
+  }
+
+  .mark { width: 88px; height: 88px; flex: none; display: block; }
+  .mark path { fill: var(--mark); }
+
+  .rule {
+    width: 1px;
+    height: 52px;
+    background: var(--border);
+    flex: none;
+  }
+
+  .tagline {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 42px;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--foreground);
+  }
+
+  /* Wireframe theme switcher, hidden in clean/embedded capture mode */
+  .wf-controls {
+    position: fixed; top: 12px; right: 12px; z-index: 10;
+    display: flex; gap: 6px;
+    font-family: var(--font-sans); font-size: 12px;
+  }
+  .wf-controls button {
+    border: 1px solid var(--border); background: var(--background);
+    color: var(--muted-foreground); border-radius: 999px;
+    padding: 4px 12px; cursor: pointer;
+  }
+  .wf-controls button[aria-pressed="true"] { color: var(--foreground); }
+  .embedded .wf-controls { display: none; }
+  .embedded body { overflow: hidden; }
+  .embedded .banner { position: absolute; top: 0; left: 0; }
+</style>
+</head>
+<body>
+
+<div class="wf-controls" role="group" aria-label="Wireframe theme">
+  <button type="button" data-set-theme="light" aria-pressed="false">Light</button>
+  <button type="button" data-set-theme="dark" aria-pressed="true">Dark</button>
+</div>
+
+<div class="banner">
+  <svg class="mark" viewBox="0 0 1024 1024" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <g transform="translate(0,1024) scale(0.1,-0.1)">
+      <g transform="translate(5138 5118) scale(1.2) translate(-5138 -5118)">
+        <path stroke="none" fill-rule="evenodd"
+              d="M6717 6618 c-4 -169 -8 -212 -24 -258 -38 -104 -76 -165 -147 -236 -113 -113 -236 -164 -401 -164 -103 0 -178 19 -290 75 -99 49 -168 99 -385 280 -210 175 -277 227 -371 288 -161 104 -338 179 -457 194 -35 4 -49 9 -40 14 7 5 487 9 1067 9 l1054 0 -6 -202z M4261 6713 c-37 -23 -98 -74 -147 -126 -176 -184 -245 -420 -195 -661 56 -271 248 -512 582 -729 109 -72 311 -182 569 -312 511 -257 708 -398 839 -599 148 -228 137 -503 -29 -696 l-30 -35 21 49 c17 40 21 63 17 122 -13 195 -185 374 -513 535 -187 91 -390 161 -722 248 -251 66 -369 105 -478 157 -303 143 -528 409 -613 723 -23 86 -26 114 -26 276 0 166 2 188 27 279 96 345 305 598 622 752 127 62 168 71 76 17z M4359 6628 c-20 -35 -17 -155 5 -213 50 -131 180 -256 386 -372 82 -47 319 -145 460 -192 69 -23 238 -73 375 -111 282 -78 346 -100 486 -169 296 -147 502 -371 595 -648 87 -258 67 -574 -52 -832 -110 -238 -310 -436 -555 -550 -115 -53 -145 -61 -88 -22 67 45 175 147 219 206 50 68 93 154 122 245 32 105 33 290 0 403 -78 272 -281 497 -652 723 -52 31 -246 135 -430 229 -509 261 -647 350 -804 516 -135 143 -196 281 -196 438 0 124 27 214 98 323 36 55 56 73 31 26z M4295 4247 c146 -51 195 -82 435 -277 199 -162 346 -274 440 -337 152 -102 323 -172 465 -191 133 -18 -279 -25 -1180 -19 -506 4 -921 7 -922 7 -11 1 0 324 13 388 44 217 200 389 405 447 81 23 253 14 344 -18z"/>
+      </g>
+    </g>
+  </svg>
+
+  <div class="rule"></div>
+
+  <p class="tagline">Find your rhythm.</p>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const params = new URLSearchParams(window.location.search);
+  const isEmbedded = window.parent !== window;
+  const isClean = params.has("clean");
+  if (isEmbedded || isClean) root.classList.add("embedded");
+
+  const requested = params.get("theme");
+  const initial = requested === "light" || requested === "dark"
+    ? requested
+    : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  root.dataset.theme = initial;
+
+  document.querySelectorAll(".wf-controls [data-set-theme]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", btn.dataset.setTheme === initial ? "true" : "false");
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.setTheme;
+      root.dataset.theme = t;
+      document.querySelectorAll(".wf-controls [data-set-theme]").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>
