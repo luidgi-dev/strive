@@ -13,6 +13,7 @@ GitHub recognizes these whether they sit at the repo root or in `.github/`:
 - [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute (branching, standards).
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1.
 - [SECURITY.md](SECURITY.md) — responsible vulnerability disclosure.
+- [PULL_REQUEST_TEMPLATE.md](PULL_REQUEST_TEMPLATE.md) — checklist prefilled on every new PR.
 
 (`LICENSE` stays at the repo root so GitHub's license detection picks it up.)
 
