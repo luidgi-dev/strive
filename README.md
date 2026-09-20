@@ -1,5 +1,3 @@
-# Strive
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="public/readme-banner-dark.png">
   <img alt="Strive. Find your rhythm." src="public/readme-banner-light.png">
@@ -14,8 +12,8 @@ Strive (live at [striveapp.cc](https://www.striveapp.cc)) is a minimalist, AI-fi
 **Status:** live, feature complete for the first release. Built solo. Maintained rather than actively expanded.
 
 <p>
-  <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/rhythm-dark.png"><img alt="Rhythm: today's rituals at a glance" src="public/wireframes/rhythm-light.png" width="240"></picture>
-  <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/the-arc-dark.png"><img alt="The Arc: twelve weeks of consistency" src="public/wireframes/the-arc-light.png" width="240"></picture>
+  <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/rhythm-dark.png"><img alt="Rhythm: today's rituals at a glance" src="public/wireframes/rhythm-light.png" width="240"></picture>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/the-arc-dark.png"><img alt="The Arc: twelve weeks of consistency" src="public/wireframes/the-arc-light.png" width="240"></picture>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <picture><source media="(prefers-color-scheme: dark)" srcset="public/wireframes/ai-chat-v2-dark.png"><img alt="My Strive: logging a ritual in plain language" src="public/wireframes/ai-chat-v2-light.png" width="240"></picture>
 </p>
 
