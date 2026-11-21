@@ -1,9 +1,12 @@
 // The Arc: pure data transforms for the 12-week ritual consistency view.
-// No I/O here. The page RSC fetches logs and calls buildArcModel; the display
-// component renders the result. Dates are handled as plain YYYY-MM-DD strings
-// in UTC to avoid timezone/DST drift.
+// No I/O here. The page RSC fetches logs and reduces them with
+// countCompletedByDate; buildArcModel turns those counts into one 12-week
+// window (server-side for the current one, client-side when navigating back).
+// Dates are handled as plain YYYY-MM-DD strings in UTC to avoid timezone/DST
+// drift.
 
-export type ArcDayStatus = "logged" | "rest" | "future";
+/** `before`: the ritual had not started yet, so the day is neither rest nor missed. */
+export type ArcDayStatus = "logged" | "rest" | "future" | "before";
 
 export type ArcDay = {
   /** Calendar day, YYYY-MM-DD. */
@@ -43,18 +46,27 @@ export type ArcLog = {
   status_id: string | null;
 };
 
-type BuildArcModelInput = {
-  logs: ArcLog[];
+/** Completed logs per calendar day (YYYY-MM-DD). Days without logs are absent. */
+export type ArcCounts = Record<string, number>;
+
+export type BuildArcModelInput = {
+  counts: ArcCounts;
   ritualType: string;
   frequencyUnit: string | null;
   frequencyValue: number | null;
   /** Reference "today" as YYYY-MM-DD, computed in the user's timezone server-side. */
   today: string;
   /**
-   * When the ritual started (YYYY-MM-DD). The chart spans from the ritual's
-   * first week up to now, so younger rituals render fewer weeks.
+   * When the ritual started (YYYY-MM-DD). The current window spans from the
+   * ritual's first week up to now, so younger rituals render fewer weeks.
    */
   startDate?: string | null;
+  /**
+   * Windows back from the current one (0 = the window ending this week). Past
+   * windows always render maxWeeks; the oldest one starts on the ritual's
+   * first week, so it may overlap the next one.
+   */
+  offset?: number;
   /** Maximum number of weeks to render. Defaults to 12. */
   maxWeeks?: number;
 };
@@ -96,43 +108,85 @@ export function deriveWeeklyTarget(
   return null;
 }
 
+/** Reduce raw log rows to completed logs per calendar day. */
+export function countCompletedByDate(logs: ArcLog[]): ArcCounts {
+  const counts: ArcCounts = {};
+  for (const log of logs) {
+    if (log.status_id !== "completed" || !log.logged_at) continue;
+    const date = log.logged_at.slice(0, 10);
+    counts[date] = (counts[date] ?? 0) + 1;
+  }
+  return counts;
+}
+
+/**
+ * How many windows can be browsed: 1 (the current one) until the ritual's
+ * first week falls out of it, then one more per maxWeeks elapsed.
+ */
+export function arcWindowCount({
+  today,
+  startDate,
+  maxWeeks = DEFAULT_WEEKS,
+}: {
+  today: string;
+  startDate?: string | null;
+  maxWeeks?: number;
+}): number {
+  if (!startDate) return 1;
+  const elapsed = weeksBetween(
+    mondayOf(startDate.slice(0, 10)),
+    mondayOf(today),
+  );
+  return Math.max(0, Math.floor(elapsed / maxWeeks)) + 1;
+}
+
 export function buildArcModel({
-  logs,
+  counts,
   ritualType,
   frequencyUnit,
   frequencyValue,
   today,
   startDate,
+  offset = 0,
   maxWeeks = DEFAULT_WEEKS,
 }: BuildArcModelInput): ArcModel {
-  // Count completed logs per calendar day.
-  const completedByDate = new Map<string, number>();
-  for (const log of logs) {
-    if (log.status_id !== "completed" || !log.logged_at) continue;
-    const date = log.logged_at.slice(0, 10);
-    completedByDate.set(date, (completedByDate.get(date) ?? 0) + 1);
+  const start = startDate ? startDate.slice(0, 10) : null;
+  let windowEndMonday = addDays(
+    mondayOf(today),
+    -offset * maxWeeks * DAYS_PER_WEEK,
+  );
+  if (offset > 0 && start !== null) {
+    // Pin the oldest window to the ritual's first week instead of leaving an
+    // empty stretch on the left of the chart.
+    const earliestEnd = addDays(
+      mondayOf(start),
+      DAYS_PER_WEEK * (maxWeeks - 1),
+    );
+    if (windowEndMonday < earliestEnd) windowEndMonday = earliestEnd;
   }
-
-  const currentMonday = mondayOf(today);
-  const weeks = weeksToRender(startDate, currentMonday, maxWeeks);
-  const firstMonday = addDays(currentMonday, -DAYS_PER_WEEK * (weeks - 1));
+  const weeks =
+    offset === 0 ? weeksToRender(start, windowEndMonday, maxWeeks) : maxWeeks;
+  const firstMonday = addDays(windowEndMonday, -DAYS_PER_WEEK * (weeks - 1));
 
   const arcWeeks: ArcWeek[] = [];
   let totalLogs = 0;
 
   for (let w = 0; w < weeks; w++) {
     const startDate = addDays(firstMonday, w * DAYS_PER_WEEK);
+    const endDate = addDays(startDate, DAYS_PER_WEEK - 1);
     const days: ArcDay[] = [];
     let count = 0;
 
     for (let d = 0; d < DAYS_PER_WEEK; d++) {
       const date = addDays(startDate, d);
-      const logged = completedByDate.get(date) ?? 0;
+      const logged = counts[date] ?? 0;
       count += logged;
 
+      // A log always wins over `before`: started_at can be edited after logging.
       let status: ArcDayStatus;
       if (date > today) status = "future";
       else if (logged > 0) status = "logged";
+      else if (start !== null && date < start) status = "before";
       else status = "rest";
 
       days.push({ date, status, count: logged, isToday: date === today });
@@ -141,7 +195,7 @@ export function buildArcModel({
     totalLogs += count;
     arcWeeks.push({
       startDate,
-      endDate: addDays(startDate, DAYS_PER_WEEK - 1),
+      endDate,
       count,
       days,
     });
@@ -195,12 +249,16 @@ function weeksToRender(
   maxWeeks: number,
 ): number {
   if (!startDate) return maxWeeks;
-  const startMonday = mondayOf(startDate.slice(0, 10));
-  const elapsedWeeks = Math.round(
-    (parseISODate(currentMonday).getTime() - parseISODate(startMonday).getTime()) /
+  const elapsedWeeks = weeksBetween(mondayOf(startDate), currentMonday);
+  return Math.max(1, Math.min(maxWeeks, elapsedWeeks + 1));
+}
+
+/** Whole weeks from one Monday to another (negative when `to` is earlier). */
+function weeksBetween(fromMonday: string, toMonday: string): number {
+  return Math.round(
+    (parseISODate(toMonday).getTime() - parseISODate(fromMonday).getTime()) /
       (MS_PER_DAY * DAYS_PER_WEEK),
   );
-  return Math.max(1, Math.min(maxWeeks, elapsedWeeks + 1));
 }
 
 /** Compare the last two fully elapsed weeks (the current week is partial). */
@@ -251,9 +309,7 @@ export function buildArcGeometry(
 
   const linePath = buildSmoothPath(points);
   const areaPath =
-    points.length > 0
-      ? `${linePath} L ${width},${height} L 0,${height} Z`
-      : "";
+    points.length > 0 ? `${linePath} L ${width},${height} L 0,${height} Z` : "";
 
   return {
     width,

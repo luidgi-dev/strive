@@ -695,6 +695,8 @@
         "meta": "{n} sur {target}",
         "metaCount": "{n} enregistrés",
         "selectWeek": "Afficher la semaine du {date}",
+        "earlier": "Semaines précédentes",
+        "later": "Semaines suivantes",
         "emptyTitle": "L'Arc se dessine avec le temps",
         "emptyBody": "Enregistre ce rituel et ton rythme au fil des semaines apparaîtra ici."
       },

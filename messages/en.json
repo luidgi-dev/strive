@@ -695,6 +695,8 @@
         "meta": "{n} of {target}",
         "metaCount": "{n} logged",
         "selectWeek": "Show week of {date}",
+        "earlier": "Earlier weeks",
+        "later": "Later weeks",
         "emptyTitle": "The Arc takes shape with time",
         "emptyBody": "Log this ritual and your rhythm over the weeks will appear here."
       },

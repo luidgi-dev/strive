@@ -8,7 +8,7 @@ import { RitualCardActions } from "@/components/rituals/ritual-card-actions";
 import { RitualLogControl } from "@/components/rituals/ritual-log-control";
 import { RitualLogProvider } from "@/components/rituals/ritual-log-provider";
 import { RitualMeta } from "@/components/rituals/ritual-meta";
-import { TheArc } from "@/components/rituals/the-arc";
+import { TheArcBrowser } from "@/components/rituals/the-arc-browser";
 import { TheArcLive } from "@/components/rituals/the-arc-live";
 import { Link } from "@/lib/i18n/navigation";
 import { getUserToday } from "@/lib/profile";
@@ -21,7 +21,7 @@ import {
   getVisibleCategoriesForUser,
   type MomentumStatus,
 } from "@/lib/data/rituals";
-import { buildArcModel } from "@/lib/rituals/arc";
+import { buildArcModel, countCompletedByDate } from "@/lib/rituals/arc";
 import { getCategoryLabel } from "@/lib/rituals/category-label";
 import { isRitualFresh, ritualPeriodLabel } from "@/lib/rituals/presentation";
 import { createClient } from "@/lib/supabase/server";
@@ -30,12 +30,6 @@ type Props = {
   params: Promise<{ locale: string; id: string }>;
   searchParams: Promise<{ from?: string }>;
 };
-
-const ARC_LOOKBACK_DAYS = 90;
-
-function isoDaysAgo(days: number): string {
-  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
-}
 
 export default async function RitualDetailPage({ params, searchParams }: Props) {
   const { locale, id } = await params;
@@ -54,19 +48,21 @@ export default async function RitualDetailPage({ params, searchParams }: Props) 
 
   const [progress, logs, categories] = await Promise.all([
     getRitualProgress(supabase, id),
-    getRitualArcLogs(supabase, id, isoDaysAgo(ARC_LOOKBACK_DAYS)),
+    getRitualArcLogs(supabase, id),
     getVisibleCategoriesForUser(supabase),
   ]);
 
   const startedAt = ritual.started_at ?? ritual.created_at;
-  const model = buildArcModel({
-    logs,
+  // Only daily counts reach the client: every Arc window is rebuilt from them.
+  const arcHistory = {
+    counts: countCompletedByDate(logs),
     ritualType: ritual.ritual_type,
     frequencyUnit: ritual.frequency_unit,
     frequencyValue: ritual.frequency_value,
     today,
     startDate: startedAt,
-  });
+  };
+  const model = buildArcModel(arcHistory);
 
   const isOneTime = ritual.ritual_type === "one_time";
   const completedAt = isOneTime
@@ -74,10 +70,7 @@ export default async function RitualDetailPage({ params, searchParams }: Props) 
     : null;
 
   // One-time logging is a single done flag; recurring/open count today's logs.
-  const todayCount = logs.filter(
-    (log) =>
-      log.status_id === "completed" && log.logged_at?.slice(0, 10) === today,
-  ).length;
+  const todayCount = arcHistory.counts[today] ?? 0;
   const initialLogCount = isOneTime ? (completedAt ? 1 : 0) : todayCount;
 
   const subtitle = buildSubtitle();
@@ -192,9 +185,9 @@ export default async function RitualDetailPage({ params, searchParams }: Props) 
           </div>
 
           {isArchived ? (
-            <TheArc model={model} />
+            <TheArcBrowser history={arcHistory} />
           ) : (
-            <TheArcLive baseModel={model} today={today} />
+            <TheArcLive history={arcHistory} />
           )}
         </>
       )}
