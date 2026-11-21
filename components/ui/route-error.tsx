@@ -1,9 +1,12 @@
 "use client";
 
 import { RotateCcw } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
+import { ErrorState } from "@/components/errors/error-state";
 import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
+import { homePath, type Locale } from "@/lib/locales";
 
 type Props = {
   /** The reset handler from the route's `error.tsx` boundary. */
@@ -11,30 +14,32 @@ type Props = {
 };
 
 /**
- * Shared UI for App Router `error.tsx` boundaries — a calm, centered message
- * with a retry action, in the app's quiet style. Each segment's `error.tsx`
- * logs the error and renders this.
+ * Shared UI for App Router `error.tsx` boundaries: retry first, and a way out
+ * when retrying does not help. Each segment's `error.tsx` logs the error and
+ * renders this.
  */
 export function RouteError({ reset }: Props) {
   const t = useTranslations("error");
+  const locale = useLocale() as Locale;
 
   return (
-    <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-4 px-2 pb-24 text-center">
-      <div
-        aria-hidden
-        className="flex size-16 items-center justify-center rounded-2xl bg-accent text-muted-foreground"
-      >
-        <RotateCcw className="size-7" strokeWidth={1.5} />
-      </div>
-      <h2 className="max-w-[280px] font-heading text-[22px] font-bold leading-tight tracking-tight text-foreground">
-        {t("title")}
-      </h2>
-      <p className="max-w-[280px] text-[13.5px] leading-relaxed text-muted-foreground">
-        {t("body")}
-      </p>
-      <Button onClick={reset} size="lg" className="mt-2 min-h-[44px]">
+    <ErrorState
+      code="500"
+      title={t("title")}
+      body={t("body")}
+      icon={<RotateCcw />}
+    >
+      <Button onClick={reset} size="lg" className="min-h-[44px] px-5">
         {t("retry")}
       </Button>
-    </div>
+      {/* Landing redirects signed-in users to Rhythm (proxy.ts). */}
+      <ButtonLink
+        href={homePath(locale)}
+        variant="link"
+        className="min-h-[44px] text-muted-foreground"
+      >
+        {t("back")}
+      </ButtonLink>
+    </ErrorState>
   );
 }
