@@ -1,8 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import { signInAsDemo } from "@/app/[locale]/actions";
 import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 
 type HeroSectionProps = {
   logoAlt: string;
@@ -57,11 +57,13 @@ export function HeroSection({
         </p>
       ) : null}
       <div className="mt-12 flex flex-col items-center gap-5">
-        <Button className="h-14 rounded-full px-10 text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]">
-          <Link href={authHref} prefetch={false}>
-            {ctaLabel}
-          </Link>
-        </Button>
+        <ButtonLink
+          href={authHref}
+          prefetch={false}
+          className="h-14 rounded-full px-10 text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          {ctaLabel}
+        </ButtonLink>
         {demoCtaLabel ? (
           <form action={signInAsDemo}>
             <Button
