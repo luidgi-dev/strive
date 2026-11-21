@@ -11,6 +11,7 @@ import { homePath, type Locale } from "@/lib/locales";
 type Props = {
   /** The reset handler from the route's `error.tsx` boundary. */
   reset: () => void;
+  className?: string;
 };
 
 /**
@@ -18,7 +19,7 @@ type Props = {
  * when retrying does not help. Each segment's `error.tsx` logs the error and
  * renders this.
  */
-export function RouteError({ reset }: Props) {
+export function RouteError({ reset, className }: Props) {
   const t = useTranslations("error");
   const locale = useLocale() as Locale;
 
@@ -28,6 +29,7 @@ export function RouteError({ reset }: Props) {
       title={t("title")}
       body={t("body")}
       icon={<RotateCcw />}
+      className={className}
     >
       <Button onClick={reset} size="lg" className="min-h-[44px] px-5">
         {t("retry")}

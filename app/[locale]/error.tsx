@@ -3,6 +3,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
+import { ErrorPage } from "@/components/errors/error-page";
 import { RouteError } from "@/components/ui/route-error";
 
 /**
@@ -21,5 +22,9 @@ export default function LocaleError({
     console.error("[locale] route error", error);
   }, [error]);
 
-  return <RouteError reset={reset} />;
+  return (
+    <ErrorPage>
+      <RouteError reset={reset} className="min-h-0 pb-0" />
+    </ErrorPage>
+  );
 }

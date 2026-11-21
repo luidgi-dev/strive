@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { cn } from "@/lib/utils";
+
 type Props = {
   /** Status caption above the title, e.g. "404". Not translated. */
   code: string;
@@ -9,6 +11,8 @@ type Props = {
   icon: ReactNode;
   /** One primary action, optionally followed by a secondary link. */
   children: ReactNode;
+  /** Placement override; the default suits the in-app layout (bottom nav). */
+  className?: string;
 };
 
 /**
@@ -16,9 +20,21 @@ type Props = {
  * one primary action. No hooks, so Server and Client Components can both use it.
  * Never pass it a raw error message.
  */
-export function ErrorState({ code, title, body, icon, children }: Props) {
+export function ErrorState({
+  code,
+  title,
+  body,
+  icon,
+  children,
+  className,
+}: Props) {
   return (
-    <div className="mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-4 px-2 pb-24 text-center">
+    <div
+      className={cn(
+        "mx-auto flex min-h-[70dvh] max-w-md flex-col items-center justify-center gap-4 px-2 pb-24 text-center",
+        className,
+      )}
+    >
       <div
         aria-hidden
         className="flex size-16 items-center justify-center rounded-2xl bg-accent text-muted-foreground [&_svg]:size-7 [&_svg]:stroke-[1.5]"
