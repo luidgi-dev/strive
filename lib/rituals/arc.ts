@@ -25,8 +25,6 @@ export type ArcWeek = {
   endDate: string;
   /** Completed logs during the week (multiple logs per day are summed). */
   count: number;
-  /** Whole week ends before the ritual's start: padding in the oldest window. */
-  beforeStart: boolean;
   /** Always 7 entries, Monday through Sunday. */
   days: ArcDay[];
 };
@@ -65,7 +63,8 @@ export type BuildArcModelInput = {
   startDate?: string | null;
   /**
    * Windows back from the current one (0 = the window ending this week). Past
-   * windows always render maxWeeks, padding pre-start weeks with `before`.
+   * windows always render maxWeeks; the oldest one starts on the ritual's
+   * first week, so it may overlap the next one.
    */
   offset?: number;
   /** Maximum number of weeks to render. Defaults to 12. */
@@ -152,10 +151,19 @@ export function buildArcModel({
   maxWeeks = DEFAULT_WEEKS,
 }: BuildArcModelInput): ArcModel {
   const start = startDate ? startDate.slice(0, 10) : null;
-  const windowEndMonday = addDays(
+  let windowEndMonday = addDays(
     mondayOf(today),
     -offset * maxWeeks * DAYS_PER_WEEK,
   );
+  if (offset > 0 && start !== null) {
+    // Pin the oldest window to the ritual's first week instead of leaving an
+    // empty stretch on the left of the chart.
+    const earliestEnd = addDays(
+      mondayOf(start),
+      DAYS_PER_WEEK * (maxWeeks - 1),
+    );
+    if (windowEndMonday < earliestEnd) windowEndMonday = earliestEnd;
+  }
   const weeks =
     offset === 0 ? weeksToRender(start, windowEndMonday, maxWeeks) : maxWeeks;
   const firstMonday = addDays(windowEndMonday, -DAYS_PER_WEEK * (weeks - 1));
@@ -189,7 +197,6 @@ export function buildArcModel({
       startDate,
       endDate,
       count,
-      beforeStart: start !== null && endDate < start && count === 0,
       days,
     });
   }
@@ -294,26 +301,15 @@ export function buildArcGeometry(
   const counts = weeks.map((week) => week.count);
   const yMax = Math.max(weeklyTarget ?? 0, ...counts, 1);
 
-  // Pre-start weeks keep their x slot (same scale in every window) but get no
-  // point: the curve begins at the ritual's first week.
-  const points: ArcPoint[] = weeks.flatMap((week, index) =>
-    week.beforeStart
-      ? []
-      : [
-          {
-            weekIndex: index,
-            x:
-              weeks.length === 1 ? width : (index / (weeks.length - 1)) * width,
-            y: height - (counts[index] / yMax) * height,
-          },
-        ],
-  );
+  const points: ArcPoint[] = weeks.map((_, index) => ({
+    weekIndex: index,
+    x: weeks.length === 1 ? width : (index / (weeks.length - 1)) * width,
+    y: height - (counts[index] / yMax) * height,
+  }));
 
   const linePath = buildSmoothPath(points);
   const areaPath =
-    points.length > 0
-      ? `${linePath} L ${points[points.length - 1].x},${height} L ${points[0].x},${height} Z`
-      : "";
+    points.length > 0 ? `${linePath} L ${width},${height} L 0,${height} Z` : "";
 
   return {
     width,

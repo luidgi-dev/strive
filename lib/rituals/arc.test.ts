@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { isoWeekday } from "@/lib/date";
 import {
   arcWindowCount,
-  buildArcGeometry,
   buildArcModel,
   countCompletedByDate,
   type ArcLog,
@@ -125,11 +124,10 @@ describe("arcWindowCount", () => {
 });
 
 describe("buildArcModel past windows", () => {
-  const OLD_START = "2026-04-15"; // a Wednesday
-
   it("renders 12 Monday-aligned weeks right before the current window", () => {
-    const current = build([], { startDate: OLD_START }).weeks;
-    const previous = build([], { startDate: OLD_START, offset: 1 }).weeks;
+    const START = "2026-03-02"; // 28 weeks back: three windows
+    const current = build([], { startDate: START }).weeks;
+    const previous = build([], { startDate: START, offset: 1 }).weeks;
 
     expect(previous).toHaveLength(12);
     for (const week of previous) {
@@ -142,7 +140,7 @@ describe("buildArcModel past windows", () => {
 
   it("places logs and has no today or future days", () => {
     const model = build(completed("2026-05-05T10:00:00Z"), {
-      startDate: OLD_START,
+      startDate: "2026-03-02",
       offset: 1,
     });
     const days = model.weeks.flatMap((week) => week.days);
@@ -155,53 +153,40 @@ describe("buildArcModel past windows", () => {
     );
   });
 
-  it("pads the oldest window with pre-start weeks and days", () => {
-    const weeks = build([], { startDate: OLD_START, offset: 1 }).weeks;
+  describe("oldest window", () => {
+    const START = "2026-04-15"; // a Wednesday, 22 weeks back: two windows
 
-    expect(weeks).toHaveLength(12);
-    expect(weeks[0].startDate).toBe("2026-04-06");
-    expect(weeks[0].beforeStart).toBe(true);
-    expect(weeks[0].days.every((day) => day.status === "before")).toBe(true);
+    it("starts on the ritual's first week, overlapping the next window", () => {
+      const weeks = build([], { startDate: START, offset: 1 }).weeks;
 
-    // Start week: Mon/Tue before the start, Wednesday onwards counts.
-    const startWeek = weeks[1];
-    expect(startWeek.beforeStart).toBe(false);
-    expect(startWeek.days.map((day) => day.status)).toEqual([
-      "before",
-      "before",
-      "rest",
-      "rest",
-      "rest",
-      "rest",
-      "rest",
-    ]);
+      expect(weeks).toHaveLength(12);
+      expect(weeks[0].startDate).toBe("2026-04-13");
+      expect(weeks.at(-1)!.endDate).toBe("2026-07-05");
+    });
+
+    it("marks start-week days before the start as before, not rest", () => {
+      const startWeek = build([], { startDate: START, offset: 1 }).weeks[0];
+      expect(startWeek.days.map((day) => day.status)).toEqual([
+        "before",
+        "before",
+        "rest",
+        "rest",
+        "rest",
+        "rest",
+        "rest",
+      ]);
+    });
+
+    it("lets a log win over the before status", () => {
+      const startWeek = build(completed("2026-04-14T10:00:00Z"), {
+        startDate: START,
+        offset: 1,
+      }).weeks[0];
+      expect(startWeek.days[1].status).toBe("logged");
+    });
   });
 
-  it("lets a log win over the pre-start status", () => {
-    const weeks = build(completed("2026-04-07T10:00:00Z"), {
-      startDate: OLD_START,
-      offset: 1,
-    }).weeks;
-    expect(weeks[0].beforeStart).toBe(false);
-    expect(weeks[0].days[1].status).toBe("logged");
-  });
-
-  it("keeps the current window of a young ritual unpadded", () => {
-    const weeks = build([], { startDate: "2026-08-12" }).weeks;
-    expect(weeks).toHaveLength(6);
-    expect(weeks.some((week) => week.beforeStart)).toBe(false);
-  });
-});
-
-describe("buildArcGeometry", () => {
-  it("draws no point for pre-start weeks but keeps the x scale", () => {
-    const weeks = build([], { startDate: "2026-04-15", offset: 1 }).weeks;
-    const geometry = buildArcGeometry(weeks, 4, 330, 96);
-
-    expect(geometry.points.map((point) => point.weekIndex)).toEqual([
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-    ]);
-    expect(geometry.points[0].x).toBe(30); // 1/11 of 330
-    expect(geometry.points.at(-1)!.x).toBe(330);
+  it("keeps the current window of a young ritual short", () => {
+    expect(build([], { startDate: "2026-08-12" }).weeks).toHaveLength(6);
   });
 });

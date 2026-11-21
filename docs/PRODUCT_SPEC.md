@@ -173,7 +173,7 @@ Detailed view of a ritual.
 **The Arc**
 - 12-week consistency visualization
 - shows: consistency, rest days, progress trend
-- earlier 12-week windows browsable (chevrons, swipe) back to the ritual's first week; weeks before the start are muted, never shown as missed
+- earlier 12-week windows browsable (chevrons, swipe); the oldest window starts on the ritual's first week, and days before the start are muted, never shown as missed
 
 **History**
 - list of logs

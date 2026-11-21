@@ -81,13 +81,9 @@ export function TheArc({ model, isEmpty, nav, className }: Props) {
     CHART_HEIGHT,
   );
   const week = weeks[selectedWeek];
-  // Pre-start weeks have no point, so look it up by week rather than by index.
-  const selectedPoint = geometry.points.find(
-    (point) => point.weekIndex === selectedWeek,
-  );
-  const firstStartedWeek = weeks.find((w) => !w.beforeStart) ?? weeks[0];
+  const selectedPoint = geometry.points[selectedWeek];
   const range = format.dateTimeRange(
-    parseIsoDateUtc(firstStartedWeek.startDate),
+    parseIsoDateUtc(weeks[0].startDate),
     parseIsoDateUtc(weeks[weeks.length - 1].endDate),
     { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" },
   );
@@ -185,19 +181,17 @@ export function TheArc({ model, isEmpty, nav, className }: Props) {
               vectorEffect="non-scaling-stroke"
             />
 
-            {selectedPoint ? (
-              <line
-                x1={selectedPoint.x}
-                y1={selectedPoint.y}
-                x2={selectedPoint.x}
-                y2={CHART_HEIGHT}
-                stroke="currentColor"
-                strokeWidth="1"
-                strokeDasharray="2 3"
-                opacity="0.3"
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null}
+            <line
+              x1={selectedPoint.x}
+              y1={selectedPoint.y}
+              x2={selectedPoint.x}
+              y2={CHART_HEIGHT}
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeDasharray="2 3"
+              opacity="0.3"
+              vectorEffect="non-scaling-stroke"
+            />
           </svg>
 
           {/* Points are HTML so they stay perfectly round at any width: the
@@ -233,7 +227,7 @@ export function TheArc({ model, isEmpty, nav, className }: Props) {
         </div>
 
         <div className="flex justify-between text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          <span>{formatShortDate(firstStartedWeek.startDate)}</span>
+          <span>{formatShortDate(weeks[0].startDate)}</span>
           <span>{formatShortDate(weeks[weeks.length - 1].startDate)}</span>
         </div>
       </div>
