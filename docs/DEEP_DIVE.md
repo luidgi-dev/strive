@@ -107,7 +107,9 @@ A load-bearing technical decision that maps directly to the product philosophy.
 - `ritual_progress` gives current-period progression and completion rate per
   active ritual.
 - `daily_summary` gives the daily snapshot (total, logged today, remaining).
-- `ritual_log_history` powers **The Arc**, the 12-week consistency view.
+- `ritual_log_history` powers **The Arc**, the 12-week consistency view. The
+  ritual's whole history is read once and reduced to daily counts, so browsing
+  earlier windows happens client-side with no extra request.
 
 All three views are declared `security_invoker = on`, so they read under the
 caller's RLS rather than the view owner's.

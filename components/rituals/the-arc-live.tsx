@@ -1,21 +1,18 @@
 "use client";
 
-import { applyOptimisticToday, type ArcModel } from "@/lib/rituals/arc";
-
 import { useRitualLog } from "./ritual-log-provider";
-import { TheArc } from "./the-arc";
+import { TheArcBrowser, type ArcHistory } from "./the-arc-browser";
 
 type Props = {
-  baseModel: ArcModel;
-  /** Today as YYYY-MM-DD, in the user's timezone. */
-  today: string;
+  history: ArcHistory;
 };
 
 /**
- * Renders The Arc with today's optimistic log count overlaid, so the chart and
- * heatmap react the instant the user logs. Keeps TheArc a pure display component.
+ * The Arc with today's optimistic log count overlaid, so the chart and heatmap
+ * react the instant the user logs. Needs the ritual log provider; archived
+ * rituals render TheArcBrowser directly.
  */
-export function TheArcLive({ baseModel, today }: Props) {
+export function TheArcLive({ history }: Props) {
   const { count } = useRitualLog();
-  return <TheArc model={applyOptimisticToday(baseModel, today, count)} />;
+  return <TheArcBrowser history={history} todayCount={count} />;
 }
