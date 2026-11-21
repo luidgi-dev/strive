@@ -31,35 +31,37 @@ export function CtaFinalSection({
         </Button>
       </section>
 
-      <footer className="border-t border-border px-6 py-8 text-center text-xs text-muted-foreground">
+      <footer className="border-t border-border px-6 py-5 text-center text-xs text-muted-foreground">
         <span>
           © 2026 Strive · Built by{" "}
+          {/* noreferrer drops the Referer header, so ?ref is what attributes
+              the visit on the portfolio. */}
           <Link
-            href="https://github.com/luidgi-dev"
+            href="https://luidgi.dev?ref=strive"
             target="_blank"
             rel="noopener noreferrer"
-            className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
+            className="inline-flex min-h-11 items-center underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-border"
           >
-            Luidgi
+            luidgi.dev
           </Link>
           {" · "}
           <Link
             href={privacyHref}
-            className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
+            className="inline-flex min-h-11 items-center underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-border"
           >
             Privacy
           </Link>
           {" · "}
           <Link
             href={termsHref}
-            className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
+            className="inline-flex min-h-11 items-center underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-border"
           >
             Terms
           </Link>
           {" · "}
           <Link
             href={helpHref}
-            className="border-b border-transparent transition-colors hover:border-border hover:text-foreground"
+            className="inline-flex min-h-11 items-center underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-border"
           >
             Help
           </Link>
