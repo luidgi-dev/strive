@@ -289,17 +289,20 @@ export async function getRitualProgress(
   };
 }
 
+/**
+ * Full log history of a ritual, for every window of The Arc. Newest first: if
+ * the API row cap (1000 by default) is ever reached, the oldest weeks drop out,
+ * never the current ones. Largest history in prod on 2026-11-21: 184 rows.
+ */
 export async function getRitualArcLogs(
   client: SupabaseClient<Database>,
   ritualId: string,
-  since: string,
 ): Promise<RitualLogHistoryEntry[]> {
   const { data, error } = await client
     .from("ritual_log_history")
     .select("logged_at, status_id, note")
     .eq("ritual_id", ritualId)
-    .gte("logged_at", since)
-    .order("logged_at", { ascending: true });
+    .order("logged_at", { ascending: false });
 
   if (error) throw error;
   return data ?? [];

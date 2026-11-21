@@ -1,25 +1,42 @@
 "use client";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useId, useState } from "react";
 
 import { parseIsoDateUtc } from "@/lib/date";
-import { buildArcGeometry, type ArcDay, type ArcModel } from "@/lib/rituals/arc";
+import {
+  buildArcGeometry,
+  type ArcDay,
+  type ArcModel,
+} from "@/lib/rituals/arc";
 import { cn } from "@/lib/utils";
+
+type ArcNav = {
+  canGoEarlier: boolean;
+  canGoLater: boolean;
+  onEarlier: () => void;
+  onLater: () => void;
+};
 
 type Props = {
   model: ArcModel;
+  /** The ritual has no log at all (not just in this window). */
+  isEmpty: boolean;
+  /** Window navigation; absent when there is only one window. */
+  nav?: ArcNav;
+  className?: string;
 };
 
 const CHART_WIDTH = 330;
 const CHART_HEIGHT = 96;
 
-export function TheArc({ model }: Props) {
+export function TheArc({ model, isEmpty, nav, className }: Props) {
   const t = useTranslations("rituals.detail.arc");
   const format = useFormatter();
   const gradientId = useId();
 
-  const { weeks, weeklyTarget, totalLogs } = model;
+  const { weeks, weeklyTarget } = model;
   const [selectedWeek, setSelectedWeek] = useState(weeks.length - 1);
 
   // The Arc's dates are calendar days, parsed and formatted in UTC so the day
@@ -37,9 +54,11 @@ export function TheArc({ model }: Props) {
       timeZone: "UTC",
     });
 
-  if (totalLogs === 0) {
+  if (isEmpty) {
     return (
-      <section className="rounded-xl border border-border bg-card p-4">
+      <section
+        className={cn("rounded-xl border border-border bg-card p-4", className)}
+      >
         <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
           {t("label")}
         </span>
@@ -62,14 +81,28 @@ export function TheArc({ model }: Props) {
     CHART_HEIGHT,
   );
   const week = weeks[selectedWeek];
-  const selectedPoint = geometry.points[selectedWeek];
+  // Pre-start weeks have no point, so look it up by week rather than by index.
+  const selectedPoint = geometry.points.find(
+    (point) => point.weekIndex === selectedWeek,
+  );
+  const firstStartedWeek = weeks.find((w) => !w.beforeStart) ?? weeks[0];
+  const range = format.dateTimeRange(
+    parseIsoDateUtc(firstStartedWeek.startDate),
+    parseIsoDateUtc(weeks[weeks.length - 1].endDate),
+    { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" },
+  );
   const meta =
     weeklyTarget === null
       ? t("metaCount", { n: week.count })
       : t("meta", { n: week.count, target: weeklyTarget });
 
   return (
-    <section className="flex flex-col gap-3.5 rounded-xl border border-border bg-card p-4 text-foreground">
+    <section
+      className={cn(
+        "flex flex-col gap-3.5 rounded-xl border border-border bg-card p-4 text-foreground",
+        className,
+      )}
+    >
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between gap-2 px-0.5">
           <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
@@ -81,6 +114,35 @@ export function TheArc({ model }: Props) {
             </span>
           ) : null}
         </div>
+
+        {nav ? (
+          <div className="-mx-2.5 -my-1.5 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={nav.onEarlier}
+              disabled={!nav.canGoEarlier}
+              aria-label={t("earlier")}
+              className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <span
+              aria-live="polite"
+              className="text-[11px] font-semibold tracking-[0.04em] text-foreground"
+            >
+              {range}
+            </span>
+            <button
+              type="button"
+              onClick={nav.onLater}
+              disabled={!nav.canGoLater}
+              aria-label={t("later")}
+              className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
+        ) : null}
 
         <div className="relative h-24 w-full">
           <svg
@@ -123,17 +185,19 @@ export function TheArc({ model }: Props) {
               vectorEffect="non-scaling-stroke"
             />
 
-            <line
-              x1={selectedPoint.x}
-              y1={selectedPoint.y}
-              x2={selectedPoint.x}
-              y2={CHART_HEIGHT}
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeDasharray="2 3"
-              opacity="0.3"
-              vectorEffect="non-scaling-stroke"
-            />
+            {selectedPoint ? (
+              <line
+                x1={selectedPoint.x}
+                y1={selectedPoint.y}
+                x2={selectedPoint.x}
+                y2={CHART_HEIGHT}
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeDasharray="2 3"
+                opacity="0.3"
+                vectorEffect="non-scaling-stroke"
+              />
+            ) : null}
           </svg>
 
           {/* Points are HTML so they stay perfectly round at any width: the
@@ -169,7 +233,7 @@ export function TheArc({ model }: Props) {
         </div>
 
         <div className="flex justify-between text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          <span>{formatShortDate(weeks[0].startDate)}</span>
+          <span>{formatShortDate(firstStartedWeek.startDate)}</span>
           <span>{formatShortDate(weeks[weeks.length - 1].startDate)}</span>
         </div>
       </div>
@@ -187,7 +251,11 @@ export function TheArc({ model }: Props) {
         </div>
         <div className="grid grid-cols-7 gap-1.5">
           {week.days.map((day) => (
-            <DayCell key={day.date} day={day} letter={formatDayLetter(day.date)} />
+            <DayCell
+              key={day.date}
+              day={day}
+              letter={formatDayLetter(day.date)}
+            />
           ))}
         </div>
       </div>
@@ -208,8 +276,8 @@ function DayCell({ day, letter }: { day: ArcDay; letter: string }) {
           "text-[10px] font-bold uppercase tracking-[0.08em]",
           day.status === "logged" || day.isToday
             ? "text-foreground"
-            : day.status === "future"
-              ? "text-muted-foreground"
+            : day.status === "before"
+              ? "text-muted-foreground/50"
               : "text-muted-foreground",
         )}
       >
@@ -227,6 +295,8 @@ function DayCell({ day, letter }: { day: ArcDay; letter: string }) {
             "border border-dashed border-muted-foreground/35 bg-transparent",
           day.status === "future" &&
             "border border-dashed border-muted-foreground/20 bg-transparent",
+          // Not started yet: a flat faint dot, unlike the dashed rest/missed ring.
+          day.status === "before" && "bg-muted-foreground/10",
         )}
       />
     </div>
