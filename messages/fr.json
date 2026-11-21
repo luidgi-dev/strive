@@ -854,7 +854,12 @@
   "error": {
     "title": "Une erreur est survenue.",
     "body": "Une erreur inattendue a interrompu cette page. Vous pouvez réessayer.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "back": "Retour à Strive",
+    "notFound": {
+      "title": "Cette page n'existe pas.",
+      "body": "Le lien est peut-être ancien, ou l'adresse mal saisie."
+    }
   },
   "insights": {
     "title": "Insights",
