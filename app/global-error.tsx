@@ -1,15 +1,34 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+
+import { localeFromPathname, type Locale } from "@/lib/locales";
+
+// The one documented exception to "no hardcoded strings": next-intl is not
+// available here, so the copy is inlined and the locale read from the URL.
+const COPY: Record<Locale, { title: string; body: string; retry: string }> = {
+  en: {
+    title: "Something went wrong.",
+    body: "Try reloading the page.",
+    retry: "Try again",
+  },
+  fr: {
+    title: "Une erreur est survenue.",
+    body: "Essayez de recharger la page.",
+    retry: "Réessayer",
+  },
+};
 
 /**
  * Last-resort boundary for crashes in the root layout itself. It replaces
  * `<html>/<body>`, so the design-system stylesheet, fonts, theme provider and
- * i18n are NOT available here — hence the self-contained, English-only markup
- * with inline colors mirroring the Strive palette (light + dark via media
- * query). Every other error is handled by the styled, localized
- * `(app)/error.tsx`. Keep this rare path simple and on-brand.
+ * i18n are NOT available here — hence the self-contained markup with inline
+ * copy (EN/FR, locale from the URL) and inline colors mirroring the Strive
+ * palette (light + dark via media query). Every other error is handled by the
+ * styled, localized `[locale]/error.tsx` and `(app)/error.tsx`. Keep this rare
+ * path simple and on-brand.
  */
 export default function GlobalError({
   error,
@@ -18,13 +37,16 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const locale = localeFromPathname(usePathname() ?? "/");
+  const copy = COPY[locale];
+
   useEffect(() => {
     Sentry.captureException(error);
     console.error("[global] root layout error", error);
   }, [error]);
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         style={{
           margin: 0,
@@ -55,6 +77,19 @@ export default function GlobalError({
             gap: 12,
           }}
         >
+          <p
+            className="ge-muted"
+            style={{
+              margin: "0 0 -4px",
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "oklch(0.55 0.01 200)",
+            }}
+          >
+            500
+          </p>
           <h1
             style={{
               margin: 0,
@@ -63,7 +98,7 @@ export default function GlobalError({
               letterSpacing: "-0.02em",
             }}
           >
-            Something went wrong.
+            {copy.title}
           </h1>
           <p
             className="ge-muted"
@@ -74,7 +109,7 @@ export default function GlobalError({
               color: "oklch(0.55 0.01 200)",
             }}
           >
-            Strive hit an unexpected error. Try reloading the page.
+            {copy.body}
           </p>
           <button
             type="button"
@@ -93,7 +128,7 @@ export default function GlobalError({
               color: "oklch(0.985 0 0)",
             }}
           >
-            Try again
+            {copy.retry}
           </button>
         </main>
       </body>

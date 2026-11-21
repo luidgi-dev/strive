@@ -854,7 +854,12 @@
   "error": {
     "title": "Something went wrong.",
     "body": "An unexpected error interrupted this page. You can try again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "back": "Back to Strive",
+    "notFound": {
+      "title": "This page doesn't exist.",
+      "body": "The link may be outdated, or the address mistyped."
+    }
   },
   "insights": {
     "title": "Insights",
